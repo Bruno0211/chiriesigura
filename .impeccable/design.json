@@ -1,0 +1,593 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T22:41:09.115Z",
+  "title": "Design System: ChirieSigură",
+  "extensions": {
+    "colorMeta": {
+      "frame": {
+        "role": "primary",
+        "displayName": "Secure-Zone Indigo",
+        "canonical": "#23205a",
+        "oklch": "oklch(28.5% 0.101 280.2)",
+        "tonalRamp": [
+          "#08081f",
+          "#1f1f42",
+          "#383a69",
+          "#545693",
+          "#767ab3",
+          "#9ca0cf",
+          "#c4c8eb",
+          "#ebedfe"
+        ]
+      },
+      "frame-hi": {
+        "role": "primary",
+        "displayName": "Raised Indigo",
+        "canonical": "#322e7a",
+        "oklch": "oklch(35.3% 0.125 280.2)",
+        "tonalRamp": [
+          "#080623",
+          "#1e1d49",
+          "#373773",
+          "#5253a0",
+          "#7478be",
+          "#9a9fd9",
+          "#c2c7f3",
+          "#ebedfe"
+        ]
+      },
+      "frame-ink": {
+        "role": "primary",
+        "displayName": "Frame White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#26241d",
+          "#433f36",
+          "#625d51",
+          "#848075",
+          "#a8a49b",
+          "#cdcac3",
+          "#f0eeea"
+        ]
+      },
+      "frame-ink-2": {
+        "role": "primary",
+        "displayName": "Frame Lilac Ink",
+        "canonical": "#d3cff4",
+        "oklch": "oklch(86.9% 0.051 290.3)",
+        "tonalRamp": [
+          "#0b0915",
+          "#242133",
+          "#3f3c54",
+          "#5d5978",
+          "#7f7c99",
+          "#a4a1b9",
+          "#cac8da",
+          "#eeedf9"
+        ]
+      },
+      "frame-muted": {
+        "role": "primary",
+        "displayName": "Muted Indigo",
+        "canonical": "#8f8bb0",
+        "oklch": "oklch(65.3% 0.055 289.7)",
+        "tonalRamp": [
+          "#0b0915",
+          "#242134",
+          "#3f3c56",
+          "#5d597a",
+          "#7f7c9b",
+          "#a4a1bb",
+          "#cac8db",
+          "#eeedfa"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Lilac-Grey Ground",
+        "canonical": "#f0eff6",
+        "oklch": "oklch(95.5% 0.009 292.8)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#24232a",
+          "#403e48",
+          "#5e5c68",
+          "#807f8a",
+          "#a5a3ac",
+          "#cac9d0",
+          "#eeeef3"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Statement White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#26241d",
+          "#433f36",
+          "#625d51",
+          "#848075",
+          "#a8a49b",
+          "#cdcac3",
+          "#f0eeea"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Faint Lilac",
+        "canonical": "#f8f7fc",
+        "oklch": "oklch(97.8% 0.007 295.5)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#24232a",
+          "#403e48",
+          "#5e5c68",
+          "#817e8a",
+          "#a5a3ac",
+          "#cbc9d0",
+          "#efeef2"
+        ]
+      },
+      "tab": {
+        "role": "neutral",
+        "displayName": "Tab Lilac",
+        "canonical": "#e4e1f2",
+        "oklch": "oklch(91.7% 0.023 294.0)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#24232b",
+          "#403e49",
+          "#5e5b69",
+          "#807e8b",
+          "#a5a3ae",
+          "#cbc9d1",
+          "#eeeef3"
+        ]
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected Lilac",
+        "canonical": "#ebe9f8",
+        "oklch": "oklch(94.0% 0.020 292.1)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#24232a",
+          "#403e48",
+          "#5e5c68",
+          "#807f8a",
+          "#a4a3ad",
+          "#cac9d1",
+          "#eeeef3"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline Lilac",
+        "canonical": "#cfcbe3",
+        "oklch": "oklch(85.3% 0.033 293.3)",
+        "tonalRamp": [
+          "#0b0a11",
+          "#24222e",
+          "#403d4d",
+          "#5e5a6f",
+          "#817d90",
+          "#a5a2b2",
+          "#cbc9d4",
+          "#eeedf5"
+        ]
+      },
+      "rule-soft": {
+        "role": "neutral",
+        "displayName": "Soft Hairline",
+        "canonical": "#e7e5f1",
+        "oklch": "oklch(92.7% 0.016 293.7)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#24232a",
+          "#403e48",
+          "#5e5c68",
+          "#807e8a",
+          "#a5a3ac",
+          "#cbc9d0",
+          "#eeeef2"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "#a9a4cc",
+        "oklch": "oklch(73.7% 0.057 290.6)",
+        "tonalRamp": [
+          "#0b0916",
+          "#242135",
+          "#3f3b57",
+          "#5d587b",
+          "#807c9c",
+          "#a4a1bc",
+          "#cac8dc",
+          "#eeedfb"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#15132b",
+        "oklch": "oklch(20.3% 0.047 285.2)",
+        "tonalRamp": [
+          "#0a0a14",
+          "#222232",
+          "#3d3d53",
+          "#5b5a77",
+          "#7d7d98",
+          "#a2a2b8",
+          "#c9c9d9",
+          "#ededf9"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "#45425e",
+        "oklch": "oklch(39.4% 0.047 289.0)",
+        "tonalRamp": [
+          "#0b0a14",
+          "#232232",
+          "#3f3d53",
+          "#5c5a76",
+          "#7f7d97",
+          "#a3a2b8",
+          "#cac8d9",
+          "#eeedf8"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3",
+        "canonical": "#575472",
+        "oklch": "oklch(46.1% 0.048 288.9)",
+        "tonalRamp": [
+          "#0b0914",
+          "#232232",
+          "#3f3c53",
+          "#5c5a77",
+          "#7f7d98",
+          "#a3a2b8",
+          "#c9c8da",
+          "#eeedf9"
+        ]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "Ledger Green",
+        "canonical": "#0f7a4a",
+        "oklch": "oklch(51.2% 0.118 156.8)",
+        "tonalRamp": [
+          "#001005",
+          "#002d17",
+          "#004d2c",
+          "#027042",
+          "#479268",
+          "#7bb491",
+          "#add6bc",
+          "#dbf7e4"
+        ]
+      },
+      "ok-bg": {
+        "role": "tertiary",
+        "displayName": "Ledger Green Tint",
+        "canonical": "#e2f2e9",
+        "oklch": "oklch(94.7% 0.021 161.5)",
+        "tonalRamp": [
+          "#080c0a",
+          "#1f2622",
+          "#38433d",
+          "#54615a",
+          "#77847d",
+          "#9da7a2",
+          "#c5cdc8",
+          "#ebf0ed"
+        ]
+      },
+      "fail": {
+        "role": "tertiary",
+        "displayName": "Refusal Red",
+        "canonical": "#b3261e",
+        "oklch": "oklch(50.1% 0.178 28.7)",
+        "tonalRamp": [
+          "#210000",
+          "#4c0000",
+          "#7a0a08",
+          "#aa211a",
+          "#cb5649",
+          "#e68679",
+          "#ffb5aa",
+          "#fee9e5"
+        ]
+      },
+      "fail-bg": {
+        "role": "tertiary",
+        "displayName": "Refusal Red Tint",
+        "canonical": "#fbe8e6",
+        "oklch": "oklch(94.6% 0.021 24.8)",
+        "tonalRamp": [
+          "#0f0a09",
+          "#2a2221",
+          "#483c3b",
+          "#695958",
+          "#8b7c7b",
+          "#ada1a0",
+          "#d1c8c7",
+          "#f3edec"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Notice Amber",
+        "canonical": "#8a5300",
+        "oklch": "oklch(49.4% 0.109 66.9)",
+        "tonalRamp": [
+          "#160700",
+          "#361d00",
+          "#5c3600",
+          "#855000",
+          "#a5753f",
+          "#c49c73",
+          "#e3c4a6",
+          "#feebd7"
+        ]
+      },
+      "warn-bg": {
+        "role": "tertiary",
+        "displayName": "Notice Amber Tint",
+        "canonical": "#fdf0d5",
+        "oklch": "oklch(95.8% 0.038 85.3)",
+        "tonalRamp": [
+          "#0f0b04",
+          "#292316",
+          "#473f2d",
+          "#675c46",
+          "#897f6b",
+          "#aca493",
+          "#d0cabd",
+          "#f2eee5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The one H1 per screen."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "Product name on the frame bar."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Record row labels, alert titles (700), button labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Leads (max 42ch) and reading pages (1.6, max 65ch)."
+      },
+      "body-small": {
+        "displayName": "Body small",
+        "purpose": "Row messages, notices, field labels (600), links (500)."
+      },
+      "label": {
+        "displayName": "Tab label",
+        "purpose": "Uppercase module tab headers; the frame zone label at 0.08em."
+      },
+      "mono-code": {
+        "displayName": "Mono code",
+        "purpose": "One-time-code cells at projector scale."
+      },
+      "mono-meta": {
+        "displayName": "Mono meta",
+        "purpose": "Indices, times, masked numbers, URLs, footers, step count and session clock; tabular figures."
+      },
+      "mono-state": {
+        "displayName": "Mono state",
+        "purpose": "Uppercase state words and tags."
+      }
+    },
+    "shadows": [
+      {
+        "name": "badge-float",
+        "value": "0 12px 32px rgb(21 19 43 / 0.22), 0 2px 6px rgb(21 19 43 / 0.14)",
+        "purpose": "Extension listing badge only: separates the badge from a third-party listing page. Phone pages carry no shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "System easing for every transition and entrance."
+      },
+      {
+        "name": "post",
+        "value": "clip-path inset(0 100% 0 0) to inset(0), opacity 0.35 to 1; 460ms ease-out; stagger 170ms per posted row",
+        "purpose": "A check result posts into the record like a printed line. Off under prefers-reduced-motion."
+      },
+      {
+        "name": "cell-in",
+        "value": "clip-path inset(100% 0 0 0) to inset(0); 420ms ease-out; delay 240ms + 110ms per cell",
+        "purpose": "Code cells reveal bottom-up. Off under prefers-reduced-motion."
+      },
+      {
+        "name": "checking-turn",
+        "value": "rotate 360deg; 1.6s linear infinite",
+        "purpose": "Dashed ring on a check that is actually running. Off under prefers-reduced-motion."
+      },
+      {
+        "name": "button-state",
+        "value": "background-color and color 160ms ease-out; :active translateY(1px)",
+        "purpose": "Button hover and press. Transition removed under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-record",
+        "value": "430px",
+        "purpose": "Below it the compact record hides per-row time so the code plate stays in the first screen at 390x844."
+      },
+      {
+        "name": "column",
+        "value": "480px",
+        "purpose": "Max width of the single page column and the frame content."
+      }
+    ],
+    "surfaces": [
+      {
+        "name": "Phone pages",
+        "path": "apps/web/app/(phone)/phone.module.css",
+        "role": "Canonical source of the tokens and components."
+      },
+      {
+        "name": "Extension listing badge",
+        "path": "apps/extension/lib/badge.css",
+        "role": "Re-declares the same colour, radius and easing tokens verbatim; bundles Public Sans and JetBrains Mono through the FontFace API (CS Public Sans / CS JetBrains Mono); reads as a code plate at badge scale. Carries the only shadow."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Full-width indigo action, pinned in the thumb zone.",
+      "html": "<button class=\"ds-btn-primary\">I agree — start the checks</button>",
+      "css": ".ds-btn-primary { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:54px; padding:12px 20px; border:0; border-radius:8px; background:var(--frame, #23205a); color:#ffffff; font:600 17px/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 160ms cubic-bezier(0.16, 1, 0.3, 1), color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background:var(--frame-hi, #322e7a); } .ds-btn-primary:active:not(:disabled) { transform:translateY(1px); } .ds-btn-primary:focus-visible { outline:3px solid var(--frame, #23205a); outline-offset:2px; } .ds-btn-primary:disabled { background:var(--frame-muted, #8f8bb0); cursor:not-allowed; } @media (prefers-reduced-motion: reduce) { .ds-btn-primary { transition:none; } }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White, indigo-stroked companion action, e.g. Copy the line.",
+      "html": "<button class=\"ds-btn-secondary\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"7\" width=\"9\" height=\"10\" rx=\"1.5\"/><path d=\"M4 13V4.5A1.5 1.5 0 0 1 5.5 3H12\"/></svg>Copy the line</button>",
+      "css": ".ds-btn-secondary { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:54px; padding:12px 20px; border:1px solid var(--frame, #23205a); border-radius:8px; background:var(--surface, #ffffff); color:var(--frame, #23205a); font:600 17px/1.25 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 160ms cubic-bezier(0.16, 1, 0.3, 1), color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-secondary svg { flex:none; } .ds-btn-secondary:hover { background:var(--selected, #ebe9f8); } .ds-btn-secondary:active { transform:translateY(1px); } .ds-btn-secondary:focus-visible { outline:3px solid var(--frame, #23205a); outline-offset:2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "52px white field with a 3px indigo focus ring; mono variant for numbers and IDs.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Your phone number</span><input class=\"ds-input ds-input-mono\" value=\"+40 700 000 001\"></label>",
+      "css": ".ds-field { display:grid; gap:6px; font-family:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color:var(--ink, #15132b); } .ds-field-label { font-size:15px; font-weight:600; } .ds-input { width:100%; min-height:52px; padding:12px 14px; border:1px solid var(--field, #a9a4cc); border-radius:6px; background:var(--surface, #ffffff); color:var(--ink, #15132b); font:17px/1.3 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-input-mono { font-family:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size:16px; letter-spacing:0.04em; font-variant-numeric:tabular-nums; } .ds-input:hover { border-color:var(--ink-3, #575472); } .ds-input:focus-visible { outline:3px solid var(--frame, #23205a); outline-offset:1px; border-color:var(--frame, #23205a); } .ds-input[aria-invalid='true'] { border-color:var(--fail, #b3261e); }"
+    },
+    {
+      "name": "Frame Bar",
+      "kind": "nav",
+      "refersTo": "frame-bar",
+      "description": "The secure-zone header: brand, zone label, connection chip, mono step count.",
+      "html": "<header class=\"ds-frame\"><div class=\"ds-frame-top\"><span class=\"ds-brand\">ChirieSigură</span><span class=\"ds-zone\">Secure verification</span></div><div class=\"ds-frame-meta\"><span class=\"ds-chip\"><span class=\"ds-dot\"></span>On mobile data</span><span class=\"ds-nums\">1 / 6</span></div></header>",
+      "css": ".ds-frame { background:var(--frame, #23205a); color:#ffffff; padding:14px 20px; font-family:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-frame-top { display:flex; justify-content:space-between; align-items:baseline; gap:12px; } .ds-brand { font-size:18px; font-weight:700; letter-spacing:-0.01em; } .ds-zone { font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--frame-ink-2, #d3cff4); } .ds-frame-meta { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px 12px; margin-top:12px; } .ds-chip { display:inline-flex; align-items:center; gap:8px; min-height:30px; padding:4px 12px; border-radius:15px; background:var(--frame-hi, #322e7a); font-size:13px; font-weight:500; line-height:1.3; } .ds-dot { width:8px; height:8px; border-radius:50%; background:#5bd69a; } .ds-nums { font:600 13px 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; letter-spacing:0.04em; font-variant-numeric:tabular-nums; color:var(--frame-ink-2, #d3cff4); }"
+    },
+    {
+      "name": "State Cell",
+      "kind": "chip",
+      "refersTo": "state-cell",
+      "description": "Mono uppercase state word with an icon; the only place state colour lives in the record.",
+      "html": "<span class=\"ds-state\" data-state=\"ok\"><svg viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 10.5l3.5 3.5 7.5-8\"/></svg>Passed</span> <span class=\"ds-state\" data-state=\"fail\"><svg viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5.5 5.5l9 9M14.5 5.5l-9 9\"/></svg>Failed</span> <span class=\"ds-state\" data-state=\"checking\"><svg viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"10\" cy=\"10\" r=\"6.5\" stroke-dasharray=\"3 3.2\"/></svg>Checking</span>",
+      "css": ".ds-state { display:inline-flex; align-items:center; gap:5px; min-height:30px; padding:4px 9px 4px 7px; border:1px solid var(--rule-soft, #e7e5f1); border-radius:4px; background:var(--surface-2, #f8f7fc); color:var(--ink-3, #575472); font:600 12px/1 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; } .ds-state svg { flex:none; width:16px; height:16px; } .ds-state[data-state='ok'] { border-color:transparent; background:var(--ok-bg, #e2f2e9); color:var(--ok, #0f7a4a); } .ds-state[data-state='fail'] { border-color:transparent; background:var(--fail-bg, #fbe8e6); color:var(--fail, #b3261e); } .ds-state[data-state='checking'] { border-color:var(--rule, #cfcbe3); color:var(--frame, #23205a); } .ds-state[data-state='checking'] svg { animation:ds-turn 1.6s linear infinite; } @keyframes ds-turn { to { transform:rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-state svg { animation:none; } }"
+    },
+    {
+      "name": "Confirmation Record",
+      "kind": "card",
+      "refersTo": "module",
+      "description": "Ruled white module: uppercase tab (contents left, source or data handling right), idx · label · state rows with message and mono meta beneath, mono provenance footer.",
+      "html": "<section class=\"ds-module\"><div class=\"ds-tab\"><h2>Confirmation record</h2><span>By your operator</span></div><ol class=\"ds-rows\"><li class=\"ds-row\"><span class=\"ds-idx\">01</span><p class=\"ds-what\">Phone number</p><span class=\"ds-st ok\">Passed</span><div class=\"ds-more\"><p class=\"ds-msg\">Phone number confirmed</p><p class=\"ds-meta\">14:31:07 · +40 7•• ••• 001</p></div></li><li class=\"ds-row active\"><span class=\"ds-idx\">02</span><p class=\"ds-what\">ID matches the SIM owner</p><span class=\"ds-st chk\">Checking</span></li></ol><p class=\"ds-foot\">via Nokia Network as Code · CAMARA</p></section>",
+      "css": ".ds-module { background:var(--surface, #ffffff); border:1px solid var(--rule, #cfcbe3); border-radius:6px; overflow:hidden; font-family:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color:var(--ink, #15132b); } .ds-tab { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px; padding:7px 12px; background:var(--tab, #e4e1f2); border-bottom:1px solid var(--rule, #cfcbe3); color:var(--ink-2, #45425e); font-size:12px; font-weight:600; line-height:1.3; letter-spacing:0.06em; text-transform:uppercase; } .ds-tab h2 { font:inherit; letter-spacing:inherit; margin:0; color:var(--ink, #15132b); white-space:nowrap; } .ds-rows { list-style:none; margin:0; padding:0; } .ds-row { display:grid; grid-template-columns:26px minmax(0,1fr) auto; column-gap:10px; row-gap:3px; align-items:center; padding:13px 12px; border-bottom:1px solid var(--rule-soft, #e7e5f1); } .ds-row:last-child { border-bottom:0; } .ds-idx { font:600 13px/1.6 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; color:var(--ink-3, #575472); } .ds-row.active .ds-idx { color:var(--frame, #23205a); } .ds-what { margin:0; font-size:17px; font-weight:600; line-height:1.3; } .ds-more { grid-column:2 / -1; } .ds-msg { margin:0; font-size:15px; line-height:1.4; color:var(--ink-2, #45425e); } .ds-meta { margin:4px 0 0; font:13px 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; font-variant-numeric:tabular-nums; color:var(--ink-3, #575472); } .ds-st { display:inline-flex; align-items:center; min-height:30px; padding:4px 9px; border:1px solid transparent; border-radius:4px; font:600 12px/1 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; letter-spacing:0.06em; text-transform:uppercase; } .ds-st.ok { background:var(--ok-bg, #e2f2e9); color:var(--ok, #0f7a4a); } .ds-st.chk { border-color:var(--rule, #cfcbe3); background:var(--surface-2, #f8f7fc); color:var(--frame, #23205a); } .ds-foot { margin:0; padding:9px 12px; border-top:1px solid var(--rule, #cfcbe3); background:var(--surface-2, #f8f7fc); color:var(--ink-3, #575472); font:12px 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; } .ds-row:not(.active) { animation:ds-post 460ms cubic-bezier(0.16, 1, 0.3, 1) backwards; } @keyframes ds-post { from { clip-path:inset(0 100% 0 0); opacity:0.35; } to { clip-path:inset(0); opacity:1; } } @media (prefers-reduced-motion: reduce) { .ds-row { animation:none !important; } }"
+    },
+    {
+      "name": "Code Plate",
+      "kind": "custom",
+      "refersTo": "code-cell",
+      "description": "The record's last line: indigo-tabbed module, muted VC- prefix and one-time-code cells with an inset ::after slot mark.",
+      "html": "<section class=\"ds-plate\"><div class=\"ds-plate-tab\"><h2>Your code</h2><span>Public · paste it</span></div><p class=\"ds-cells\"><span class=\"ds-prefix\">VC-</span><span class=\"ds-cell\" style=\"--i:0\">7</span><span class=\"ds-cell\" style=\"--i:1\">K</span><span class=\"ds-cell\" style=\"--i:2\">3</span><span class=\"ds-cell\" style=\"--i:3\">Q</span></p></section>",
+      "css": ".ds-plate { background:var(--surface, #ffffff); border:1px solid var(--frame, #23205a); border-radius:6px; overflow:hidden; } .ds-plate-tab { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:34px; padding:7px 12px; background:var(--frame, #23205a); color:var(--frame-ink-2, #d3cff4); font:600 12px/1.3 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; letter-spacing:0.06em; text-transform:uppercase; } .ds-plate-tab h2 { font:inherit; letter-spacing:inherit; margin:0; color:#ffffff; } .ds-cells { display:flex; justify-content:center; align-items:center; gap:8px; margin:0; padding:22px 12px 20px; font-family:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace; } .ds-prefix { margin-right:2px; font-size:30px; font-weight:600; color:var(--ink-2, #45425e); } .ds-cell { position:relative; display:grid; place-items:center; width:54px; height:70px; border:1px solid var(--rule, #cfcbe3); border-radius:6px; background:var(--surface-2, #f8f7fc); color:var(--frame, #23205a); font-size:40px; font-weight:700; line-height:1; animation:ds-cell-in 420ms cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay:calc(var(--i, 0) * 110ms + 240ms); } .ds-cell::after { content:''; position:absolute; right:9px; bottom:7px; left:9px; height:3px; border-radius:2px; background:var(--frame, #23205a); } @keyframes ds-cell-in { from { clip-path:inset(100% 0 0 0); } to { clip-path:inset(0); } } @media (prefers-reduced-motion: reduce) { .ds-cell { animation:none; } }"
+    },
+    {
+      "name": "Alert",
+      "kind": "card",
+      "refersTo": "alert",
+      "description": "Tinted state box: red by default, amber for warn, green for ok.",
+      "html": "<div class=\"ds-alert\" role=\"alert\"><p class=\"ds-alert-title\">We couldn't confirm this phone number</p><p class=\"ds-alert-body\">Switch to mobile data and try again</p></div>",
+      "css": ".ds-alert { padding:14px; border:1px solid #efc3be; border-radius:6px; background:var(--fail-bg, #fbe8e6); font-family:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-alert-title { margin:0; font-size:17px; font-weight:700; line-height:1.3; color:var(--fail, #b3261e); } .ds-alert-body { margin:4px 0 0; font-size:15px; line-height:1.5; color:var(--ink, #15132b); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Confirmation Screen",
+    "overview": "Every surface is a Romanian bank's 3-D Secure / SMS-code confirmation, not a KYC vendor card. A deep indigo frame bar marks the secure zone; under it, on a lilac-grey ground, white modules ruled in hairlines carry the record of what is being checked. Each network check posts a timestamped, masked line into a running record (`+40 7•• ••• 001`), and the issued code lands as the record's final line in segmented one-time-code cells, large enough to read off a projector.\n\nThe system is dense and procedural, the way a bank statement is: small uppercase tab headers name what a module holds and what happens to its data, numbers run in one tabular mono grammar, and colour is quarantined so that green and red always mean a result, never decoration. One column, one job per screen, the action pinned in the thumb zone. Trust is shown by naming the check, who runs it and what is never kept, not by security iconography.\n\nTwo surfaces share the system. The phone pages (`apps/web/app/(phone)/`) are the canonical source. The Chrome extension's listing badge (`apps/extension/lib/badge.css`) re-declares the same colour, radius and easing tokens verbatim, bundles the same two faces (loaded from bytes through the FontFace API as \"CS Public Sans\" and \"CS JetBrains Mono\" so a listing site's CSP cannot block them), and reads as a code plate at badge scale: indigo frame, status cell, ruled tab-headed modules.",
+    "keyCharacteristics": [
+      "Indigo frame bar over a lilac-grey ground; white ruled modules, no floating cards.",
+      "Every module opens with an uppercase tab naming its contents and its data handling.",
+      "Every number, code, time, masked identifier and state word in tabular JetBrains Mono.",
+      "State colour lives only where a result is stated; indigo marks the secure zone and what can be acted on now.",
+      "The confirmation record (idx · label · state) is the signature structure; the code plate is its last line.",
+      "Flat: depth is tonal layering and 1px rules, never shadow, on the phone pages."
+    ],
+    "rules": [
+      {
+        "name": "The Colour Quarantine Rule",
+        "body": "Green, red and amber appear only where a result or condition is stated: state cells and state icons, alerts, field errors and reasons, the connection chip and the session clock. Never on headings, module chrome, buttons, the ground or decoration. If a colour does not answer \"did it pass?\", it is not a state colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reserved Indigo Rule",
+        "body": "Indigo is the secure zone and the thing in hand: the frame, the action, the code plate, the active step and the check that is running. Neutral rows, finished rows and idle copy stay in the lilac inks. A second accent hue is not part of this system.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Mono Grammar Rule",
+        "body": "Every number, code, time, masked identifier, URL and state word is set in JetBrains Mono with tabular figures; words are never set in mono, numbers are never set in Public Sans. Two-digit indices (01–04) and \"n / of\" step counts, never progress dots.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fixed Thumb Zone Rule",
+        "body": "A screen's primary action is pinned to the bottom with `position: fixed`, over a 16px fade from transparent to the ground, with a 150px spacer at the end of the flow so content clears it. Not `sticky`: the root body's `overflow-x` makes sticky inert. Long forms use the inline action stack instead (12px gap, safe-area padding).",
+        "section": "layout"
+      },
+      {
+        "name": "The One Job Rule",
+        "body": "One H1, one module story, one primary action per screen; steps are counted in the frame (\"1 / 6\"), not drawn.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Secure Zone Rule",
+        "body": "On pages the product owns, no surface casts a shadow; a module is defined by its rule and its tab, not by lift.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Slot Mark Rule",
+        "body": "A one-time-code cell carries its underline as an inset mark: a 3px indigo bar with 2px radius, 9px in from each side and 7px up from the bottom, drawn by a pseudo-element inside the rounded cell. Never a thick bottom border on a rounded box, which bends around the corners.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** open every module with an uppercase tab naming its contents on the left and its data handling or source on the right.",
+      "**Do** set every number, code, time, masked identifier and state word in tabular JetBrains Mono.",
+      "**Do** mask personal data in the record (`+40 7•• ••• 001`) and keep the code whole on one line.",
+      "**Do** keep state colour inside state cells, alerts, field errors and the connection/session indicators; pair every colour with a word or an icon with a screen-reader word.",
+      "**Do** pin the primary action with `position: fixed` and a spacer; the root body's `overflow-x` makes `sticky` inert.",
+      "**Do** draw the one-time-code underline as an inset `::after` slot mark inside the rounded cell.",
+      "**Do** honour `prefers-reduced-motion` for the post wipe, the cell reveal and the checking ring.",
+      "**Do** keep strings pinned by tests verbatim (state words \"Passed\", \"Failed\", \"Checking\"; \"Proprietar verificat · ChirieSigură VC-XXXX\"; API messages shown as returned); change the test and the copy together or not at all.",
+      "**Do** use the 20px, 2px-stroke, currentColor SVG icon family for every icon."
+    ],
+    "donts": [
+      "**Don't** use green, red or amber on headings, buttons, module chrome or decoration.",
+      "**Don't** add a second accent hue or use indigo on idle or finished rows.",
+      "**Don't** lift phone-page modules with shadows or present them as floating white cards on white.",
+      "**Don't** use shield, padlock or check-circle-pop imagery; trust is stated in words in the record.",
+      "**Don't** draw progress dots or fake progress; count steps in mono in the frame and show a ring only while a check is actually running.",
+      "**Don't** put a thick bottom border on a rounded code cell.",
+      "**Don't** use `position: sticky` for the pinned action.",
+      "**Don't** reword verbatim strings pinned by tests or returned by the API."
+    ]
+  }
+}
