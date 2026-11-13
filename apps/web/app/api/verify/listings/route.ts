@@ -1,0 +1,65 @@
+import { and, eq } from 'drizzle-orm';
+import { generateCode, parseListingUrl, pasteLine, type ListingsRequest, type ListingsResponse } from '@cs/shared';
+import { getDb, type Db } from '@/lib/db';
+import { listing, verification } from '@/lib/db/schema';
+import { ownVerification } from '@/lib/landlord-auth';
+
+const isUniqueViolation = (e: unknown) => /unique|duplicate/i.test(String((e as { cause?: unknown })?.cause ?? e));
+
+async function issueCode(db: Db, verificationId: string): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = generateCode();
+    try {
+      await db.update(verification).set({ code, verifiedAt: new Date() }).where(eq(verification.id, verificationId));
+      return code;
+    } catch (e) {
+      if (!isUniqueViolation(e)) throw e;
+    }
+  }
+  throw new Error('Could not generate a unique code');
+}
+
+export async function POST(req: Request) {
+  const body = (await req.json().catch(() => null)) as Partial<ListingsRequest> | null;
+  if (!Array.isArray(body?.urls) || body.urls.some((u) => typeof u !== 'string')) {
+    return Response.json({ error: 'bad_request' }, { status: 400 });
+  }
+  const db = getDb();
+  const own = await ownVerification(db, req, body.verificationId);
+  if (own instanceof Response) return own;
+  const v = own.verification;
+  if (!v.locationResult) return Response.json({ error: 'location_not_verified' }, { status: 409 });
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
+  const out: ListingsResponse = { accepted: [], rejected: [] };
+  for (const raw of body.urls) {
+    const url = raw.trim();
+    const ref = parseListingUrl(url, appUrl);
+    if (!ref) {
+      out.rejected.push({ url: raw, reason: 'unparseable' });
+      continue;
+    }
+    const [existing] = await db
+      .select()
+      .from(listing)
+      .where(and(eq(listing.site, ref.site), eq(listing.siteListingId, ref.listingId)));
+    if (existing && existing.verificationId !== v.id) {
+      out.rejected.push({ url: raw, reason: 'already_registered' });
+      continue;
+    }
+    if (!existing) {
+      try {
+        await db.insert(listing).values({ verificationId: v.id, site: ref.site, siteListingId: ref.listingId, url });
+      } catch (e) {
+        if (!isUniqueViolation(e)) throw e;
+        out.rejected.push({ url: raw, reason: 'already_registered' });
+        continue;
+      }
+    }
+    out.accepted.push(ref);
+  }
+
+  const code = v.code ?? (out.accepted.length > 0 ? await issueCode(db, v.id) : undefined);
+  if (code) Object.assign(out, { code, pasteLine: pasteLine(code) });
+  return Response.json(out);
+}
