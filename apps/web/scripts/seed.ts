@@ -46,6 +46,8 @@ export async function seed(db: Db): Promise<void> {
 
 // Run directly (`pnpm seed`), not when a test imports it.
 if (/[\\/]scripts[\\/]seed\.ts$/.test(process.argv[1] ?? '')) {
+  // `vercel env pull` writes "[SENSITIVE]" for secrets; seeding with it silently breaks every phone match.
+  if (process.env.PHONE_PEPPER?.startsWith('[')) throw new Error('PHONE_PEPPER is a placeholder: set the real team value');
   seed(getDb()).then(
     () => {
       console.log(`Seeded: ${DEMO_CODE} on demo:d1 with ${EARLIER_NO_SHOWS.length} earlier no-shows; demo:d4 is free.`);
