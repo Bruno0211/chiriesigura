@@ -11,6 +11,42 @@
         ],
         "createdAt": "2026-11-13T20:42:19.111Z",
         "reason": "agent decided: throwaway decision-page sketch; the 6px line is the security-print microtext rule device, not body text"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-11-13T22:42:11.458Z",
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-11-13T22:42:12.125Z",
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-crouwel.html"
+        ],
+        "createdAt": "2026-11-13T22:42:12.765Z",
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-11-13T22:42:13.460Z",
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
       }
     ]
   }
