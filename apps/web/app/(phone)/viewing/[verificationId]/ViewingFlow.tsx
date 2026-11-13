@@ -343,7 +343,7 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
         <section className={s.module} aria-labelledby="landlord-reports">
           <div className={s.tab}>
             <h2 id="landlord-reports">This landlord so far</h2>
-            <span>Verified viewings only</span>
+            <span>Verified only</span>
           </div>
           <ul className={s.list}>
             {REPORT_CATEGORIES.filter((k) => st.counts![k] > 0).map((k) => (
