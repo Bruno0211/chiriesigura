@@ -1,0 +1,12 @@
+{
+  "name": "chiriesigura",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "pnpm -r test",
+    "dev:web": "pnpm --filter @cs/web dev",
+    "dev:ext": "pnpm --filter @cs/extension dev"
+  }
+}
