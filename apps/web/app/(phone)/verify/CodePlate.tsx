@@ -40,7 +40,7 @@ export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string
     <section className={s.plate} aria-labelledby="code-title">
       <div className={s.tab}>
         <h2 id="code-title">Your code</h2>
-        <span>Public · goes in your listings</span>
+        <span>Public · paste it</span>
       </div>
       <p className={s.cells}>
         <span className={s.srOnly}>{code}</span>
@@ -53,7 +53,18 @@ export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string
       </p>
       <div className={s.paste}>
         <p className={s.label}>Paste this line into each listing</p>
-        <p ref={lineRef} className={s.pasteLine}>{pasteLine}</p>
+        <p ref={lineRef} className={s.pasteLine}>
+          {/* Keep the code whole: a line break inside VC-7K3Q reads as two things. */}
+          {pasteLine.includes(code) ? (
+            <>
+              {pasteLine.slice(0, pasteLine.indexOf(code))}
+              <span className={s.nowrap}>{code}</span>
+              {pasteLine.slice(pasteLine.indexOf(code) + code.length)}
+            </>
+          ) : (
+            pasteLine
+          )}
+        </p>
         <button type="button" className={s.secondary} onClick={copyLine}>
           <CopyIcon />
           {copy === 'copied' ? 'Copied' : 'Copy the line'}

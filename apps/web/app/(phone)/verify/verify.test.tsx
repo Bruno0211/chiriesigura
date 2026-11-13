@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VerifyWizard } from './VerifyWizard';
 
@@ -92,8 +92,10 @@ describe('VerifyWizard', () => {
     await userEvent.type(screen.getByLabelText(/your listing links/i), 'http://localhost:3000/demo/listing/d1');
     await userEvent.click(screen.getByRole('button', { name: /register these listings/i }));
 
-    expect(await screen.findByText('VC-7K3Q')).toBeTruthy();
-    expect(screen.getByText('Proprietar verificat · ChirieSigură VC-7K3Q')).toBeTruthy();
+    const plate = await screen.findByRole('region', { name: /your code/i });
+    expect(within(plate).getAllByText('VC-7K3Q').length).toBeGreaterThan(0);
+    const pasteLine = screen.getByText((_, el) => el?.tagName === 'P' && el.textContent === 'Proprietar verificat · ChirieSigură VC-7K3Q');
+    expect(pasteLine).toBeTruthy();
     const identityBody = JSON.parse(String(fetchMock.mock.calls[0]![1]!.body));
     expect(identityBody).toMatchObject({ consent: true, idDocument: ID_NUMBER, givenName: 'Ana' });
   });

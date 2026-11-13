@@ -332,7 +332,7 @@ function IdentityForm({
         <section className={s.module} aria-labelledby={`${id}-idt`}>
           <div className={s.tab}>
             <h2 id={`${id}-idt`}>Your ID card</h2>
-            <span>To your operator · never saved</span>
+            <span>To operator · not saved</span>
           </div>
           <div className={s.fields}>
             {field('givenName', 'Given name', { autoComplete: 'given-name', autoCapitalize: 'words', spellCheck: false }, 'Exactly as on your ID card.')}
@@ -350,7 +350,7 @@ function IdentityForm({
         <section className={s.module} aria-labelledby={`${id}-apt`}>
           <div className={s.tab}>
             <h2 id={`${id}-apt`}>The apartment</h2>
-            <span>Kept · checked against your phone</span>
+            <span>Kept · location check</span>
           </div>
           <div className={s.fields}>
             {field(
@@ -630,9 +630,8 @@ function DoneScreen({
       <StepList
         steps={steps}
         times={st.times}
-        details={masked ? { number: masked } : undefined}
         compact
-        footer={st.issuedAt ? `Code issued ${shortDate(st.issuedAt)} · ${clockTime(st.issuedAt)}` : undefined}
+        footer={[masked, st.issuedAt && `code issued ${shortDate(st.issuedAt)}, ${clockTime(st.issuedAt)}`].filter(Boolean).join(' · ')}
       />
       {st.code && st.pasteLine && <CodePlate code={st.code} pasteLine={st.pasteLine} />}
 

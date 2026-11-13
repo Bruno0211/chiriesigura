@@ -47,7 +47,7 @@ export function ConsentScreen({
       <section className={s.module} aria-labelledby="consent-checks">
         <div className={s.tab}>
           <h2 id="consent-checks">What will be checked</h2>
-          <span>By your mobile operator</span>
+          <span>By your operator</span>
         </div>
         <ol className={s.rows} aria-labelledby="consent-checks">
           {ordered.map((name, i) => {
@@ -55,14 +55,14 @@ export function ConsentScreen({
             return (
               <li key={name} className={s.row}>
                 <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
-                <div className={s.rowBody}>
-                  <p className={s.what}>{c.label}</p>
-                  <p className={s.how}>{c.how}</p>
-                </div>
+                <p className={s.what}>{c.label}</p>
                 <span className={s.state} data-state="waiting">
                   <PendingIcon />
                   Pending
                 </span>
+                <div className={s.rowMore}>
+                  <p className={s.how}>{c.how}</p>
+                </div>
               </li>
             );
           })}
@@ -73,7 +73,7 @@ export function ConsentScreen({
       <section className={s.module} aria-labelledby="consent-data">
         <div className={s.tab}>
           <h2 id="consent-data">Your data</h2>
-          <span>GDPR · your consent</span>
+          <span>GDPR · consent</span>
         </div>
         <div className={s.split}>
           <div>
@@ -87,6 +87,7 @@ export function ConsentScreen({
         </div>
       </section>
 
+      <div className={s.actionsSpacer} aria-hidden="true" />
       <div className={s.actions}>
         <button type="button" className={s.primary} onClick={onAccept}>
           {acceptLabel}

@@ -42,7 +42,7 @@ export function StepList({
   details = {},
   labels = {},
   title = 'Confirmation record',
-  by = 'By your mobile operator',
+  by = 'By your operator',
   footer,
   compact = false,
 }: Props) {
@@ -62,18 +62,34 @@ export function StepList({
           const state: RowState = r ? (r.ok ? 'ok' : 'fail') : pending.includes(name) ? 'checking' : 'waiting';
           const style = r ? ({ '--i': posted++ } as CSSProperties) : undefined;
           const meta = [times[name], details[name]].filter(Boolean).join(' · ');
+          if (compact) {
+            // A finished record: one line per check, so the code below it stays in the first screen.
+            return (
+              <li key={`${name}:${state}`} className={`${s.row} ${s.rowCompact}`} data-state={state}>
+                <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
+                <p className={s.what}>{labels[name] ?? CHECK_COPY[name].label}</p>
+                <span className={s.meta}>{times[name]}</span>
+                <span className={s.stateIcon} data-state={state}>
+                  {STATE_ICON[state]}
+                  <span className={s.srOnly}>{STATE_WORD[state]}</span>
+                </span>
+              </li>
+            );
+          }
           return (
             <li key={`${name}:${state}`} className={r ? `${s.row} ${s.posted}` : s.row} data-state={state} style={style}>
               <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
-              <div className={s.rowBody}>
-                <p className={s.what}>{labels[name] ?? CHECK_COPY[name].label}</p>
-                {r && !compact && <p className={s.msg}>{r.message}</p>}
-                {meta && <p className={s.meta}>{meta}</p>}
-              </div>
+              <p className={s.what}>{labels[name] ?? CHECK_COPY[name].label}</p>
               <span className={s.state} data-state={state}>
                 {STATE_ICON[state]}
                 {STATE_WORD[state]}
               </span>
+              {((r && !compact) || meta) && (
+                <div className={s.rowMore}>
+                  {r && !compact && <p className={s.msg}>{r.message}</p>}
+                  {meta && <p className={s.meta}>{meta}</p>}
+                </div>
+              )}
             </li>
           );
         })}

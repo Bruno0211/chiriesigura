@@ -87,7 +87,7 @@ export function NumberStep({
         <section className={s.module} aria-labelledby={`${id}-title`}>
           <div className={s.tab}>
             <h2 id={`${id}-title`}>Your number</h2>
-            <span>Kept only as a one-way hash</span>
+            <span>Kept as a one-way hash</span>
           </div>
           <div className={s.fields}>
             <div className={s.field}>

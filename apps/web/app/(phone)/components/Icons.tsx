@@ -44,6 +44,13 @@ export const CopyIcon = () => (
   </Svg>
 );
 
+export const ClockIcon = () => (
+  <Svg>
+    <circle cx="10" cy="10" r="7" />
+    <path d="M10 6v4l2.5 2" />
+  </Svg>
+);
+
 export const ArrowIcon = () => (
   <Svg>
     <path d="M4 10h11.5M11 5.5l4.5 4.5-4.5 4.5" />

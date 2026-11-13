@@ -3,6 +3,7 @@
 import s from '../phone.module.css';
 import { SESSION_MS, countdown } from './flow';
 import { useConnection, useSeconds } from './hooks';
+import { ClockIcon } from './Icons';
 
 interface Props {
   /** Right-hand label naming the zone the visitor is in. */
@@ -38,7 +39,8 @@ export function FrameBar({ zone = 'Secure verification', step, sessionStartedAt 
           </p>
           <p className={s.frameNums}>
             {left !== null && (
-              <span className={left <= 60_000 ? s.clockLow : undefined}>
+              <span className={left <= 60_000 ? `${s.clock} ${s.clockLow}` : s.clock}>
+                <ClockIcon />
                 <span className={s.srOnly}>Number check valid for </span>
                 {left > 0 ? countdown(left) : 'expired'}
               </span>

@@ -8,7 +8,7 @@ export const CHECK_COPY: Record<CheckStepName, { label: string; how: string }> =
   number: { label: 'Phone number', how: 'Your operator confirms this phone owns the number.' },
   kyc: { label: "ID matches this SIM's owner", how: 'Your operator answers yes or no. Your ID details are never saved.' },
   simswap: { label: 'No recent SIM change', how: 'Nobody moved this number to a new SIM in the last 7 days.' },
-  location: { label: 'Phone near the apartment', how: 'Cell-level: near the address, never "inside the flat".' },
+  location: { label: 'Phone near the apartment', how: 'Cell-level: near the address, never “inside the flat”.' },
 };
 
 /** The Number Verification cookie lives 15 minutes (lib/nv-session.ts). */

@@ -251,7 +251,7 @@ function ReportForm({
           <div className={s.module}>
             <div className={s.tab}>
               <span>Something went wrong</span>
-              <span>Categories only, no text</span>
+              <span>Categories only</span>
             </div>
             {PROBLEMS.map(option)}
           </div>
@@ -321,9 +321,9 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
         <StepList
           steps={[NUMBER_STEP, AT_ADDRESS]}
           times={st.times}
-          details={masked ? { number: masked } : undefined}
           labels={RECORD_LABELS}
           compact
+          footer={masked}
         />
       )}
 
@@ -341,7 +341,7 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
         <section className={s.module} aria-labelledby="landlord-reports">
           <div className={s.tab}>
             <h2 id="landlord-reports">This landlord so far</h2>
-            <span>Verified viewings only</span>
+            <span>Verified viewings</span>
           </div>
           <p className={`${s.moduleBody} ${s.tally}`}>{line}</p>
         </section>
