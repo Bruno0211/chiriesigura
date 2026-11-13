@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Security Print — /verify step 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ground: #E3ECE6; --guilloche: #C7D3CC; --ink: #1C2B4A; --ink-2: #44506A; --rose: #7C3F7E; --paper: #F4F8F5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 390px; height: 844px; overflow: hidden; }
+  body {
+    color: var(--ink); font: 400 16px/1.45 "Archivo", system-ui, sans-serif;
+    background:
+      repeating-radial-gradient(circle at 110% -10%, transparent 0 7px, rgba(124,63,126,.07) 7px 8px),
+      repeating-radial-gradient(circle at -20% 120%, transparent 0 9px, rgba(28,43,74,.06) 9px 10px),
+      var(--ground);
+  }
+  .mono { font-family: "Martian Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .micro { font: 600 6px/1 "Martian Mono", monospace; letter-spacing: .18em; color: var(--rose); white-space: nowrap; overflow: hidden; }
+
+  header { padding: 14px 20px 12px; }
+  .brandline { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0; }
+  .brand { font-weight: 800; font-size: 20px; letter-spacing: .02em; }
+  .serial { font-size: 11px; color: var(--ink-2); }
+
+  main { padding: 6px 20px 0; }
+  h1 { font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; }
+  .lead { margin-top: 8px; color: var(--ink-2); }
+
+  .sheet { margin-top: 18px; background: var(--paper); border: 1px solid var(--guilloche); border-radius: 2px; padding: 14px 14px 10px; position: relative; }
+  .sheet::before { content: ""; position: absolute; inset: 4px; border: 1px solid rgba(124,63,126,.25); pointer-events: none; }
+  .sheet h2 { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); font-weight: 700; margin-bottom: 6px; }
+  .line { display: flex; align-items: baseline; gap: 8px; padding: 10px 0; border-bottom: 1px dotted #9AA9A0; }
+  .line:last-child { border-bottom: 0; }
+  .num { font-size: 13px; color: var(--rose); width: 26px; }
+  .what { font-weight: 700; font-size: 16px; }
+  .lead-dots { flex: 1; border-bottom: 2px dotted #B4C2B9; transform: translateY(-4px); }
+  .st { font-size: 11px; color: var(--ink-2); }
+
+  .sealrow { display: flex; gap: 14px; align-items: center; margin-top: 16px; }
+  .seal {
+    width: 104px; height: 104px; border-radius: 50%; flex: none;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(124,63,126,.55) 0 1deg, transparent 1deg 6deg),
+      radial-gradient(circle, var(--paper) 0 30%, transparent 31%),
+      repeating-radial-gradient(circle, rgba(28,43,74,.35) 0 1px, transparent 1px 5px);
+    border: 1px solid var(--rose);
+  }
+  .sealtxt { font-size: 14px; color: var(--ink-2); }
+  .sealtxt b { color: var(--ink); display: block; font-size: 16px; }
+
+  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 24px; }
+  .primary { display: flex; align-items: center; justify-content: center; height: 54px; background: var(--ink); color: #F4F8F5; font-weight: 700; font-size: 17px; border-radius: 3px; text-decoration: none; letter-spacing: .01em; }
+  .link { display: block; text-align: center; margin-top: 12px; font-size: 14px; color: var(--ink); text-decoration: underline; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="micro">CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ</div>
+    <div class="brandline"><span class="brand">ChirieSigură</span><span class="serial mono">STEP 1/6 · MOBILE DATA ✓</span></div>
+    <div class="micro">VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE</div>
+  </header>
+
+  <main>
+    <h1>Verify as a landlord</h1>
+    <p class="lead">Do this at the apartment, on mobile data. About 3 minutes.</p>
+
+    <section class="sheet">
+      <h2>Checked by your mobile operator</h2>
+      <div class="line"><span class="num mono">I</span><span class="what">Phone number</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
+      <div class="line"><span class="num mono">II</span><span class="what">ID matches SIM owner</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
+      <div class="line"><span class="num mono">III</span><span class="what">No SIM change, 7 days</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
+      <div class="line"><span class="num mono">IV</span><span class="what">Near the apartment</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
+    </section>
+
+    <div class="sealrow">
+      <div class="seal" aria-hidden="true"></div>
+      <p class="sealtxt"><b>Your code is printed here</b>Its pattern is generated from the code, so a copy shows.</p>
+    </div>
+  </main>
+
+  <div class="actions">
+    <a class="primary" href="#">I agree — start the checks</a>
+    <a class="link" href="#">What we keep, and what we never keep</a>
+  </div>
+</body>
+</html>

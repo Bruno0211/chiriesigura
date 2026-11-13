@@ -625,13 +625,23 @@ function DoneScreen({
   return (
     <>
       <h1 id="step-heading" tabIndex={-1} className={s.h1}>You&apos;re verified</h1>
-      <p className={s.lead}>Paste the line below into the description of each listing. Students&apos; ChirieSigură extension finds it.</p>
+      <p className={s.lead}>Paste the line below into each listing.</p>
 
       <StepList
         steps={steps}
         times={st.times}
         compact
-        footer={[masked, st.issuedAt && `code issued ${shortDate(st.issuedAt)}, ${clockTime(st.issuedAt)}`].filter(Boolean).join(' · ')}
+        footer={
+          <>
+            {masked}
+            {masked && st.issuedAt ? ' · ' : ''}
+            {st.issuedAt ? (
+              <>
+                issued <span className={s.nowrap}>{shortDate(st.issuedAt)}</span>, {clockTime(st.issuedAt).slice(0, 5)}
+              </>
+            ) : null}
+          </>
+        }
       />
       {st.code && st.pasteLine && <CodePlate code={st.code} pasteLine={st.pasteLine} />}
 

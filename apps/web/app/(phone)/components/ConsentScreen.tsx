@@ -4,13 +4,12 @@ import type { CheckStepName } from '@cs/shared';
 import type { ReactNode } from 'react';
 import s from '../phone.module.css';
 import { CHECK_COPY, CHECK_ORDER } from './flow';
-import { PendingIcon } from './Icons';
 
 export interface DataUse { kept: string[]; neverKept: string[] }
 
 export const LANDLORD_DATA: DataUse = {
-  kept: ['Check results and times', 'A one-way hash of your number', 'The apartment address', 'Your listing links'],
-  neverKept: ['Your ID number', 'Your name and birthdate', "Your phone's location", 'Your phone number itself'],
+  kept: ['Check results, times', 'Number hash (one-way)', 'Apartment address', 'Listing links'],
+  neverKept: ['ID card number', 'Name, birthdate', 'Phone location', 'Phone number'],
 };
 
 interface Props {
@@ -31,7 +30,7 @@ export function ConsentScreen({
   checks,
   onAccept,
   heading = 'Verify as a landlord',
-  lead = 'Do this at the apartment, on mobile data. About 3 minutes.',
+  lead = 'At the apartment, on mobile data, 3 min.',
   copy = {},
   data = LANDLORD_DATA,
   acceptLabel = 'I agree — start the checks',
@@ -53,13 +52,10 @@ export function ConsentScreen({
           {ordered.map((name, i) => {
             const c = copy[name] ?? CHECK_COPY[name];
             return (
-              <li key={name} className={s.row}>
+              <li key={name} className={`${s.row} ${s.rowTight}`}>
                 <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
                 <p className={s.what}>{c.label}</p>
-                <span className={s.state} data-state="waiting">
-                  <PendingIcon />
-                  Pending
-                </span>
+                <span className={s.stateWord}>Pending</span>
                 <div className={s.rowMore}>
                   <p className={s.how}>{c.how}</p>
                 </div>

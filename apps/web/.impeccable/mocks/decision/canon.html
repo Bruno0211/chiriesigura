@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Category standard — /verify step 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #111827; --muted: #4B5563; --line: #E5E7EB; --blue: #2563EB; --bg: #F9FAFB; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 390px; height: 844px; overflow: hidden; }
+  body { background: var(--bg); color: var(--ink); font: 400 16px/1.5 "Inter", system-ui, sans-serif; }
+  header { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 20px; background: #fff; border-bottom: 1px solid var(--line); }
+  .brand { font-weight: 700; font-size: 17px; }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .dots i:first-child { background: var(--blue); width: 20px; border-radius: 4px; }
+  .banner { margin: 16px 20px 0; padding: 10px 12px; border-radius: 10px; background: #EFF6FF; color: #1E40AF; font-size: 14px; }
+  .card { margin: 16px 20px 0; padding: 22px 20px; background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  ul { list-style: none; margin-top: 18px; }
+  li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); }
+  .ic { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #BFDBFE; flex: none; margin-top: 2px; }
+  .t { font-weight: 600; font-size: 15px; }
+  .d { color: var(--muted); font-size: 14px; }
+  .fine { margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 20px 26px; background: #fff; border-top: 1px solid var(--line); }
+  .primary { display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 12px; background: var(--blue); color: #fff; font-weight: 600; font-size: 16px; text-decoration: none; }
+  .link { display: block; text-align: center; margin-top: 10px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <header><span class="brand">ChirieSigură</span><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></header>
+  <div class="banner">Use mobile data, not Wi-Fi</div>
+  <section class="card">
+    <h1>Verify your identity</h1>
+    <p class="sub">We'll run four quick checks with your mobile operator. It takes about 3 minutes.</p>
+    <ul>
+      <li><span class="ic"></span><div><div class="t">Phone number</div><div class="d">Confirms this phone owns the number</div></div></li>
+      <li><span class="ic"></span><div><div class="t">ID match</div><div class="d">Your ID matches the SIM owner</div></div></li>
+      <li><span class="ic"></span><div><div class="t">SIM swap</div><div class="d">No SIM change in the last 7 days</div></div></li>
+      <li><span class="ic"></span><div><div class="t">Location</div><div class="d">Your phone is near the apartment</div></div></li>
+    </ul>
+    <p class="fine">We never store your ID number, name or birthdate.</p>
+  </section>
+  <div class="actions">
+    <a class="primary" href="#">Continue</a>
+    <a class="link" href="#">Privacy policy</a>
+  </div>
+</body>
+</html>

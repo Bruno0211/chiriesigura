@@ -1,0 +1,3 @@
+- UI language English (Romanian only in the product name and the paste line \"Proprietar verificat · ChirieSigură VC-XXXX\").
+- Demo: phone mirrored to a projector, so the check record and the issued code must read across a room.
+- Verbatim strings required by the team plan tests (must not change): "Use mobile data, not Wi-Fi", "Switch to mobile data and try again", "We couldn't confirm this phone number", "This SIM was changed in the last 7 days", "Already registered — contact us", "You need to be at the apartment to report", "You've already reported this viewing", the five report category labels including "✅ All good".

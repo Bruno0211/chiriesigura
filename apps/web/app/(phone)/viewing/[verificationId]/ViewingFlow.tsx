@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  REPORT_CATEGORIES,
   findCode,
   reportLine,
   type CheckStep,
@@ -47,9 +48,10 @@ const STUDENT_COPY = {
   location: { label: 'Phone at the viewing address', how: 'Checked when you send. Cell-level: near the address, never "inside".' },
 };
 const STUDENT_DATA: DataUse = {
-  kept: ['What you report and when', 'A one-way hash of your number, so each phone reports once'],
-  neverKept: ['Your phone number itself', "Your phone's location", 'Any free text: reports are categories only'],
+  kept: ['Your report, its time', 'Number hash (one-way)'],
+  neverKept: ['Phone number', 'Phone location', 'Any free text'],
 };
+const TALLY_LABEL: Record<ReportCategory, string> = { ...LABEL, ok: 'All good' };
 const RECORD_LABELS = { location: STUDENT_COPY.location.label };
 
 const NUMBER_STEP: CheckStep = { name: 'number', ok: true, message: 'Phone number confirmed' };
@@ -337,13 +339,24 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
         </section>
       )}
 
-      {line && (
+      {st.counts && line && (
         <section className={s.module} aria-labelledby="landlord-reports">
           <div className={s.tab}>
             <h2 id="landlord-reports">This landlord so far</h2>
-            <span>Verified viewings</span>
+            <span>Verified viewings only</span>
           </div>
-          <p className={`${s.moduleBody} ${s.tally}`}>{line}</p>
+          <ul className={s.list}>
+            {REPORT_CATEGORIES.filter((k) => st.counts![k] > 0).map((k) => (
+              <li key={k} className={s.tallyRow}>
+                <span className={s.tallyNum}>{st.counts![k]}</span>
+                <span>{TALLY_LABEL[k]}</span>
+                {k === 'ok' ? <CheckIcon /> : <span />}
+              </li>
+            ))}
+          </ul>
+          <p className={s.footNote}>
+            On the listing badge: <span>{line}</span>
+          </p>
         </section>
       )}
     </>

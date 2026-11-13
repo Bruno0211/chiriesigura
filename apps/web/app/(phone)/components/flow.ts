@@ -5,10 +5,10 @@ export const CHECK_ORDER: readonly CheckStepName[] = ['number', 'kyc', 'simswap'
 
 /** Plain-words copy for each check: the record label, and what the consent screen says it does. */
 export const CHECK_COPY: Record<CheckStepName, { label: string; how: string }> = {
-  number: { label: 'Phone number', how: 'Your operator confirms this phone owns the number.' },
-  kyc: { label: "ID matches this SIM's owner", how: 'Your operator answers yes or no. Your ID details are never saved.' },
-  simswap: { label: 'No recent SIM change', how: 'Nobody moved this number to a new SIM in the last 7 days.' },
-  location: { label: 'Phone near the apartment', how: 'Cell-level: near the address, never “inside the flat”.' },
+  number: { label: 'Phone number', how: 'Confirms this phone owns the number.' },
+  kyc: { label: 'ID matches the SIM owner', how: 'A yes or no. Your ID is never saved.' },
+  simswap: { label: 'No recent SIM change', how: 'No new SIM for this number in 7 days.' },
+  location: { label: 'Phone near the apartment', how: 'Cell-level: near, never “inside”.' },
 };
 
 /** The Number Verification cookie lives 15 minutes (lib/nv-session.ts). */

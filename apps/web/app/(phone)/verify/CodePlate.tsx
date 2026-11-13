@@ -52,7 +52,7 @@ export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string
         ))}
       </p>
       <div className={s.paste}>
-        <p className={s.label}>Paste this line into each listing</p>
+        <p className={s.label}>The ChirieSigură extension looks for this line</p>
         <p ref={lineRef} className={s.pasteLine}>
           {/* Keep the code whole: a line break inside VC-7K3Q reads as two things. */}
           {pasteLine.includes(code) ? (

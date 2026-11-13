@@ -195,7 +195,7 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 20px 0;
+  padding: 20px 20px 0;
 }
 
 .h1 {
@@ -250,7 +250,7 @@
 /* ── Ruled modules with a tab ───────────────────────────────────────── */
 
 .module {
-  margin-top: 20px;
+  margin-top: 18px;
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -258,7 +258,7 @@
 }
 
 .module + .module {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .tab {
@@ -327,9 +327,44 @@
   grid-column: 2 / -1;
 }
 
+/* Consent: the whole story (record, footer, kept / never kept) fits above the pinned action at 390x844. */
+.rowTight {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.rowTight .what {
+  font-size: 16px;
+}
+
+.rowTight .how {
+  font-size: 14px;
+}
+
+/* Nothing has run yet, so a plain word, not a progress ring. */
+.stateWord {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
 .rowCompact {
   grid-template-columns: 26px minmax(0, 1fr) auto auto;
   padding: 9px 12px;
+}
+
+/* Narrow: the footer carries the issue time, so the code plate stays on the first screen. */
+@media (max-width: 430px) {
+  .rowCompact {
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+  }
+
+  .rowCompact .meta {
+    display: none;
+  }
 }
 
 .rowCompact .what {
@@ -490,7 +525,7 @@
 }
 
 .split > div {
-  padding: 12px;
+  padding: 10px 12px;
 }
 
 .split > div + div {
@@ -498,7 +533,7 @@
 }
 
 .split h3 {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   font-size: 15px;
   font-weight: 700;
 }
@@ -508,7 +543,7 @@
 }
 
 .split li {
-  padding: 2px 0;
+  padding: 1px 0;
   font-size: 14px;
   line-height: 1.4;
   color: var(--ink-2);
@@ -523,8 +558,13 @@
   bottom: 0;
   left: 0;
   z-index: 10;
-  padding: 26px 20px max(16px, env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, rgb(240 239 246 / 0), var(--ground) 24px);
+  padding: 18px 20px max(12px, env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgb(240 239 246 / 0), var(--ground) 16px);
+}
+
+.actions .centerLink {
+  margin-top: 4px;
+  padding: 2px 0;
 }
 
 .actions > * {
@@ -902,12 +942,41 @@ textarea.input {
   color: var(--fail);
 }
 
-.tally {
-  font-family: var(--mono);
+/* Viewing tally: one ruled row per category, a mono figure, the label in words. */
+.tallyRow {
+  display: grid;
+  grid-template-columns: 3ch minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule-soft);
   font-size: 16px;
-  font-weight: 600;
-  line-height: 1.5;
+}
+
+.tallyRow:last-child {
+  border-bottom: 0;
+}
+
+.tallyNum {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tallyRow svg {
+  color: var(--ok);
+}
+
+.footNote {
+  padding: 9px 12px;
+  border-top: 1px solid var(--rule);
+  background: var(--surface-2);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-2);
 }
 
 /* ── Report options ─────────────────────────────────────────────────── */
