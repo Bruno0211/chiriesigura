@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "tiny-text",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-11-13T20:42:19.111Z",
+        "reason": "agent decided: throwaway decision-page sketch; the 6px line is the security-print microtext rule device, not body text"
+      }
+    ]
+  }
+}
