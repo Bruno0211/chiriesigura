@@ -1,0 +1,41 @@
+<!doctype html>
+<!--
+  Trimmed OLX listing page structure, hand-written: olx.ro refuses automated fetches,
+  so this keeps OLX's own hooks (data-cy="ad_description", data-testid="contact-phone")
+  with neutral placeholder text. Replace with a real page saved via Ctrl+S (kickoff, Person 4)
+  and trimmed, then re-run the extract tests.
+  Page URL used by the tests: https://www.olx.ro/d/oferta/apartament-2-camere-zona-complex-IDhXyZ1.html
+-->
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <title>Apartament 2 camere zona Complex • OLX.ro</title>
+  </head>
+  <body>
+    <div id="mainContent">
+      <div data-cy="ad_title" data-testid="ad_title"><h4>Apartament 2 camere zona Complex</h4></div>
+      <div data-testid="ad-price-container"><h3>400 €</h3></div>
+      <ul data-testid="ad-parameters-container">
+        <li><p>Persoana fizica</p></li>
+        <li><p>Compartimentare: Decomandat</p></li>
+        <li><p>Suprafata utila: 52 m²</p></li>
+      </ul>
+      <div data-cy="ad_description" data-testid="ad_description">
+        <h3>Descriere</h3>
+        <div>Ofer spre închiriere apartament cu 2 camere, decomandat, etaj 2. Mobilat complet, centrală proprie.<br />Disponibil de la 1 decembrie. Fără animale.</div>
+      </div>
+      <div data-testid="ad-footer-bar-section"><span>ID: 290001234</span><span>Vizualizări: 312</span></div>
+    </div>
+    <aside data-testid="aside">
+      <div data-testid="user-profile-user-name"><h4>Proprietar</h4></div>
+      <div data-testid="phones-container">
+        <button data-testid="show-phone" type="button">Arată</button>
+        <span>xxx xxx xxx</span>
+      </div>
+    </aside>
+    <div data-testid="other-ads">
+      <h2>Alte anunțuri ale vânzătorului</h2>
+      <a href="/d/oferta/garsoniera-IDzzzz9.html">Garsonieră · Proprietar verificat · ChirieSigură VC-ZZZZ</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+import type { Extracted } from './extract';
+
+const base = (appUrl: string) => appUrl.replace(/\/+$/, '');
+
+/** GET /api/check with whatever the page had. The phone goes only to this comparison and is never logged. */
+export function checkUrl(appUrl: string, e: Extracted): string {
+  const q = new URLSearchParams();
+  if (e.listing) {
+    q.set('site', e.listing.site);
+    q.set('listingId', e.listing.listingId);
+  }
+  if (e.code) q.set('code', e.code);
+  if (e.phone) q.set('phone', e.phone);
+  const qs = q.toString();
+  return `${base(appUrl)}/api/check${qs ? `?${qs}` : ''}`;
+}
+
+/** The phone page a student opens at the viewing; ?code= lets it name the listing. */
+export function viewingUrl(appUrl: string, verificationId: string, code: string | null): string {
+  const path = `${base(appUrl)}/viewing/${encodeURIComponent(verificationId)}`;
+  return code ? `${path}?code=${encodeURIComponent(code)}` : path;
+}
+
+export const verifyUrl = (appUrl: string): string => `${base(appUrl)}/verify`;
+
+export const askMessage = (appUrl: string): string =>
+  `Hi! Before I visit, could you verify your listing on ChirieSigură? It takes 2 minutes: ${verifyUrl(appUrl)}`;

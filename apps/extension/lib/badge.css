@@ -1,0 +1,663 @@
+/*
+ * ChirieSigură listing badge: The Confirmation Screen, at badge scale.
+ * Tokens are the phone pages' (apps/web/app/(phone)/phone.module.css). The badge reads as a code plate:
+ * an indigo frame bar over a status cell, the only place state colour lives, and ruled tab-headed modules below.
+ */
+
+/* !important here outranks the listing site's own rules for this element (inner-context important wins). */
+:host {
+  all: initial !important;
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: 2147483647 !important;
+  display: block !important;
+  width: min(360px, calc(100vw - 32px)) !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+:host([data-mode='popup']) {
+  position: static !important;
+  width: 100% !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.cs {
+  --frame: #23205a;
+  --frame-hi: #322e7a;
+  --frame-ink-2: #d3cff4;
+  --ground: #f0eff6;
+  --surface: #ffffff;
+  --surface-2: #f8f7fc;
+  --tab: #e4e1f2;
+  --rule: #cfcbe3;
+  --rule-soft: #e7e5f1;
+  --field: #a9a4cc;
+  --ink: #15132b;
+  --ink-2: #45425e;
+  --ink-3: #575472;
+  --ok: #0f7a4a;
+  --ok-bg: #e2f2e9;
+  --fail: #b3261e;
+  --fail-bg: #fbe8e6;
+  --warn: #8a5300;
+  --warn-bg: #fdf0d5;
+  --radius: 6px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --text: 'CS Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'CS JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
+  border: 1px solid var(--frame);
+  border-radius: var(--radius);
+  background: var(--ground);
+  box-shadow:
+    0 12px 32px rgb(21 19 43 / 0.22),
+    0 2px 6px rgb(21 19 43 / 0.14);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  caret-color: var(--frame);
+  -webkit-font-smoothing: antialiased;
+}
+
+:host([data-mode='popup']) .cs {
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+::selection {
+  background: #d3cff4;
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--frame);
+  outline-offset: 2px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── Head: frame bar + status cell ──────────────────────────────────── */
+
+.head {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+}
+
+button.head {
+  cursor: pointer;
+}
+
+button.head:focus-visible {
+  outline-offset: -3px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: var(--frame);
+  color: #ffffff;
+  transition: background-color 160ms var(--ease-out);
+}
+
+button.head:hover .bar {
+  background: var(--frame-hi);
+}
+
+.brand {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.zone {
+  margin-left: auto;
+  color: var(--frame-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chev {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--frame-ink-2);
+  transition: transform 220ms var(--ease-out);
+}
+
+.cs[data-open='true'] .chev {
+  transform: rotate(180deg);
+}
+
+.status {
+  --tone: var(--ink-3);
+  --tone-bg: var(--tab);
+  --tone-ink: var(--ink);
+
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 11px 12px 12px;
+  background: var(--tone-bg);
+}
+
+.status[data-tone='ok'] {
+  --tone: var(--ok);
+  --tone-bg: var(--ok-bg);
+  --tone-ink: var(--ok);
+}
+
+.status[data-tone='warn'] {
+  --tone: var(--warn);
+  --tone-bg: var(--warn-bg);
+  --tone-ink: var(--warn);
+}
+
+.status[data-tone='fail'] {
+  --tone: var(--fail);
+  --tone-bg: var(--fail-bg);
+  --tone-ink: var(--fail);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--tone);
+  color: #ffffff;
+}
+
+.mark[data-tone='none'] {
+  background: var(--surface);
+  color: var(--ink-3);
+}
+
+.mark svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mark[data-busy='true'] svg {
+  animation: turn 1.6s linear infinite;
+}
+
+.label {
+  display: block;
+  min-width: 0;
+  padding-top: 5px;
+  color: var(--tone-ink);
+}
+
+.lead {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.rest {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.sep {
+  display: none;
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A result posts into the badge like a printed line: the phone record's left-to-right wipe. */
+.posted {
+  animation: post 460ms var(--ease-out) backwards;
+}
+
+@keyframes post {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Panel ──────────────────────────────────────────────────────────── */
+
+.panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 10px 12px;
+  border-top: 1px solid var(--rule);
+  scrollbar-width: thin;
+  scrollbar-color: var(--field) transparent;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+:host([data-mode='popup']) .panel {
+  overflow: visible;
+}
+
+.module {
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.tab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--tab);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tab h2 {
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+}
+
+.tab > span {
+  text-align: right;
+}
+
+.foot {
+  padding: 7px 10px;
+  border-top: 1px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The listing record ─────────────────────────────────────────────── */
+
+.rows {
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.idx {
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.row[data-row='fail'] .idx {
+  color: var(--fail);
+}
+
+.what {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.rowMore {
+  grid-column: 2 / -1;
+}
+
+.meta {
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.msg {
+  margin-top: 1px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.row[data-row='fail'] .msg {
+  color: var(--ink);
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  padding: 3px 7px 3px 5px;
+  border: 1px solid var(--rule-soft);
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.state svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.state[data-state='ok'] {
+  border-color: transparent;
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.state[data-state='fail'] {
+  border-color: transparent;
+  background: var(--fail-bg);
+  color: var(--fail);
+}
+
+/* Two facts in the landlord record's footer, one per line. */
+.footLine {
+  display: block;
+}
+
+/* ── Reports ────────────────────────────────────────────────────────── */
+
+.reportLine {
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.reportWarn {
+  color: var(--warn);
+}
+
+.note {
+  padding: 7px 10px;
+  border-top: 1px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* ── Report a viewing ───────────────────────────────────────────────── */
+
+.qrBody {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 10px;
+}
+
+.qr svg {
+  display: block;
+  width: 124px;
+  height: 124px;
+}
+
+.qrText p {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.qrText p + p {
+  margin-top: 4px;
+}
+
+.qrText .qrLead {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--frame);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.link svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ── Ask the landlord ───────────────────────────────────────────────── */
+
+.askBody {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.message {
+  padding: 8px 10px;
+  border: 1px dashed var(--field);
+  border-radius: 4px;
+  background: var(--surface-2);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-out);
+}
+
+.primary {
+  border: 0;
+  background: var(--frame);
+  color: #ffffff;
+}
+
+.primary:hover {
+  background: var(--frame-hi);
+}
+
+.secondary {
+  margin-top: 10px;
+  border: 1px solid var(--frame);
+  background: var(--surface);
+  color: var(--frame);
+}
+
+.secondary:hover {
+  background: #ebe9f8;
+}
+
+.primary:active,
+.secondary:active {
+  transform: translateY(1px);
+}
+
+.primary svg,
+.secondary svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.hint {
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* ── Popup: where it works ──────────────────────────────────────────── */
+
+.sites {
+  list-style: none;
+}
+
+.sites li {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sites li:last-child {
+  border-bottom: 0;
+}
+
+a.primary {
+  text-decoration: none;
+}
+
+/* ── Warnings and plain lines ───────────────────────────────────────── */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #efc3be;
+  border-radius: var(--radius);
+  background: var(--fail-bg);
+  color: var(--fail);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.alert svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+.plain {
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posted,
+  .mark[data-busy='true'] svg {
+    animation: none;
+  }
+
+  .chev,
+  .bar,
+  .primary,
+  .secondary {
+    transition: none;
+  }
+}

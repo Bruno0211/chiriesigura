@@ -1,25 +1,21 @@
 import './style.css';
-import wxtLogo from '/wxt.svg';
+import { renderBadge, renderEmpty, renderState } from '@/lib/badge-ui';
+import { APP_URL } from '@/lib/config';
+import { loadFonts } from '@/lib/fonts';
+import { tabKey, type TabState } from '@/lib/messages';
 
-import typescriptLogo from '@/assets/typescript.svg';
-import { setupCounter } from '@/components/counter';
+/** The toolbar popup: the verdict for the listing in the active tab, open in full, or where the badge works. */
+async function main() {
+  const host = document.querySelector<HTMLElement>('#app')!;
+  void loadFonts();
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  const key = tab?.id === undefined ? null : tabKey(tab.id);
+  const state = key ? ((await browser.storage.session.get(key))[key] as TabState | undefined) : undefined;
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://wxt.dev" target="_blank">
-      <img src="${wxtLogo}" class="logo" alt="WXT logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>WXT + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the WXT and TypeScript logos to learn more
-    </p>
-  </div>
-`;
+  if (!state) return renderEmpty(host, { appUrl: APP_URL });
+  const opts = { appUrl: APP_URL, code: state.extracted.code, phoneShown: state.extracted.phone !== null, mode: 'popup' as const };
+  if (state.reply.ok) renderBadge(host, state.reply.data, opts);
+  else renderState(host, 'unavailable', { ...opts, onRetry: () => tab?.id !== undefined && void browser.tabs.reload(tab.id) });
+}
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!);
+void main();
