@@ -3,7 +3,7 @@ import type { LocationRequest, LocationResponse } from '@cs/shared';
 import { getDb } from '@/lib/db';
 import { verification } from '@/lib/db/schema';
 import { ownVerification } from '@/lib/landlord-auth';
-import { network } from '@/lib/network';
+import { CHECK_ERROR, network } from '@/lib/network';
 
 const NOT_NEAR = "Your phone isn't near this address. Open this page at the apartment, on mobile data.";
 
@@ -15,7 +15,10 @@ export async function POST(req: Request) {
   const { verification: v, e164 } = own;
 
   const radiusM = Number(process.env.LOCATION_RADIUS_M ?? 2000);
-  const result = await network().verifyLocation(e164, { lat: v.lat, lng: v.lng, radiusM });
+  const result = await network().verifyLocation(e164, { lat: v.lat, lng: v.lng, radiusM }).catch(() => null);
+  if (result === null) {
+    return Response.json({ ok: false, step: { name: 'location', ok: false, message: CHECK_ERROR } } satisfies LocationResponse);
+  }
   if (result !== 'TRUE' && result !== 'PARTIAL') {
     return Response.json({ ok: false, step: { name: 'location', ok: false, message: NOT_NEAR } } satisfies LocationResponse);
   }

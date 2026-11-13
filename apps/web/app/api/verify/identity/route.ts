@@ -3,7 +3,7 @@ import { getDb } from '@/lib/db';
 import { landlord, verification } from '@/lib/db/schema';
 import { geocode } from '@/lib/geocode';
 import { phoneHash } from '@/lib/hash';
-import { kycPasses, network } from '@/lib/network';
+import { CHECK_ERROR, kycPasses, network } from '@/lib/network';
 import { readNv } from '@/lib/nv-session';
 
 const SIM_SWAP_WINDOW_HOURS = 168;
@@ -18,19 +18,23 @@ export async function POST(req: Request) {
   if (!nv) return Response.json({ error: 'not_number_verified' }, { status: 401 });
   const b = body as IdentityRequest;
 
-  // ID fields go to the operator only; nothing below persists them.
+  // ID fields go to the operator only; nothing below persists them. A failed operator call becomes null, shown as "couldn't run".
   const [kyc, swapped] = await Promise.all([
-    network().kycMatch(nv.e164, { givenName: b.givenName, familyName: b.familyName, birthdate: b.birthdate, idDocument: b.idDocument }),
-    network().simSwapped(nv.e164, SIM_SWAP_WINDOW_HOURS),
+    network().kycMatch(nv.e164, { givenName: b.givenName, familyName: b.familyName, birthdate: b.birthdate, idDocument: b.idDocument }).catch(() => null),
+    network().simSwapped(nv.e164, SIM_SWAP_WINDOW_HOURS).catch(() => null),
   ]);
   const steps: CheckStep[] = [
     { name: 'number', ok: true, message: 'Phone number confirmed' },
-    kycPasses(kyc)
-      ? { name: 'kyc', ok: true, message: "ID details match this phone number's owner" }
-      : { name: 'kyc', ok: false, message: "Your ID details don't match this phone number's owner" },
-    swapped
-      ? { name: 'simswap', ok: false, message: 'This SIM was changed in the last 7 days' }
-      : { name: 'simswap', ok: true, message: 'No recent SIM change' },
+    kyc === null
+      ? { name: 'kyc', ok: false, message: CHECK_ERROR }
+      : kycPasses(kyc)
+        ? { name: 'kyc', ok: true, message: "ID details match this phone number's owner" }
+        : { name: 'kyc', ok: false, message: "Your ID details don't match this phone number's owner" },
+    swapped === null
+      ? { name: 'simswap', ok: false, message: CHECK_ERROR }
+      : swapped
+        ? { name: 'simswap', ok: false, message: 'This SIM was changed in the last 7 days' }
+        : { name: 'simswap', ok: true, message: 'No recent SIM change' },
   ];
   if (steps.some((s) => !s.ok)) return Response.json({ ok: false, steps } satisfies IdentityResponse);
 

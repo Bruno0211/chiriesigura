@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReportResponse } from '@cs/shared';
 import { makeTestDb } from '@/lib/db/test-db';
-import { viewingReport } from '@/lib/db/schema';
+import { verification, viewingReport } from '@/lib/db/schema';
+import { mockNetwork } from '@/lib/network/mock';
 import { issueNvCookie } from '@/lib/nv-session';
 import { addReports, seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
@@ -14,6 +15,7 @@ beforeEach(async () => {
   db = await makeTestDb();
   ({ verificationId } = await seedVerified(db));
 });
+afterEach(() => vi.restoreAllMocks());
 
 const report = (body: object, phone?: string) =>
   POST(new Request('http://localhost:3000/api/viewing/report', {
@@ -67,6 +69,22 @@ describe('POST /api/viewing/report', () => {
 
   it('404s an unknown verification', async () => {
     expect((await report({ ...ok('ok'), verificationId: '00000000-0000-0000-0000-000000000000' }, '+40711111111')).status).toBe(404);
+  });
+
+  it('counts one student once per landlord, even across several verifications', async () => {
+    const [v2] = await db.insert(verification).values({
+      landlordId: (await db.select().from(verification))[0]!.landlordId, code: 'VC-AAAA', addressText: 'x', lat: 45.75, lng: 21.22, locationResult: 'TRUE', verifiedAt: new Date(),
+    }).returning();
+    await report(ok('no_show'), '+40711111111');
+    const res = await report({ ...ok('no_show'), verificationId: v2!.id }, '+40711111111');
+    expect(((await res.json()) as ReportResponse).counts?.no_show).toBe(1);
+  });
+
+  it('answers 503 when the operator call fails', async () => {
+    vi.spyOn(mockNetwork, 'verifyLocation').mockRejectedValueOnce(new Error('nokia down'));
+    const res = await report(ok('no_show'), '+40711111111');
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ ok: false });
   });
 
   it('never stores the reporter phone in the clear', async () => {

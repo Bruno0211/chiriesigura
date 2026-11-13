@@ -31,10 +31,10 @@ export async function findVerificationByCode(db: Db, code: string): Promise<Issu
   };
 }
 
-/** Reports attach to the landlord: counts across all of their verifications. */
+/** Reports attach to the landlord: across all their verifications, each reporter counts once per category. */
 export async function landlordReportCounts(db: Db, landlordId: string): Promise<ReportCounts> {
   const rows = await db
-    .select({ category: viewingReport.category, n: sql<number>`count(*)::int` })
+    .select({ category: viewingReport.category, n: sql<number>`count(distinct ${viewingReport.reporterPhoneHash})::int` })
     .from(viewingReport)
     .innerJoin(verification, eq(verification.id, viewingReport.verificationId))
     .where(eq(verification.landlordId, landlordId))

@@ -19,4 +19,7 @@ export function network(): Network {
   };
 }
 
+/** Shown when an operator API call fails (timeout, rate limit, unsupported number). */
+export const CHECK_ERROR = "We couldn't run this check. Please try again.";
+
 export const kycPasses = (r: KycResult): boolean => r.name === 'true' && r.birthdate === 'true' && r.idDocument === 'true';

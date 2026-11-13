@@ -7,5 +7,6 @@ export function normalizeRoPhone(raw: string): string | null {
   else if (digits.startsWith('00')) e164 = `+${digits.slice(2)}`;
   else if (digits.length === 10 && digits.startsWith('0')) e164 = `+40${digits.slice(1)}`;
   else return null;
+  e164 = e164.replace(/^\+400/, '+40'); // "+40 (0)722…" style: Romanian numbers never have a 0 after the country code
   return /^\+[1-9]\d{7,14}$/.test(e164) ? e164 : null;
 }

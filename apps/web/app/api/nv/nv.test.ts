@@ -28,7 +28,7 @@ describe('number verification routes (mock)', () => {
     expect(res.headers.get('location')).toBe('/viewing/abc?x=1&nv=ok');
   });
   it('rejects external next URLs', async () => {
-    for (const next of ['https://evil.com', '//evil.com']) {
+    for (const next of ['https://evil.com', '//evil.com', '/\t/evil.com', '/\\evil.com', '/\n/evil.com']) {
       const res = await start(new Request(`http://localhost:3000/api/nv/start?phone=0700000001&next=${encodeURIComponent(next)}`));
       expect(res.status).toBe(400);
     }
@@ -36,6 +36,12 @@ describe('number verification routes (mock)', () => {
   it('rejects an invalid phone', async () => {
     const res = await start(new Request('http://localhost:3000/api/nv/start?phone=abc&next=/verify'));
     expect(res.status).toBe(400);
+  });
+  it('reports a declined consent as fail, not wifi', async () => {
+    const s = await start(new Request('http://localhost:3000/api/nv/start?phone=0700000001&next=/verify'));
+    const declined = s.headers.get('location')!.replace('code=mock', 'error=access_denied');
+    const res = await callback(new Request(declined, { headers: { cookie: cookiesOf(s).join('; ') } }));
+    expect(res.headers.get('location')).toBe('/verify?nv=fail');
   });
   it('fails a callback whose state does not match', async () => {
     const s = await start(new Request('http://localhost:3000/api/nv/start?phone=0700000001&next=/verify'));

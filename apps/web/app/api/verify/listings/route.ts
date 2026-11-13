@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { generateCode, parseListingUrl, pasteLine, type ListingsRequest, type ListingsResponse } from '@cs/shared';
 import { getDb, type Db } from '@/lib/db';
 import { listing, verification } from '@/lib/db/schema';
@@ -6,12 +6,18 @@ import { ownVerification } from '@/lib/landlord-auth';
 
 const isUniqueViolation = (e: unknown) => /unique|duplicate/i.test(String((e as { cause?: unknown })?.cause ?? e));
 
+/** Sets a code only if none exists yet, so concurrent requests all end up with the one stored code. */
 async function issueCode(db: Db, verificationId: string): Promise<string> {
   for (let attempt = 0; attempt < 10; attempt++) {
-    const code = generateCode();
     try {
-      await db.update(verification).set({ code, verifiedAt: new Date() }).where(eq(verification.id, verificationId));
-      return code;
+      const [set] = await db
+        .update(verification)
+        .set({ code: generateCode(), verifiedAt: new Date() })
+        .where(and(eq(verification.id, verificationId), isNull(verification.code)))
+        .returning({ code: verification.code });
+      if (set?.code) return set.code;
+      const [current] = await db.select({ code: verification.code }).from(verification).where(eq(verification.id, verificationId));
+      if (current?.code) return current.code;
     } catch (e) {
       if (!isUniqueViolation(e)) throw e;
     }

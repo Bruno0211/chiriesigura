@@ -3,6 +3,7 @@ import type { IdentityResponse, ListingsResponse, LocationResponse } from '@cs/s
 import { makeTestDb } from '@/lib/db/test-db';
 import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_APARTMENT } from '@/lib/geocode';
+import { mockNetwork } from '@/lib/network/mock';
 import { issueNvCookie } from '@/lib/nv-session';
 import { seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
@@ -17,7 +18,10 @@ beforeEach(async () => {
   db = await makeTestDb();
   vi.stubGlobal('fetch', vi.fn(async () => Response.json([]))); // Nominatim finds nothing unless it's the demo address
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 const post = (fn: (r: Request) => Promise<Response>, body: unknown, phone?: string) =>
   fn(new Request('http://localhost:3000/api/x', {
@@ -109,6 +113,31 @@ describe('landlord verification API', () => {
     expect(second.code).toBe(first.code);
     expect(second.accepted).toEqual([{ site: 'demo', listingId: 'd5' }, { site: 'demo', listingId: 'd4' }]);
     expect(await db.select().from(listing)).toHaveLength(2);
+  });
+
+  it('gives both concurrent listing requests the same, stored code', async () => {
+    const idRes = (await (await post(identity, idBody(), '+40700000001')).json()) as IdentityResponse;
+    await post(location, { verificationId: idRes.verificationId }, '+40700000001');
+    const [a, b] = await Promise.all(['d4', 'd5'].map(async (id) =>
+      (await (await post(listings, { verificationId: idRes.verificationId, urls: [`http://localhost:3000/demo/listing/${id}`] }, '+40700000001')).json()) as ListingsResponse));
+    const [v] = await db.select().from(verification);
+    expect(a!.code).toBe(v!.code);
+    expect(b!.code).toBe(v!.code);
+  });
+
+  it('turns a failing operator call into a plain-words step, not a 500', async () => {
+    vi.spyOn(mockNetwork, 'kycMatch').mockRejectedValueOnce(new Error('nokia 503'));
+    const res = await post(identity, idBody(), '+40700000001');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as IdentityResponse;
+    expect(body.ok).toBe(false);
+    expect(body.steps.find((s) => s.name === 'kyc')).toEqual({ name: 'kyc', ok: false, message: "We couldn't run this check. Please try again." });
+
+    const ok = (await (await post(identity, idBody(), '+40700000001')).json()) as IdentityResponse;
+    vi.spyOn(mockNetwork, 'verifyLocation').mockRejectedValueOnce(new Error('nokia 429'));
+    const loc = await post(location, { verificationId: ok.verificationId }, '+40700000001');
+    expect(loc.status).toBe(200);
+    expect(await loc.json()).toEqual({ ok: false, step: { name: 'location', ok: false, message: "We couldn't run this check. Please try again." } });
   });
 
   it('never stores the name, birthdate or ID number', async () => {

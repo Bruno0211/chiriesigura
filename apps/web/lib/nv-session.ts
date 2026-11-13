@@ -33,7 +33,6 @@ export function readSigned<T>(req: Request, name: string): T | null {
 }
 
 const NV_TTL_SEC = 15 * 60;
-
 export const issueNvCookie = (e164: string): string => signedCookie('nv', { e164 }, NV_TTL_SEC);
 
 export function readNv(req: Request): { e164: string } | null {

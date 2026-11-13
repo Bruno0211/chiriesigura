@@ -27,7 +27,8 @@ export async function POST(req: Request) {
 
   // Every report, no-show included, needs the reporter to be at the address.
   const radiusM = Number(process.env.LOCATION_RADIUS_M ?? 2000);
-  const loc = await network().verifyLocation(nv.e164, { lat: v.lat, lng: v.lng, radiusM });
+  const loc = await network().verifyLocation(nv.e164, { lat: v.lat, lng: v.lng, radiusM }).catch(() => null);
+  if (loc === null) return reply(503, { ok: false });
   if (loc !== 'TRUE' && loc !== 'PARTIAL') return reply(403, { ok: false, reason: 'not_at_address' });
 
   try {

@@ -10,7 +10,8 @@ export async function GET(req: Request) {
   const next = st?.next ?? '/';
 
   let result: NvResult = 'fail';
-  if (st && q.get('state') === st.state) {
+  // An `error` (e.g. access_denied) means the person declined; only a missing code without one is treated as Wi-Fi.
+  if (st && q.get('state') === st.state && !q.has('error')) {
     result = await network().numberVerificationFinish(st.e164, q.get('code') ?? '', st.state);
   }
 

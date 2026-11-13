@@ -3,13 +3,18 @@ import { normalizeRoPhone } from '@cs/shared';
 import { network } from '@/lib/network';
 import { signedCookie } from '@/lib/nv-session';
 
-const isLocalPath = (p: string) => p.startsWith('/') && !p.startsWith('//') && !p.startsWith('/\\');
+/** Same-origin path + query only. Whitespace, control chars and backslashes are rejected because browsers strip/convert them into `//host`. */
+function safeNext(raw: string): string | null {
+  if (!raw.startsWith('/') || /[\u0000-\u001f\s\\]/.test(raw)) return null;
+  const u = new URL(raw, 'http://local.invalid');
+  return u.origin === 'http://local.invalid' ? u.pathname + u.search : null;
+}
 
 export async function GET(req: Request) {
   const q = new URL(req.url).searchParams;
   const e164 = normalizeRoPhone(q.get('phone') ?? '');
-  const next = q.get('next') ?? '';
-  if (!e164 || !isLocalPath(next)) return Response.json({ error: 'bad_request' }, { status: 400 });
+  const next = safeNext(q.get('next') ?? '');
+  if (!e164 || !next) return Response.json({ error: 'bad_request' }, { status: 400 });
 
   const state = randomBytes(16).toString('base64url');
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
