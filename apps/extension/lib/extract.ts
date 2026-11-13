@@ -8,13 +8,37 @@ export interface Extracted {
   phone: string | null;
 }
 
+/** Elements that sit inside a line of text; every other element (p, div, li, br, …) breaks the line. */
+const INLINE = new Set(['A', 'ABBR', 'B', 'BDI', 'BDO', 'CITE', 'CODE', 'DATA', 'DFN', 'EM', 'I', 'KBD', 'MARK', 'Q', 'S', 'SAMP', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TIME', 'U', 'VAR', 'WBR']);
+
+/**
+ * The text as a reader sees its lines. textContent glues `VC-7K3Q<br>Preț` into `VC-7K3QPreț` (code lost)
+ * and `<p>VC-7K3</p><p>Q…` into `VC-7K3Q` (code invented); this breaks at <br> and block boundaries instead.
+ */
+function lineText(el: Element): string {
+  let out = '';
+  const walk = (node: Node) => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === 3) out += (child as Text).data;
+      else if (child.nodeType === 1) {
+        const inline = INLINE.has((child as Element).tagName.toUpperCase());
+        if (!inline) out += '\n';
+        walk(child);
+        if (!inline) out += '\n';
+      }
+    }
+  };
+  walk(el);
+  return out;
+}
+
 /** Reads only what the student is already looking at: the listing URL, its description and the visible phone. */
 export function extractFromDocument(doc: Document, url: string, adapter: SiteAdapter, demoOrigin: string): Extracted {
   const description = doc.querySelector(adapter.descriptionSelector);
   const phoneText = adapter.phoneSelector ? doc.querySelector(adapter.phoneSelector)?.textContent?.trim() : null;
   return {
     listing: parseListingUrl(url, demoOrigin),
-    code: description ? findCode(description.textContent ?? '') : null,
+    code: description ? findCode(lineText(description)) : null,
     phone: phoneText || null,
   };
 }

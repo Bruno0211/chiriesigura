@@ -51,6 +51,23 @@ describe('extractFromDocument', () => {
     expect(extractFromDocument(doc, OLX_URL, olx, APP).phone).toBe('0722 123 456');
   });
 
+  it.each([
+    ['a <br> right after the code', 'Proprietar verificat · ChirieSigură VC-7K3Q<br>Preț negociabil'],
+    ['a <br> right before the code', 'Vizionare după ora 17<br>VC-7K3Q'],
+    ['the code ending a paragraph with no whitespace before the next', '<p>ChirieSigură VC-7K3Q</p><p>Contact doar telefonic</p>'],
+    ['the code split across inline elements', 'ChirieSigură VC-<b>7K3Q</b> verificat'],
+  ])('finds the code with %s', (_, html) => {
+    const doc = parse(fixture('demo-listing.html'));
+    doc.querySelector('[data-testid="description"]')!.innerHTML = html;
+    expect(extractFromDocument(doc, DEMO_URL, demo, APP).code).toBe('VC-7K3Q');
+  });
+
+  it('does not join a code fragment with the next paragraph into a code', () => {
+    const doc = parse(fixture('demo-listing.html'));
+    doc.querySelector('[data-testid="description"]')!.innerHTML = '<p>VC-7K3</p><p>Q este codul</p>';
+    expect(extractFromDocument(doc, DEMO_URL, demo, APP).code).toBeNull();
+  });
+
   it('returns no code for a page without a description element', () => {
     const doc = parse('<main><p>Proprietar verificat · ChirieSigură VC-7K3Q</p></main>');
     expect(extractFromDocument(doc, DEMO_URL, demo, APP).code).toBeNull();

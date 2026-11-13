@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "test/fixtures/demo-listing.html"
+        ],
+        "createdAt": "2026-11-13T22:29:27.659Z",
+        "reason": "agent decided: unstyled HTML test fixture parsed by DOMParser in extract tests, never rendered to users"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "test/fixtures/olx-listing.html"
+        ],
+        "createdAt": "2026-11-13T22:29:27.664Z",
+        "reason": "agent decided: unstyled HTML test fixture parsed by DOMParser in extract tests, never rendered to users"
+      }
+    ]
+  }
+}

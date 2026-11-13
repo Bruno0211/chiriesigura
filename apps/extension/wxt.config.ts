@@ -12,7 +12,6 @@ export default defineConfig({
   manifest: () => ({
     name: 'ChirieSigură',
     description: "Shows whether a rental listing's landlord was verified by their mobile operator.",
-    permissions: ['storage'],
     host_permissions: [`${appHost()}/*`],
     action: { default_title: 'ChirieSigură · listing check' },
     web_accessible_resources: [

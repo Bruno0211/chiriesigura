@@ -1,9 +1,9 @@
 import { findAdapter } from '@/lib/adapters';
-import { renderBadge, renderState } from '@/lib/badge-ui';
 import { APP_URL } from '@/lib/config';
-import { extractFromDocument, isListingPage } from '@/lib/extract';
+import { extractFromDocument } from '@/lib/extract';
 import { loadFonts } from '@/lib/fonts';
-import type { CheckReply, CheckRequest, ClearRequest } from '@/lib/messages';
+import type { CheckReply, CheckRequest, ShowRequest, StateRequest } from '@/lib/messages';
+import { createWatcher } from '@/lib/watcher';
 
 /**
  * Reads the listing the student is looking at and pins the badge to it.
@@ -13,55 +13,45 @@ export default defineContentScript({
   matches: ['*://*.olx.ro/*', '*://*.storia.ro/*'],
   runAt: 'document_idle',
   main(ctx) {
-    let host: HTMLElement | null = null;
-    let last = '';
-    let timer: number | undefined;
-
-    async function run(force = false) {
-      const adapter = findAdapter(location.href, APP_URL);
-      if (!adapter) return;
-      const extracted = extractFromDocument(document, location.href, adapter, APP_URL);
-      const key = JSON.stringify(extracted);
-      if (!force && key === last) return;
-      last = key;
-
-      if (!isListingPage(extracted)) {
-        if (host) void browser.runtime.sendMessage<ClearRequest>({ type: 'clear' }).catch(() => undefined);
-        host?.remove();
-        host = null;
-        return;
-      }
-      if (!host?.isConnected) {
-        host = document.createElement('chiriesigura-badge');
+    const watcher = createWatcher({
+      appUrl: APP_URL,
+      read() {
+        const adapter = findAdapter(location.href, APP_URL);
+        return adapter ? extractFromDocument(document, location.href, adapter, APP_URL) : null;
+      },
+      async ask(extracted) {
+        return browser.runtime.sendMessage<CheckRequest, CheckReply>({ type: 'check', extracted });
+      },
+      mount() {
+        void loadFonts();
+        const host = document.createElement('chiriesigura-badge');
         document.documentElement.append(host);
-      }
-      const opts = { appUrl: APP_URL, code: extracted.code, phoneShown: extracted.phone !== null };
-      renderState(host, 'checking', opts);
-
-      let reply: CheckReply;
-      try {
-        reply = await browser.runtime.sendMessage<CheckRequest, CheckReply>({ type: 'check', extracted });
-      } catch {
-        reply = { ok: false };
-      }
-      if (key !== last || !host || !ctx.isValid) return; // the page changed while we asked
-      if (reply?.ok) renderBadge(host, reply.data, opts);
-      else renderState(host, 'unavailable', { ...opts, onRetry: () => void run(true) });
-    }
-
-    void loadFonts();
-    void run();
-
-    // Single-page navigation, a description that renders late, or a phone number revealed on click.
-    const observer = new MutationObserver(() => {
-      clearTimeout(timer);
-      timer = ctx.setTimeout(() => void run(), 500);
+        return host;
+      },
+      onShow(shown) {
+        const status = shown?.reply?.ok ? shown.reply.data.status : null;
+        void browser.runtime.sendMessage<ShowRequest>({ type: 'show', status }).catch(() => undefined);
+      },
     });
+
+    // The popup asks the page what its badge shows, so the two can never disagree.
+    browser.runtime.onMessage.addListener((msg: StateRequest, _sender, sendResponse) => {
+      if (msg?.type !== 'state') return;
+      sendResponse(watcher.shown());
+    });
+
+    void watcher.run();
+
+    // Single-page navigation, a description that renders late, a phone revealed on click, or the page
+    // re-rendering away the badge (it lives on <html>, hence the second observe).
+    const observer = new MutationObserver(() => watcher.schedule());
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-    ctx.addEventListener(window, 'wxt:locationchange', () => void run());
+    observer.observe(document.documentElement, { childList: true });
+    // Fires before the URL commits, so read the page on the next scheduled run, not now.
+    ctx.addEventListener(window, 'wxt:locationchange', () => watcher.schedule());
     ctx.onInvalidated(() => {
       observer.disconnect();
-      host?.remove();
+      watcher.destroy();
     });
   },
 });

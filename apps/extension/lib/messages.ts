@@ -1,4 +1,4 @@
-import type { CheckResponse } from '@cs/shared';
+import type { BadgeStatus, CheckResponse } from '@cs/shared';
 import type { Extracted } from './extract';
 
 /** Content script → background: ask /api/check about what the page shows. */
@@ -7,22 +7,30 @@ export interface CheckRequest {
   extracted: Extracted;
 }
 
-/** Content script → background: this page is no longer a listing, forget its verdict. */
-export interface ClearRequest {
-  type: 'clear';
-}
-
-export type ExtensionMessage = CheckRequest | ClearRequest;
-
 export type CheckReply = { ok: true; data: CheckResponse } | { ok: false };
 
-/** What the toolbar popup reads for a tab (browser.storage.session, key `tab:<id>`). */
-export interface TabState {
-  extracted: Extracted;
-  reply: CheckReply;
+/**
+ * What the page's badge shows right now (reply null: still checking). The content script owns it; the toolbar
+ * and popup only mirror it, so they can never show a verdict the page has moved past. No phone number in it.
+ */
+export interface Shown {
+  code: string | null;
+  phoneShown: boolean;
+  reply: CheckReply | null;
 }
 
-export const tabKey = (tabId: number) => `tab:${tabId}`;
+/** Content script → background: the badge now shows this status (null: no verdict), for the toolbar icon. */
+export interface ShowRequest {
+  type: 'show';
+  status: BadgeStatus | null;
+}
+
+/** Popup → the tab's content script: what does your badge show? Answer: Shown | null. */
+export interface StateRequest {
+  type: 'state';
+}
+
+export type ExtensionMessage = CheckRequest | ShowRequest;
 
 const STATUSES = new Set(['green', 'amber', 'red_fake_code', 'red_copied', 'red_phone_mismatch', 'grey_unverified', 'grey_cannot_confirm']);
 
