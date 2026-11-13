@@ -10,7 +10,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts"
+    "seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
+    "seed:prod": "tsx --env-file=.env.prod.local scripts/seed.ts"
   },
   "dependencies": {
     "@cs/shared": "workspace:*",
