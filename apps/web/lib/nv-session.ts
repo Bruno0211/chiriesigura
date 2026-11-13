@@ -32,6 +32,10 @@ export function readSigned<T>(req: Request, name: string): T | null {
   }
 }
 
+/** Where the operator sends the browser back to. Start and callback must use the same value or the code exchange fails. */
+export const nvCallbackUrl = (req: Request): string =>
+  `${(process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin).replace(/\/+$/, '')}/api/nv/callback`;
+
 const NV_TTL_SEC = 15 * 60;
 export const issueNvCookie = (e164: string): string => signedCookie('nv', { e164 }, NV_TTL_SEC);
 

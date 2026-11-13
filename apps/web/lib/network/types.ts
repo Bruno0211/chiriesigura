@@ -11,5 +11,6 @@ export interface Network {
   verifyLocation(phone: string, area: Area): Promise<LocationResult>;
   /** URL to send the phone's browser to. */
   numberVerificationStart(phone: string, redirectUri: string, state: string): Promise<string>;
-  numberVerificationFinish(phone: string, code: string, state: string): Promise<NvResult>;
+  /** `redirectUri` must be the one the start step sent, or the operator refuses the code exchange. */
+  numberVerificationFinish(phone: string, code: string, state: string, redirectUri: string): Promise<NvResult>;
 }

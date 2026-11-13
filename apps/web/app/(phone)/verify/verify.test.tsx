@@ -33,6 +33,26 @@ const identityOk: Route = () => ({
   },
 });
 
+/** A landlord who already holds a code for one listing. */
+const DONE = {
+  stage: 'done',
+  phone: '+40700000001',
+  nvAt: Date.now(),
+  verificationId: VID,
+  steps: [
+    { name: 'number', ok: true, message: 'Phone number confirmed' },
+    { name: 'kyc', ok: true, message: "ID details match this phone number's owner" },
+    { name: 'simswap', ok: true, message: 'No recent SIM change' },
+  ],
+  location: { name: 'location', ok: true, message: 'Your phone is at the address' },
+  times: { number: '14:31:07', kyc: '14:32:40', simswap: '14:32:40', location: '14:33:12' },
+  code: 'VC-7K3Q',
+  pasteLine: 'Proprietar verificat · ChirieSigură VC-7K3Q',
+  issuedAt: Date.now(),
+  accepted: [{ site: 'demo', listingId: 'd1' }],
+  rejected: [],
+};
+
 /** Lands on /verify as the operator callback does: number stage saved, `?nv=ok` in the URL. */
 function arriveVerified() {
   window.history.replaceState(null, '', '/verify?nv=ok');
@@ -140,6 +160,37 @@ describe('VerifyWizard', () => {
     await userEvent.click(screen.getByRole('button', { name: /register these listings/i }));
 
     expect(await screen.findByText('Already registered — contact us')).toBeTruthy();
+  });
+
+  it('adding another listing goes through the location check again', async () => {
+    sessionStorage.setItem('cs.verify', JSON.stringify(DONE));
+    const fetchMock = mockApi({
+      '/api/verify/location': () => ({ status: 200, json: { ok: true, step: { name: 'location', ok: true, message: 'Your phone is at the address' } } }),
+      '/api/verify/listings': () => ({
+        status: 200,
+        json: { code: 'VC-7K3Q', pasteLine: 'Proprietar verificat · ChirieSigură VC-7K3Q', accepted: [{ site: 'demo', listingId: 'd2' }], rejected: [] },
+      }),
+    });
+    render(<VerifyWizard />);
+
+    await userEvent.click(screen.getByRole('button', { name: /add a listing for this apartment/i }));
+    expect(screen.queryByLabelText(/your listing links/i)).toBeNull();
+    await userEvent.click(await screen.findByRole('button', { name: /i'm at the apartment/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /add your listings/i }));
+    await userEvent.type(screen.getByLabelText(/your listing links/i), 'http://localhost:3000/demo/listing/d2');
+    await userEvent.click(screen.getByRole('button', { name: /register these listings/i }));
+
+    expect(await screen.findByRole('region', { name: /your code/i })).toBeTruthy();
+    expect(fetchMock.mock.calls.map((c) => c[0])).toEqual(['/api/verify/location', '/api/verify/listings']);
+  });
+
+  it('a refused listings submission sends the landlord back to the location check', async () => {
+    sessionStorage.setItem('cs.verify', JSON.stringify({ ...DONE, stage: 'listings' }));
+    mockApi({ '/api/verify/listings': () => ({ status: 409, json: { error: 'location_not_verified' } }) });
+    render(<VerifyWizard />);
+    await userEvent.type(screen.getByLabelText(/your listing links/i), 'http://localhost:3000/demo/listing/d2');
+    await userEvent.click(screen.getByRole('button', { name: /register these listings/i }));
+    expect(await screen.findByRole('button', { name: /i'm at the apartment/i })).toBeTruthy();
   });
 
   it('never writes the ID document number to sessionStorage', async () => {

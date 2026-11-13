@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { normalizeRoPhone } from '@cs/shared';
 import { network } from '@/lib/network';
-import { signedCookie } from '@/lib/nv-session';
+import { nvCallbackUrl, signedCookie } from '@/lib/nv-session';
 
 /** Same-origin path + query only. Whitespace, control chars and backslashes are rejected because browsers strip/convert them into `//host`. */
 function safeNext(raw: string): string | null {
@@ -17,8 +17,7 @@ export async function GET(req: Request) {
   if (!e164 || !next) return Response.json({ error: 'bad_request' }, { status: 400 });
 
   const state = randomBytes(16).toString('base64url');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
-  const location = await network().numberVerificationStart(e164, `${appUrl}/api/nv/callback`, state);
+  const location = await network().numberVerificationStart(e164, nvCallbackUrl(req), state);
 
   const res = new Response(null, { status: 302, headers: { Location: location } });
   res.headers.append('Set-Cookie', signedCookie('nv_state', { e164, next, state }, 10 * 60));

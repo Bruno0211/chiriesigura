@@ -106,23 +106,64 @@ describe('landlord verification API', () => {
     expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd9' }]);
   });
 
-  it('adds more listings to the same code on a second call', async () => {
-    const { idRes, lstRes } = await verifyAll('+40700000001', ['http://localhost:3000/demo/listing/d4']);
+  it('needs a fresh location check before each listings submission, then adds to the same code', async () => {
+    const phone = '+40700000001';
+    const { idRes, lstRes } = await verifyAll(phone, ['http://localhost:3000/demo/listing/d4']);
     const first = (await lstRes.json()) as ListingsResponse;
-    const second = (await (await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d5', 'http://localhost:3000/demo/listing/d4'] }, '+40700000001')).json()) as ListingsResponse;
+
+    const withoutCheck = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d5'] }, phone);
+    expect(withoutCheck.status).toBe(409);
+
+    await post(location, { verificationId: idRes.verificationId }, phone);
+    const second = (await (await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d5', 'http://localhost:3000/demo/listing/d4'] }, phone)).json()) as ListingsResponse;
     expect(second.code).toBe(first.code);
     expect(second.accepted).toEqual([{ site: 'demo', listingId: 'd5' }, { site: 'demo', listingId: 'd4' }]);
     expect(await db.select().from(listing)).toHaveLength(2);
   });
 
-  it('gives both concurrent listing requests the same, stored code', async () => {
-    const idRes = (await (await post(identity, idBody(), '+40700000001')).json()) as IdentityResponse;
-    await post(location, { verificationId: idRes.verificationId }, '+40700000001');
-    const [a, b] = await Promise.all(['d4', 'd5'].map(async (id) =>
-      (await (await post(listings, { verificationId: idRes.verificationId, urls: [`http://localhost:3000/demo/listing/${id}`] }, '+40700000001')).json()) as ListingsResponse));
+  it('a location check older than 10 minutes no longer allows listings', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const phone = '+40700000001';
+      const idRes = (await (await post(identity, idBody(), phone)).json()) as IdentityResponse;
+      await post(location, { verificationId: idRes.verificationId }, phone);
+      vi.setSystemTime(Date.now() + 11 * 60 * 1000);
+      const late = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d4'] }, phone);
+      expect(late.status).toBe(409);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a submission that registers nothing does not use up the location check', async () => {
+    const phone = '+40700000001';
+    const { idRes, lstRes } = await verifyAll(phone, ['not a url']);
+    expect(((await lstRes.json()) as ListingsResponse).accepted).toEqual([]);
+    const retry = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d4'] }, phone);
+    expect(retry.status).toBe(200);
+    expect(((await retry.json()) as ListingsResponse).accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+  });
+
+  it('a failed location check withdraws an earlier pass', async () => {
+    const phone = '+40700000001';
+    const idRes = (await (await post(identity, idBody(), phone)).json()) as IdentityResponse;
+    await post(location, { verificationId: idRes.verificationId }, phone);
+    vi.spyOn(mockNetwork, 'verifyLocation').mockResolvedValueOnce('FALSE');
+    expect(((await (await post(location, { verificationId: idRes.verificationId }, phone)).json()) as LocationResponse).ok).toBe(false);
+    const res = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d4'] }, phone);
+    expect(res.status).toBe(409);
+  });
+
+  it('one location check allows only one of two concurrent submissions', async () => {
+    const phone = '+40700000001';
+    const idRes = (await (await post(identity, idBody(), phone)).json()) as IdentityResponse;
+    await post(location, { verificationId: idRes.verificationId }, phone);
+    const [a, b] = await Promise.all(['d4', 'd5'].map((id) =>
+      post(listings, { verificationId: idRes.verificationId, urls: [`http://localhost:3000/demo/listing/${id}`] }, phone)));
+    expect([a!.status, b!.status].sort()).toEqual([200, 409]);
+    const accepted = (await (a!.status === 200 ? a! : b!).json()) as ListingsResponse;
     const [v] = await db.select().from(verification);
-    expect(a!.code).toBe(v!.code);
-    expect(b!.code).toBe(v!.code);
+    expect(accepted.code).toBe(v!.code);
   });
 
   it('turns a failing operator call into a plain-words step, not a 500', async () => {

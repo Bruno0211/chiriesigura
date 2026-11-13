@@ -1,8 +1,11 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, gt, isNull } from 'drizzle-orm';
 import { generateCode, parseListingUrl, pasteLine, type ListingsRequest, type ListingsResponse } from '@cs/shared';
 import { getDb, type Db } from '@/lib/db';
 import { listing, verification } from '@/lib/db/schema';
 import { ownVerification } from '@/lib/landlord-auth';
+
+/** How long a passed location check stays usable for one listings submission. */
+const LOCATION_FRESH_MS = 10 * 60 * 1000;
 
 const isUniqueViolation = (e: unknown) => /unique|duplicate/i.test(String((e as { cause?: unknown })?.cause ?? e));
 
@@ -34,7 +37,14 @@ export async function POST(req: Request) {
   const own = await ownVerification(db, req, body.verificationId);
   if (own instanceof Response) return own;
   const v = own.verification;
-  if (!v.locationResult) return Response.json({ error: 'location_not_verified' }, { status: 409 });
+
+  // Every submission needs its own fresh location pass: claim it atomically so two requests can't share one.
+  const [claimed] = await db
+    .update(verification)
+    .set({ locationCheckedAt: null })
+    .where(and(eq(verification.id, v.id), gt(verification.locationCheckedAt, new Date(Date.now() - LOCATION_FRESH_MS))))
+    .returning({ id: verification.id });
+  if (!claimed) return Response.json({ error: 'location_not_verified' }, { status: 409 });
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
   const out: ListingsResponse = { accepted: [], rejected: [] };
@@ -63,6 +73,14 @@ export async function POST(req: Request) {
       }
     }
     out.accepted.push(ref);
+  }
+
+  if (out.accepted.length === 0) {
+    // Nothing registered (typos, links already taken): give the location pass back so the landlord can retry.
+    await db
+      .update(verification)
+      .set({ locationCheckedAt: v.locationCheckedAt })
+      .where(and(eq(verification.id, v.id), isNull(verification.locationCheckedAt)));
   }
 
   const code = v.code ?? (out.accepted.length > 0 ? await issueCode(db, v.id) : undefined);

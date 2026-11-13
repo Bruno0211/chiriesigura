@@ -121,6 +121,9 @@ export function VerifyWizard() {
     setSt(EMPTY);
   };
 
+  /** Each listings submission needs its own location pass, so going back to listings starts at "I'm at the apartment". */
+  const recheckLocation = (): Partial<Saved> => ({ location: undefined, times: { ...st.times, location: undefined } });
+
   const onVerified = useCallback(() => {
     setNv(null);
     setNotice(null);
@@ -173,7 +176,7 @@ export function VerifyWizard() {
     setBusy(null);
     if (r.status === 401) return expired('listings');
     if (r.status === 404) return setError(GONE);
-    if (r.status === 409) return go('checks');
+    if (r.status === 409) return go('checks', recheckLocation()); // the location pass expired or was used
     if (r.status !== 200 || !r.data) return setError(CHECK_ERROR);
     const seen = new Set(st.accepted.map(listingKey));
     const accepted = [...st.accepted, ...r.data.accepted.filter((a) => !seen.has(listingKey(a)))];
@@ -244,7 +247,7 @@ export function VerifyWizard() {
         <DoneScreen
           st={st}
           masked={masked}
-          onAddMore={() => go('listings', { rejected: [] })}
+          onAddMore={() => go('checks', { ...recheckLocation(), rejected: [] })}
           onStartOver={startOver}
         />
       );
@@ -666,8 +669,9 @@ function DoneScreen({
       {st.rejected.length > 0 && <RejectedList rejected={st.rejected} />}
 
       <div className={s.actionsInline}>
-        <button type="button" className={s.secondary} onClick={onAddMore}>Add more listings</button>
-        <button type="button" className={`${s.textLink} ${s.textButton}`} onClick={onStartOver}>Start a new verification</button>
+        <button type="button" className={s.secondary} onClick={onAddMore}>Add a listing for this apartment</button>
+        <p className={s.note}>You&apos;ll confirm you&apos;re at the apartment again first.</p>
+        <button type="button" className={`${s.textLink} ${s.textButton}`} onClick={onStartOver}>Verify another apartment</button>
       </div>
     </>
   );

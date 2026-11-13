@@ -1,6 +1,6 @@
 import type { NvResult } from '@cs/shared';
 import { network } from '@/lib/network';
-import { clearCookie, issueNvCookie, readSigned } from '@/lib/nv-session';
+import { clearCookie, issueNvCookie, nvCallbackUrl, readSigned } from '@/lib/nv-session';
 
 const withNv = (next: string, r: NvResult) => `${next}${next.includes('?') ? '&' : '?'}nv=${r}`;
 
@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   let result: NvResult = 'fail';
   // An `error` (e.g. access_denied) means the person declined; only a missing code without one is treated as Wi-Fi.
   if (st && q.get('state') === st.state && !q.has('error')) {
-    result = await network().numberVerificationFinish(st.e164, q.get('code') ?? '', st.state);
+    result = await network().numberVerificationFinish(st.e164, q.get('code') ?? '', st.state, nvCallbackUrl(req));
   }
 
   const res = new Response(null, { status: 302, headers: { Location: withNv(next, result) } });

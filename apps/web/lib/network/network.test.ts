@@ -32,12 +32,12 @@ describe('mock network fixtures', () => {
     expect(await n().verifyLocation('+40700000005', AREA)).toBe('PARTIAL');
   });
   it('+40700000006 is on Wi-Fi for number verification', async () => {
-    expect(await n().numberVerificationFinish('+40700000006', 'mock', 's')).toBe('wifi');
+    expect(await n().numberVerificationFinish('+40700000006', 'mock', 's', 'http://x/cb')).toBe('wifi');
   });
   it('students and unknown numbers pass', async () => {
     for (const p of ['+40711111111', '+40711111119', '+40799999999']) {
       expect(await n().verifyLocation(p, AREA)).toBe('TRUE');
-      expect(await n().numberVerificationFinish(p, 'mock', 's')).toBe('ok');
+      expect(await n().numberVerificationFinish(p, 'mock', 's', 'http://x/cb')).toBe('ok');
     }
   });
   it('mock start redirects straight back with a code and the state', async () => {
