@@ -5,7 +5,7 @@
 - App: https://chiriesigura.vercel.app (Vercel project `chiriesigura`, root `apps/web`, region `fra1`)
 - Database: Neon Postgres `chiriesigura-db` (free, `fra1`), connected to the project. `DATABASE_URL` is set on Vercel by the integration.
 - Env on Vercel: `PHONE_PEPPER` (team value, in the team chat), `NETWORK_MODE=mock`, `LOCATION_RADIUS_M=2000`, `NEXT_PUBLIC_APP_URL=https://chiriesigura.vercel.app`.
-- Deploy: from the repo root, `vercel deploy --prod` (the GitHub repo isn't connected to Vercel, so pushes don't deploy).
+- Deploy: automatic. A push to `main` deploys production, and every pull request gets a preview URL. Previews have **no database** (it's connected to production and development only, so a PR can't touch the demo data): their pages render, but API calls fail. Manual fallback: `vercel deploy --prod` from the repo root.
 - Migrations: `DATABASE_URL=<prod unpooled url> pnpm --filter @cs/web db:migrate`.
 - Demo reset: create `apps/web/.env.prod.local` (gitignored) with `DATABASE_URL`, `PHONE_PEPPER` and `NEXT_PUBLIC_APP_URL`, then run `pnpm --filter @cs/web seed:prod`. **Gotcha:** `vercel env pull` writes `PHONE_PEPPER="[SENSITIVE]"`; replace it with the real value. The seed refuses the placeholder.
 - Extension: `WXT_APP_URL=https://chiriesigura.vercel.app pnpm --filter @cs/extension build`, then load `apps/extension/.output/chrome-mv3` unpacked in Chrome.
