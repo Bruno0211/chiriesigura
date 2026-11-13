@@ -57,14 +57,23 @@ export function clearState(key: string): void {
   }
 }
 
-/** Reads `?nv=` set by /api/nv/callback and removes it, so a refresh doesn't replay the result. */
-export function takeNvParam(): NvResult | null {
-  const url = new URL(window.location.href);
-  const v = url.searchParams.get('nv');
+/** `?nv=` as set by /api/nv/callback; anything unexpected counts as a failure. */
+export function readNvParam(): NvResult | null {
+  const v = new URLSearchParams(window.location.search).get('nv');
   if (v === null) return null;
+  return v === 'ok' || v === 'wifi' ? v : 'fail';
+}
+
+/** Drops `?nv=` from the address bar so a refresh doesn't replay the operator result. */
+export function stripNvParam(): void {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('nv')) return;
   url.searchParams.delete('nv');
   window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
-  return v === 'ok' || v === 'wifi' ? v : 'fail';
+}
+
+export function shortDate(at: number): string {
+  return new Date(at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export interface JsonReply<T> { status: number; data: T | null }

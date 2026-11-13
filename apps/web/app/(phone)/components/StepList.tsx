@@ -29,6 +29,8 @@ interface Props {
   title?: string;
   by?: string;
   footer?: ReactNode;
+  /** Hide the per-check messages: a summary of a finished record. */
+  compact?: boolean;
 }
 
 /** The confirmation record: one ruled line per check, posted with its result, time and state. */
@@ -42,6 +44,7 @@ export function StepList({
   title = 'Confirmation record',
   by = 'By your mobile operator',
   footer,
+  compact = false,
 }: Props) {
   const result = new Map(steps.map((st) => [st.name, st]));
   const rows = CHECK_ORDER.filter((n) => result.has(n) || pending.includes(n) || waiting.includes(n));
@@ -64,7 +67,7 @@ export function StepList({
               <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
               <div className={s.rowBody}>
                 <p className={s.what}>{labels[name] ?? CHECK_COPY[name].label}</p>
-                {r && <p className={s.msg}>{r.message}</p>}
+                {r && !compact && <p className={s.msg}>{r.message}</p>}
                 {meta && <p className={s.meta}>{meta}</p>}
               </div>
               <span className={s.state} data-state={state}>

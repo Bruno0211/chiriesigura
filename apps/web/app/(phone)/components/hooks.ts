@@ -1,6 +1,18 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+
+/** Moves focus to the new step's heading (#step-heading) whenever `step` changes, but not on first render. */
+export function useStepFocus(step: string): void {
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    document.getElementById('step-heading')?.focus();
+  }, [step]);
+}
 
 export type Connection = 'cellular' | 'wifi' | 'unknown';
 

@@ -206,6 +206,31 @@
   font-size: 15px;
 }
 
+.confirmed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.confirmed svg {
+  width: 16px;
+  height: 16px;
+  color: var(--ok);
+}
+
+.guide {
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
 /* ── Ruled modules with a tab ───────────────────────────────────────── */
 
 .module {
