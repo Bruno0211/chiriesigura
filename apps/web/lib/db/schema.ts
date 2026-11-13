@@ -19,6 +19,8 @@ export const verification = pgTable('verification', {
   lat: doublePrecision('lat').notNull(),
   lng: doublePrecision('lng').notNull(),
   locationResult: text('location_result'), // 'TRUE' | 'PARTIAL'
+  // Last passed location check not yet used by a listings submission; each submission needs a fresh one.
+  locationCheckedAt: timestamp('location_checked_at', { withTimezone: true }),
   verifiedAt: timestamp('verified_at', { withTimezone: true }),
   createdAt: createdAt(),
 });

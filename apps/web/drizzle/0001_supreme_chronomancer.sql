@@ -1,0 +1,1 @@
+ALTER TABLE "verification" ADD COLUMN "location_checked_at" timestamp with time zone;
