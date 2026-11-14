@@ -22,6 +22,7 @@ beforeEach(async () => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
 });
 
 const post = (fn: (r: Request) => Promise<Response>, body: unknown, phone?: string) =>
@@ -58,6 +59,14 @@ describe('landlord verification API', () => {
     expect(res.steps.find((s) => s.name === 'simswap')).toEqual({ name: 'simswap', ok: false, message: 'This SIM was changed in the last 7 days' });
     expect(res.verificationId).toBeUndefined();
     expect(await db.select().from(verification)).toHaveLength(0);
+  });
+
+  it('checks the configured SIM-swap window and names it in the message', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SIM_SWAP_WINDOW_HOURS', '1');
+    const swap = vi.spyOn(mockNetwork, 'simSwapped');
+    const res = (await (await post(identity, idBody(), '+40700000002')).json()) as IdentityResponse;
+    expect(swap).toHaveBeenCalledWith('+40700000002', 1);
+    expect(res.steps.find((s) => s.name === 'simswap')).toEqual({ name: 'simswap', ok: false, message: 'This SIM was changed in the last hour' });
   });
 
   it('stops on a KYC mismatch', async () => {
@@ -105,6 +114,25 @@ describe('landlord verification API', () => {
       { url: 'http://localhost:3000/demo/listing/d1', reason: 'already_registered' },
     ]);
     expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd9' }]);
+  });
+
+  it('refuses a listing far from the verified address and keeps the location check for a retry', async () => {
+    const phone = '+40700000001';
+    const far = 'http://localhost:3000/demo/listing/d6';
+    const { idRes, lstRes } = await verifyAll(phone, [far]);
+    expect((await lstRes.json()) as ListingsResponse).toEqual({ accepted: [], rejected: [{ url: far, reason: 'far_from_address' }] });
+    const retry = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d4'] }, phone);
+    expect(retry.status).toBe(200);
+    expect(((await retry.json()) as ListingsResponse).accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+  });
+
+  it('registers the nearby listing and refuses the far one in the same submission', async () => {
+    const { lstRes } = await verifyAll('+40700000001', ['http://localhost:3000/demo/listing/d6', 'http://localhost:3000/demo/listing/d4']);
+    const body = (await lstRes.json()) as ListingsResponse;
+    expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+    expect(body.rejected).toEqual([{ url: 'http://localhost:3000/demo/listing/d6', reason: 'far_from_address' }]);
+    expect(body.code).toMatch(/^VC-/);
+    expect(await db.select().from(listing)).toHaveLength(1);
   });
 
   it('needs a fresh location check before each listings submission, then adds to the same code', async () => {

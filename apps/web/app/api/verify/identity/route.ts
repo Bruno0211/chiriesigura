@@ -8,8 +8,8 @@ import { identityHashes, phoneHash } from '@/lib/hash';
 import { CHECK_ERROR, kycPasses, network } from '@/lib/network';
 import { readNv } from '@/lib/nv-session';
 import { isBannedIdentity } from '@/lib/queries';
+import { simSwapFailMessage, simSwapWindowHours } from '@/lib/sim-swap-window';
 
-const SIM_SWAP_WINDOW_HOURS = 168;
 const FIELDS = ['givenName', 'familyName', 'birthdate', 'idDocument', 'address'] as const;
 
 export async function POST(req: Request) {
@@ -22,9 +22,10 @@ export async function POST(req: Request) {
   const b = body as IdentityRequest;
 
   // ID fields go to the operator only; nothing below persists them. A failed operator call becomes null, shown as "couldn't run".
+  const swapHours = simSwapWindowHours();
   const [kyc, swapped] = await Promise.all([
     network().kycMatch(nv.e164, { givenName: b.givenName, familyName: b.familyName, birthdate: b.birthdate, idDocument: b.idDocument }).catch(() => null),
-    network().simSwapped(nv.e164, SIM_SWAP_WINDOW_HOURS).catch(() => null),
+    network().simSwapped(nv.e164, swapHours).catch(() => null),
   ]);
   const steps: CheckStep[] = [
     { name: 'number', ok: true, message: 'Phone number confirmed' },
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     swapped === null
       ? { name: 'simswap', ok: false, message: CHECK_ERROR }
       : swapped
-        ? { name: 'simswap', ok: false, message: 'This SIM was changed in the last 7 days' }
+        ? { name: 'simswap', ok: false, message: simSwapFailMessage(swapHours) }
         : { name: 'simswap', ok: true, message: 'No recent SIM change' },
   ];
   if (steps.some((s) => !s.ok)) return Response.json({ ok: false, steps } satisfies IdentityResponse);

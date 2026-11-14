@@ -6,6 +6,7 @@ const sdk = vi.hoisted(() => ({
     oauth: { getClientCredentials: vi.fn() },
     wellKnownMetadata: { getOpenidConfiguration: vi.fn() },
     numberVerification: { verifyV2: vi.fn() },
+    location: { verify: vi.fn() },
   },
 }));
 
@@ -35,6 +36,7 @@ beforeEach(() => {
     token_endpoint: 'https://auth.example/oauth2/v1/token',
   });
   sdk.client.numberVerification.verifyV2.mockReset();
+  sdk.client.location.verify.mockReset();
   vi.unstubAllGlobals();
 });
 
@@ -97,5 +99,25 @@ describe('number verification', () => {
     stubTokenEndpoint({ ok: false, status: 400, json: { error: 'invalid_grant' } });
     expect(await nokiaNetwork.numberVerificationFinish(PHONE, 'abc', 'st', CB)).toBe('fail');
     expect(sdk.client.numberVerification.verifyV2).not.toHaveBeenCalled();
+  });
+});
+
+describe('location verification', () => {
+  const AREA = { lat: 45.7537, lng: 21.2257, radiusM: 2000 };
+
+  it('asks the network whether the SIM is inside the circle around the address', async () => {
+    sdk.client.location.verify.mockResolvedValue({ verificationResult: 'TRUE', lastLocationTime: '2026-11-14T12:21:28Z' });
+    expect(await nokiaNetwork.verifyLocation('+99999991001', AREA)).toBe('TRUE');
+    expect(sdk.client.location.verify).toHaveBeenCalledWith({
+      device: { phoneNumber: '+99999991001' },
+      area: { areaType: 'CIRCLE', center: { latitude: 45.7537, longitude: 21.2257 }, radius: 2000 },
+      maxAge: 60,
+    });
+  });
+
+  it('passes an operator error through, for the routes to turn into a plain-words step', async () => {
+    const notFound = Object.assign(new Error('Device identifier not found.'), { statusCode: 404 });
+    sdk.client.location.verify.mockRejectedValue(notFound);
+    await expect(nokiaNetwork.verifyLocation('+40700000001', AREA)).rejects.toBe(notFound);
   });
 });

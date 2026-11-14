@@ -5,8 +5,9 @@ import { DEMO_ADDRESSES, DEMO_APARTMENT } from '@/lib/geocode';
 import { identityHashes, phoneHash } from '@/lib/hash';
 
 const DEMO_CODE = 'VC-7K3Q';
-const LANDLORD = '+40700000001';
-const LIVE_REPORTER = '+40711111111';
+// Nokia simulator numbers: they pass the live checks (docs/checkpoints.md) and, having no mock fixture, mock mode too.
+const LANDLORD = '+99999992002';
+const LIVE_REPORTER = '+99999992000';
 const EARLIER_NO_SHOWS = ['+40711111118', '+40711111119'];
 // The banned-live scammer (docs/pitch.md): starts on hold with 3 "asked for money" reports.
 const SCAM_CODE = 'VC-BAN5';
