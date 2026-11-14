@@ -8,8 +8,10 @@ Track: Connected Communities (UniHack 8, Timișoara). Live URL: https://chiriesi
 2. Laptop: Chrome with the extension loaded unpacked from `apps/extension/.output/chrome-mv3` (built with `WXT_APP_URL=https://chiriesigura.vercel.app`). Tabs open: `/demo/listing/d1`, `/demo/listing/d2`.
 3. Laptop Chrome: sign in at `https://chiriesigura.vercel.app/auth/login` (the extension shows no badges until you do).
 4. Landlord phone: `https://chiriesigura.vercel.app/verify` open, on **mobile data**.
-5. Student phone: camera ready to scan the QR in the extension panel.
-6. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
+5. Student phone: signed in at `https://chiriesigura.vercel.app/check`, on mobile data.
+6. Team phone: signed in with an email listed in `REVIEW_EMAILS`, `https://chiriesigura.vercel.app/review` open.
+7. Scammer phone (can be the landlord phone): `https://chiriesigura.vercel.app/verify` open, on mobile data.
+8. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
 
 Demo inputs (mock mode accepts these):
 
@@ -17,8 +19,11 @@ Demo inputs (mock mode accepts these):
 |---|---|---|
 | Landlord | `0700000001` | Andrei Popescu, 1985-03-02, ID `TM123456`, address `Strada Alba Iulia 2, Timișoara`, listing `https://chiriesigura.vercel.app/demo/listing/d4` |
 | Student | `0711111111` | "Landlord didn't show up" |
+| Scammer, new SIM | `0700000010` | Mihai Ionescu, 1990-07-15, ID `TM654321`, address `Strada Alba Iulia 2, Timișoara` (his old number `0700000009` is on listing `d5`) |
 
 ## Script
+
+<!-- pitch owner: the ban adds ~40 s; trim elsewhere to stay within 3:00 -->
 
 ### 0:00–0:30 · The problem
 
@@ -39,13 +44,15 @@ Demo inputs (mock mode accepts these):
    - Paste the d4 listing URL → a code appears. "He pastes this line into his listing. The code only counts on the listings he registered."
 2. **Student sees a verified listing (laptop, ~20 s).** Open `d1`, a listing he verified earlier with `VC-7K3Q`. Badge: 🟢 *Verified landlord · near the address*. "It also matched the phone number shown on the page."
 3. **The scammer's copy (laptop, ~20 s).** Open `d2`: same text, same photos, same code, €130 cheaper, different phone. Badge: 🔴 *Copied from a verified listing*. "Copying the code doesn't help: it's bound to the original listing."
-4. **Viewers keep it honest (student phone, ~35 s).** Open the panel on `d1` and scan the QR. The student confirms their number, taps "I'm at the viewing" (the network checks they're really at the address), then picks "Landlord didn't show up". Reload `d1` on the laptop: 🟠 *Verified, but warnings from viewers*. "Only people who were physically there can report, one report per phone."
+4. **Viewers keep it honest (student phone, ~35 s).** "At the viewing, the student only has a phone." On `/check`, paste the `d1` link and code `VC-7K3Q`, then tap **I'm at the viewing · Report it**. The student confirms their number, taps "I'm at the viewing" (the network checks they're really at the address), then picks "Landlord didn't show up". Reload `d1` on the laptop: 🟠 *Verified, but warnings from viewers*. "Only people who were physically there can report, one report per phone."
+
+5. **Scammers are banned for life (team phone, ~40 s).** "Mihai verified with his real ID, and three viewers he asked for money reported him." On `/review`, Andrei now shows too: the no-show we just filed is his third. "One bad week doesn't ban anyone: a human decides." Tap **Confirm ban** on the card reading *3 asked for money first*. Laptop: reload `d5`: 🔴 *Landlord banned*. Scammer phone: `/verify` with a brand-new number `0700000010` and Mihai's details → refused at the ID step. "New SIM, same person: the ban follows his ID, not his phone."
 
 ### 2:20–3:00 · Why it works
 
 > Four Nokia Network as Code signals, combined: **Number Verification, KYC Match, SIM Swap and Location Verification**. Each one alone can be dodged. Together, a scammer would need the real owner's ID, their SIM, and to stand in the flat.
 >
-> **Privacy:** we store a match result, never your ID. Phone numbers are kept only as salted hashes, and nothing about the landlord is shown to students beyond the badge.
+> **Privacy:** we store a match result and a fingerprint that can only answer *is this a banned person?*, never your ID. Phone numbers are kept only as salted hashes, and nothing about the landlord is shown to students beyond the badge.
 >
 > **The honest limit:** a scammer would have to use their real identity, and viewers catch them.
 >
@@ -58,7 +65,7 @@ Demo inputs (mock mode accepts these):
 1. **Problem:** a student, a deposit, a vanished landlord, plus the three Romanian cases above.
 2. **Demo:** live (cut to the backup video if the network fails).
 3. **How it works:** the four signals as four icons, each with the one thing it proves.
-4. **Privacy:** "we store a match result, never your ID", plus the hash and consent points.
+4. **Privacy:** "we keep a fingerprint that can only answer: is this a banned person?", plus the hash and consent points.
 5. **Next:** ANCPI owner check · more sites · partners. Team names.
 
 ## Sources for the opening

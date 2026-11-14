@@ -28,6 +28,11 @@ export default function PrivacyPage() {
                 <strong>A one-way hash of your phone number</strong>: a keyed hash we can match again but cannot turn back
                 into the number.
               </li>
+              <li>
+                <strong>Two one-way fingerprints of a landlord&apos;s ID</strong>, made after the operator confirms it: one of the ID
+                card number, one of the name and date of birth. They can only answer one question: is this a person our team
+                banned for life? They cannot be turned back into the ID.
+              </li>
               <li><strong>The apartment address</strong>: you publish it in your listing anyway. It is never shown in the extension.</li>
               <li><strong>Your listing links</strong>, so the extension can tell your listings from copies.</li>
               <li>
@@ -47,7 +52,7 @@ export default function PrivacyPage() {
             <ul>
               <li>
                 <strong>Your ID card number, name and date of birth.</strong> They go to your mobile operator for a yes or no
-                match, and are then discarded.
+                match, and are then discarded. Only the one-way fingerprints above are kept.
               </li>
               <li>
                 <strong>Your phone&apos;s location.</strong> The operator only answers whether the phone is near the address. We
@@ -88,6 +93,11 @@ export default function PrivacyPage() {
             <p>
               Landlords: if a viewing report about you is wrong, email us with your code. We review it and correct or
               remove it.
+            </p>
+            <p>
+              When verified viewers report a landlord repeatedly, our team reviews the reports and may ban that person for
+              life: their listings show as banned, and verifying again with any phone number is refused. If you were refused
+              and think it is a mistake, email us.
             </p>
           </div>
         </section>
