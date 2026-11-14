@@ -60,9 +60,24 @@ describe('extractFromDocument', () => {
     expect(extractFromDocument(doc, DEMO_URL, demo, APP).place).toBe('Timișoara, Centru');
   });
 
+  const STORIA_URL = 'https://www.storia.ro/ro/oferta/apartament-2-camere-soarelui-IDJdUz';
+  const storiaDoc = (ad: object) => parse(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props: { pageProps: { ad } } })}</script>`);
+  const AD = { slug: 'apartament-2-camere-soarelui-IDJdUz', location: { coordinates: { latitude: 45.73587, longitude: 21.249695 }, mapDetails: { radius: 100 } } };
+
   it('reads Storia coordinates from the page data', () => {
-    const doc = parse('<script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"ad":{"location":{"coordinates":{"latitude":45.73587,"longitude":21.249695}}}}}}</script>');
-    expect(storiaCoords(doc)).toEqual({ lat: 45.73587, lng: 21.249695 });
+    expect(storiaCoords(storiaDoc(AD), STORIA_URL)).toEqual({ lat: 45.73587, lng: 21.249695 });
+  });
+
+  it('ignores Storia coordinates that belong to another ad (left over after in-site navigation)', () => {
+    expect(storiaCoords(storiaDoc({ ...AD, slug: 'garsoniera-cluj-IDAbCd' }), STORIA_URL)).toBeNull();
+    expect(storiaCoords(storiaDoc({ ...AD, slug: undefined }), STORIA_URL)).toBeNull();
+  });
+
+  it('ignores approximate or empty Storia coordinates', () => {
+    const at = (location: object) => storiaCoords(storiaDoc({ ...AD, location: { ...AD.location, ...location } }), STORIA_URL);
+    expect(at({ mapDetails: { radius: 5000 } })).toBeNull();
+    expect(at({ mapDetails: undefined })).toBeNull();
+    expect(at({ coordinates: { latitude: 0, longitude: 0 } })).toBeNull();
   });
 
   it('bad Storia page data gives no coordinates', () => {
@@ -70,7 +85,7 @@ describe('extractFromDocument', () => {
       '<p>no data</p>',
       '<script id="__NEXT_DATA__">{not json</script>',
       '<script id="__NEXT_DATA__">{"props":{"pageProps":{"ad":{"location":{"coordinates":{"latitude":"x","longitude":21}}}}}}</script>',
-    ]) expect(storiaCoords(parse(html))).toBeNull();
+    ]) expect(storiaCoords(parse(html), STORIA_URL)).toBeNull();
   });
 
   it('reads the OLX phone once the visitor reveals it', () => {

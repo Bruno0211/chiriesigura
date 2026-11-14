@@ -46,7 +46,7 @@ export function extractFromDocument(doc: Document, url: string, adapter: SiteAda
     code: description ? findCode(lineText(description)) : null,
     phone: phoneText || null,
     place: place || null,
-    placeCoords: adapter.placeCoords?.(doc) ?? null,
+    placeCoords: adapter.placeCoords?.(doc, url) ?? null,
   };
 }
 

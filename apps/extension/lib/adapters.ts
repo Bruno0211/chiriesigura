@@ -13,16 +13,24 @@ export interface SiteAdapter {
   /** Where the listing says the flat is, as text (each line of the element becomes one part). */
   placeSelector?: string;
   /** Exact coordinates of the flat, when the site puts them in the page. */
-  placeCoords?: (doc: Document) => { lat: number; lng: number } | null;
+  placeCoords?: (doc: Document, url: string) => { lat: number; lng: number } | null;
 }
 
+/** Storia shows a ~100 m circle when it knows the street; a wider one is a district or city centre, not the flat. */
+const STORIA_EXACT_RADIUS_M = 500;
+
 /** Storia's page data carries the flat's coordinates (checked on a real ad, 14 Nov 2026). */
-export function storiaCoords(doc: Document): { lat: number; lng: number } | null {
+export function storiaCoords(doc: Document, url: string): { lat: number; lng: number } | null {
   try {
-    const data = JSON.parse(doc.getElementById('__NEXT_DATA__')?.textContent ?? '');
-    const c = data?.props?.pageProps?.ad?.location?.coordinates;
+    const ad = JSON.parse(doc.getElementById('__NEXT_DATA__')?.textContent ?? '')?.props?.pageProps?.ad;
+    // In-site navigation keeps the first page's data: only trust it for the ad in the address bar.
+    if (typeof ad?.slug !== 'string' || !ad.slug || !new URL(url).pathname.endsWith(`/${ad.slug}`)) return null;
+    const radius = ad.location?.mapDetails?.radius;
+    if (typeof radius !== 'number' || radius > STORIA_EXACT_RADIUS_M) return null;
+    const c = ad.location?.coordinates;
     const p = { lat: c?.latitude, lng: c?.longitude };
-    return typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng) ? p : null;
+    if (typeof p.lat !== 'number' || typeof p.lng !== 'number' || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return null;
+    return p.lat === 0 && p.lng === 0 ? null : p;
   } catch {
     return null;
   }
