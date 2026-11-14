@@ -10,8 +10,7 @@ Track: Connected Communities (UniHack 8, Timișoara). Live URL: https://chiriesi
 4. Landlord phone: `https://chiriesigura.vercel.app/verify` open, on **mobile data**.
 5. Student phone: signed in at `https://chiriesigura.vercel.app/check`, on mobile data.
 6. Team phone: signed in with an email listed in `REVIEW_EMAILS`, `https://chiriesigura.vercel.app/review` open.
-7. Scammer phone (can be the landlord phone): `https://chiriesigura.vercel.app/verify` open, on mobile data.
-8. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
+7. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
 
 Demo inputs (live on Nokia's simulator; mock mode accepts them too):
 
@@ -20,11 +19,10 @@ Demo inputs (live on Nokia's simulator; mock mode accepts them too):
 | Landlord | `+99999992002` | Zoltan Eszter, 1995-03-12, ID `66666666q` (Nokia's test identity), address `Strada Alba Iulia 2, Timișoara`, listing `https://chiriesigura.vercel.app/demo/listing/d4` |
 | Student | `+99999992000` | "Landlord didn't show up" |
 | Landlord, far-away listing (optional) | `+99999992002` | after the location check, paste `https://chiriesigura.vercel.app/demo/listing/d6` (Lugoj): "This listing isn't near the address you verified" |
-| Scammer, new SIM | `0700000010` | Mihai Ionescu, 1990-07-15, ID `TM654321`, address `Strada Alba Iulia 2, Timișoara` (his old number `0700000009` is on listing `d5`). **Mock mode only:** Nokia's simulator confirms only its own test identity, so live it stops at "We couldn't run this check" before the ban. |
 
 ## Script
 
-<!-- pitch owner: the ban adds ~40 s; trim elsewhere to stay within 3:00 -->
+<!-- Timings are estimates: time the whole run at rehearsal. If over 3:00, skip the d6 detour first, then shorten the opening's three cases to two. -->
 
 ### 0:00–0:30 · The problem
 
@@ -34,7 +32,7 @@ Demo inputs (live on Nokia's simulator; mock mode accepts them too):
 >
 > OLX and Storia can't tell you who's actually behind a listing. The mobile network can.
 
-### 0:30–2:20 · Live demo
+### 0:30–2:30 · Live demo
 
 1. **Landlord verifies (phone, ~45 s).** "Zoltan owns this flat. He opens ChirieSigură on his phone, on mobile data."
    - Consent screen: "it names every check before anything runs, and we keep the result, never the ID."
@@ -42,16 +40,16 @@ Demo inputs (live on Nokia's simulator; mock mode accepts them too):
    - ID details → **KYC Match**: "the operator checks the name, birthdate and ID number against the subscriber who owns this number. A stolen ID card fails here, because it doesn't belong to whoever holds the phone."
    - **SIM Swap**: "no recent SIM change, so this isn't a hijacked number." (The real rule is 7 days; on Nokia's simulator production checks the last hour.)
    - "I'm at the apartment" → **Location Verification**: "his phone is at the address he gave, according to the network, not GPS he can fake."
-   - Paste the d4 listing URL → a code appears. "He pastes this line into his listing. The code only counts on the listings he registered."
-2. **Student sees a verified listing (laptop, ~20 s).** Open `d1`, a listing he verified earlier with `VC-7K3Q`. Badge: 🟢 *Verified landlord · near the address*. "It also matched the phone number shown on the page."
-3. **The scammer's copy (laptop, ~20 s).** Open `d2`: same text, same photos, same code, €130 cheaper, different phone. Badge: 🔴 *Copied from a verified listing*. "Copying the code doesn't help: it's bound to the original listing."
-4. **Viewers keep it honest (student phone, ~35 s).** "At the viewing, the student only has a phone." On `/check`, paste the `d1` link and code `VC-7K3Q`, then tap **I'm at the viewing · Report it**. The student confirms their number, taps "I'm at the viewing" (the network checks they're really at the address), then picks "Landlord didn't show up". Reload `d1` on the laptop: 🟠 *Verified, but warnings from viewers*. "Only people who were physically there can report, one report per phone."
+   - Paste the d4 listing URL → a code appears. "He pastes this line into his listing. The code only counts on the listings he registered." Then: "Why would he bother? Students already ask for proof, and verified listings get answered first. Three minutes, once, and it works on every listing."
+2. **Student sees a verified listing (laptop, ~15 s).** Open `d1`, a listing he verified earlier with `VC-7K3Q`. Badge: 🟢 *Verified landlord · near the address*. "It also matched the phone number shown on the page."
+3. **The scammer's copy (laptop, ~15 s).** Open `d2`: same text, same photos, same code, €130 cheaper, different phone. Badge: 🔴 *Copied from a verified listing*. "Copying the code doesn't help: it's bound to the original listing."
+4. **Viewers keep it honest (student phone, ~25 s).** "At the viewing, the student only has a phone." On `/check`, paste the `d1` link and code `VC-7K3Q`, then tap **I'm at the viewing · Report it**. The student confirms their number, taps "I'm at the viewing" (the network checks they're really at the address), then picks "Landlord didn't show up". Reload `d1` on the laptop: 🟠 *Verified, but warnings from viewers*. "Only people who were physically there can report, one report per phone."
 
-5. **Scammers are banned for life (team phone, ~40 s).** "Mihai verified with his real ID, and three viewers he asked for money reported him." On `/review`, Zoltan now shows too: the no-show we just filed is his third. "One bad week doesn't ban anyone: a human decides." Tap **Confirm ban** on the card reading *3 asked for money first*. Laptop: reload `d5`: 🔴 *Landlord banned*. Scammer phone: `/verify` with a brand-new number `0700000010` and Mihai's details → refused at the ID step. "New SIM, same person: the ban follows his ID, not his phone."
+5. **Scammers are banned for life (team phone, ~20 s).** "Mihai verified with his real ID, and three viewers he asked for money reported him." On `/review`, Zoltan now shows too: the no-show we just filed is his third. "One bad week doesn't ban anyone: a human decides." Tap **Confirm ban** on the card reading *3 asked for money first*. Laptop: reload `d5`: 🔴 *Landlord banned*. "A new SIM won't help him: the ban follows his ID card, not his phone."
 
-### 2:20–3:00 · Why it works
+### 2:30–3:00 · Why it works
 
-> Four Nokia Network as Code signals, combined: **Number Verification, KYC Match, SIM Swap and Location Verification**. Each one alone can be dodged. Together, a scammer would need the real owner's ID, their SIM, and to stand in the flat.
+> Each network signal alone can be dodged. Together, a scammer would need the real owner's ID, their SIM, and to stand in the flat.
 >
 > **Privacy:** we store a match result and a fingerprint that can only answer *is this a banned person?*, never your ID. Phone numbers are kept only as salted hashes, and nothing about the landlord is shown to students beyond the badge.
 >
