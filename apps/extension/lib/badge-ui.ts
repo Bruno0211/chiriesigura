@@ -30,6 +30,7 @@ const TONE: Record<BadgeStatus, Tone> = {
   red_fake_code: 'fail',
   red_copied: 'fail',
   red_phone_mismatch: 'fail',
+  red_banned: 'fail',
   grey_unverified: 'none',
   grey_cannot_confirm: 'none',
 };
@@ -217,6 +218,8 @@ function recordRows(status: BadgeStatus, opts: BadgeOptions): Row[] {
       return [code, FAILED('Listing ID readable from the link', "We couldn't read this listing's ID from its link, so we can't tell whose code this is.")];
     case 'red_fake_code':
       return [code, FAILED('Code issued by ChirieSigură', 'No landlord was ever given this code.')];
+    case 'red_banned':
+      return [code, PASSED('Code issued by ChirieSigură'), FAILED('Landlord in good standing', 'Our team banned this landlord after verified viewers reported them.')];
     case 'red_copied':
       return [
         code,
