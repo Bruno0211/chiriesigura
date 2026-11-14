@@ -23,6 +23,8 @@ export const verification = pgTable('verification', {
   addressText: text('address_text').notNull(),
   lat: doublePrecision('lat').notNull(),
   lng: doublePrecision('lng').notNull(),
+  // The city of the verified address, shown on the badge (never the street).
+  city: text('city'),
   locationResult: text('location_result'), // 'TRUE' | 'PARTIAL'
   // Last passed location check not yet used by a listings submission; each submission needs a fresh one.
   locationCheckedAt: timestamp('location_checked_at', { withTimezone: true }),

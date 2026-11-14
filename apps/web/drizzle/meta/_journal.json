@@ -22,6 +22,13 @@
       "when": 1794679219333,
       "tag": "0002_thick_princess_powerful",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794687034789,
+      "tag": "0003_huge_boomer",
+      "breakpoints": true
     }
   ]
 }
