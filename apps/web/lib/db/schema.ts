@@ -8,6 +8,11 @@ export const landlord = pgTable('landlord', {
   numberVerifiedAt: timestamp('number_verified_at', { withTimezone: true }),
   kycMatchedAt: timestamp('kyc_matched_at', { withTimezone: true }),
   simCheckedAt: timestamp('sim_checked_at', { withTimezone: true }),
+  // Keyed hashes of the KYC-confirmed ID card number and name + birthdate; the ban follows the person across SIMs.
+  idDocHash: text('id_doc_hash'),
+  nameBirthHash: text('name_birth_hash'),
+  bannedAt: timestamp('banned_at', { withTimezone: true }),
+  reviewDismissedAt: timestamp('review_dismissed_at', { withTimezone: true }),
   createdAt: createdAt(),
 });
 
