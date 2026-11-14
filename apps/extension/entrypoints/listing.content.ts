@@ -49,6 +49,9 @@ export default defineContentScript({
     observer.observe(document.documentElement, { childList: true });
     // Fires before the URL commits, so read the page on the next scheduled run, not now.
     ctx.addEventListener(window, 'wxt:locationchange', () => watcher.schedule());
+    // Back from signing in on the site (another tab or window): the badge updates without "Try again".
+    ctx.addEventListener(document, 'visibilitychange', () => document.visibilityState === 'visible' && watcher.recheckIfSignedOut());
+    ctx.addEventListener(window, 'focus', () => watcher.recheckIfSignedOut());
     ctx.onInvalidated(() => {
       observer.disconnect();
       watcher.destroy();

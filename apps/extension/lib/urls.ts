@@ -21,7 +21,8 @@ export function viewingUrl(appUrl: string, verificationId: string, code: string 
   return code ? `${path}?code=${encodeURIComponent(code)}` : path;
 }
 
-export const signInUrl = (appUrl: string): string => `${base(appUrl)}/auth/login`;
+/** Back to a "you are signed in" page; the listing tab re-checks by itself when the student returns to it. */
+export const signInUrl = (appUrl: string): string => `${base(appUrl)}/auth/login?returnTo=/signed-in`;
 
 export const verifyUrl = (appUrl: string): string => `${base(appUrl)}/verify`;
 

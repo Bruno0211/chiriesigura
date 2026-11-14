@@ -3,7 +3,7 @@ import { askMessage, checkUrl, signInUrl, viewingUrl } from './urls';
 
 describe('signInUrl', () => {
   it("points at the site's Auth0 sign-in", () => {
-    expect(signInUrl('https://cs.example/')).toBe('https://cs.example/auth/login');
+    expect(signInUrl('https://cs.example/')).toBe('https://cs.example/auth/login?returnTo=/signed-in');
   });
 });
 

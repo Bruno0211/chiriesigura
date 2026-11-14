@@ -23,6 +23,8 @@ export interface Watcher {
   schedule(): void;
   /** What the badge shows right now, for the popup. */
   shown(): Shown | null;
+  /** Checks again if the badge is waiting for sign-in: the student may have just signed in in another tab. */
+  recheckIfSignedOut(): void;
   destroy(): void;
 }
 
@@ -109,6 +111,9 @@ export function createWatcher(d: WatcherDeps): Watcher {
       maxWait ??= setTimeout(fire, maxWaitMs);
     },
     shown: () => current,
+    recheckIfSignedOut() {
+      if (current?.reply && !current.reply.ok && current.reply.reason === 'signed_out') void run(true);
+    },
     destroy() {
       dead = true;
       clearTimers();

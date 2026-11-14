@@ -153,7 +153,7 @@ describe('renderState', () => {
     expect(text()).not.toContain("Couldn't check");
     root().querySelector<HTMLButtonElement>('button[aria-expanded]')!.click();
     const link = [...root().querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Sign in');
-    expect(link?.href).toBe('http://localhost:3000/auth/login');
+    expect(link?.href).toBe('http://localhost:3000/auth/login?returnTo=/signed-in');
     expect(link?.target).toBe('_blank');
     button('Try again')!.click();
     expect(onRetry).toHaveBeenCalledOnce();
