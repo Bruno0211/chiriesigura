@@ -79,6 +79,7 @@ const GONE = "We can't find this verification any more. Start over to verify aga
 const REJECT_TEXT: Record<Rejected['reason'], string> = {
   unparseable: "We can't read this link — paste the listing's full address",
   already_registered: 'Already registered — contact us',
+  far_from_address: "This listing isn't near the address you verified. Verify at that apartment to register it.",
 };
 const SITE_NAME: Record<ListingRef['site'], string> = { olx: 'OLX', storia: 'Storia', imobiliare: 'imobiliare.ro', demo: 'Demo listing' };
 

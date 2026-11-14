@@ -17,6 +17,7 @@ Demo inputs (mock mode accepts these):
 |---|---|---|
 | Landlord | `0700000001` | Andrei Popescu, 1985-03-02, ID `TM123456`, address `Strada Alba Iulia 2, Timișoara`, listing `https://chiriesigura.vercel.app/demo/listing/d4` |
 | Student | `0711111111` | "Landlord didn't show up" |
+| Landlord, far-away listing (optional) | `0700000001` | after the location check, paste `https://chiriesigura.vercel.app/demo/listing/d6` (Lugoj): "This listing isn't near the address you verified" |
 
 ## Script
 

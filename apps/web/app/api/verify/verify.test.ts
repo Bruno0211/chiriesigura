@@ -106,6 +106,25 @@ describe('landlord verification API', () => {
     expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd9' }]);
   });
 
+  it('refuses a listing far from the verified address and keeps the location check for a retry', async () => {
+    const phone = '+40700000001';
+    const far = 'http://localhost:3000/demo/listing/d6';
+    const { idRes, lstRes } = await verifyAll(phone, [far]);
+    expect((await lstRes.json()) as ListingsResponse).toEqual({ accepted: [], rejected: [{ url: far, reason: 'far_from_address' }] });
+    const retry = await post(listings, { verificationId: idRes.verificationId, urls: ['http://localhost:3000/demo/listing/d4'] }, phone);
+    expect(retry.status).toBe(200);
+    expect(((await retry.json()) as ListingsResponse).accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+  });
+
+  it('registers the nearby listing and refuses the far one in the same submission', async () => {
+    const { lstRes } = await verifyAll('+40700000001', ['http://localhost:3000/demo/listing/d6', 'http://localhost:3000/demo/listing/d4']);
+    const body = (await lstRes.json()) as ListingsResponse;
+    expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+    expect(body.rejected).toEqual([{ url: 'http://localhost:3000/demo/listing/d6', reason: 'far_from_address' }]);
+    expect(body.code).toMatch(/^VC-/);
+    expect(await db.select().from(listing)).toHaveLength(1);
+  });
+
   it('needs a fresh location check before each listings submission, then adds to the same code', async () => {
     const phone = '+40700000001';
     const { idRes, lstRes } = await verifyAll(phone, ['http://localhost:3000/demo/listing/d4']);

@@ -33,7 +33,7 @@ export interface ListingsResponse {
   code?: string;
   pasteLine?: string;
   accepted: ListingRef[];
-  rejected: { url: string; reason: 'unparseable' | 'already_registered' }[];
+  rejected: { url: string; reason: 'unparseable' | 'already_registered' | 'far_from_address' }[];
 }
 
 // POST /api/viewing/report

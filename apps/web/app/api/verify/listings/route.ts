@@ -3,6 +3,7 @@ import { generateCode, parseListingUrl, pasteLine, type ListingsRequest, type Li
 import { getDb, type Db } from '@/lib/db';
 import { listing, verification } from '@/lib/db/schema';
 import { ownVerification } from '@/lib/landlord-auth';
+import { listingTooFar } from '@/lib/listing-area';
 
 /** How long a passed location check stays usable for one listings submission. */
 const LOCATION_FRESH_MS = 10 * 60 * 1000;
@@ -53,6 +54,11 @@ export async function POST(req: Request) {
     const ref = parseListingUrl(url, appUrl);
     if (!ref) {
       out.rejected.push({ url: raw, reason: 'unparseable' });
+      continue;
+    }
+    if (listingTooFar(ref, v)) {
+      // The listing is somewhere else than the address where the network located the landlord.
+      out.rejected.push({ url: raw, reason: 'far_from_address' });
       continue;
     }
     const [existing] = await db

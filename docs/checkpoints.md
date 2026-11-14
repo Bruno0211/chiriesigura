@@ -28,7 +28,9 @@ Run by API calls from a script, not yet by hand on real phones.
 
 **Still to do by hand:** load the extension in Chrome and click through the same run on two real phones (QR scan, badge on the page), then record the backup video.
 
-**Nokia (plan Task 14 Step 3):** not tried. There's no `NAC_TOKEN` yet. Once there is one, run `apps/web/scripts/nokia-smoke.ts`, then set the working `NETWORK_MODE_*` variables on Vercel to `nokia` and redeploy.
+**Nokia (plan Task 14 Step 3):** probed 14 Nov with a `NAC_TOKEN` against Nokia's simulator. Location Verification answers per test number and ignores the area: `+99999991001` and `+99999992000` are TRUE for both Timișoara and Budapest, and `+99999991000` is FALSE for both. Real numbers (`+40700000001`, any Romanian SIM) get 404 `IDENTIFIER_NOT_FOUND`, which the app shows as "We couldn't run this check". To switch location to live: set `NETWORK_MODE_LOCATION=nokia` and `NAC_TOKEN` on Vercel, then redeploy. **Production stays on mock for the demo:** the demo numbers would 404, and the simulator's answer doesn't depend on where the phone is. The switch also covers the student's viewing report, which calls the same location check.
+
+**Listing area check:** at registration, a listing more than 5 km from the address where the network located the landlord is refused (`apps/web/lib/listing-area.ts`). Only demo listings are checked: OLX answers server-side page fetches with 403, so OLX and Storia listings register without an area check. That's a known gap; the next step is an extension-side check once `feat/ai-scan` is merged.
 
 **Blockers:** none.
 
