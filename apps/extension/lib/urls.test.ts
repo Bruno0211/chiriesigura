@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { askMessage, checkUrl, viewingUrl } from './urls';
+import { askMessage, checkUrl, signInUrl, viewingUrl } from './urls';
+
+describe('signInUrl', () => {
+  it("points at the site's Auth0 sign-in", () => {
+    expect(signInUrl('https://cs.example/')).toBe('https://cs.example/auth/login');
+  });
+});
 
 describe('checkUrl', () => {
   it('sends the listing ref, code and the phone as shown', () => {

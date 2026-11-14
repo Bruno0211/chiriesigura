@@ -21,6 +21,8 @@ export function viewingUrl(appUrl: string, verificationId: string, code: string 
   return code ? `${path}?code=${encodeURIComponent(code)}` : path;
 }
 
+export const signInUrl = (appUrl: string): string => `${base(appUrl)}/auth/login`;
+
 export const verifyUrl = (appUrl: string): string => `${base(appUrl)}/verify`;
 
 export const askMessage = (appUrl: string): string =>

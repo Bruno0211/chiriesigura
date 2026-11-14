@@ -7,7 +7,8 @@ export interface CheckRequest {
   extracted: Extracted;
 }
 
-export type CheckReply = { ok: true; data: CheckResponse } | { ok: false };
+/** reason 'signed_out': the student must sign in on the site; any other failure is "no verdict". */
+export type CheckReply = { ok: true; data: CheckResponse } | { ok: false; reason?: 'signed_out' };
 
 /**
  * What the page's badge shows right now (reply null: still checking). The content script owns it; the toolbar

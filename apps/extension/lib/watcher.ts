@@ -46,7 +46,7 @@ export function createWatcher(d: WatcherDeps): Watcher {
     const opts = { appUrl: d.appUrl, code: s.code, phoneShown: s.phoneShown };
     if (!s.reply) renderState(host, 'checking', opts);
     else if (s.reply.ok) renderBadge(host, s.reply.data, opts);
-    else renderState(host, 'unavailable', { ...opts, onRetry: () => void run(true) });
+    else renderState(host, s.reply.reason === 'signed_out' ? 'signed_out' : 'unavailable', { ...opts, onRetry: () => void run(true) });
   }
 
   function show(s: Shown | null) {

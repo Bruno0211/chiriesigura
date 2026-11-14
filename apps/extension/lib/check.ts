@@ -6,6 +6,7 @@ import { checkUrl } from './urls';
 export async function fetchCheck(appUrl: string, e: Extracted, f: typeof fetch = fetch): Promise<CheckReply> {
   try {
     const res = await f(checkUrl(appUrl, e), { cache: 'no-store', credentials: 'include', signal: AbortSignal.timeout(10_000) });
+    if (res.status === 401) return { ok: false, reason: 'signed_out' };
     if (!res.ok) return { ok: false };
     const data: unknown = await res.json();
     return isCheckResponse(data) ? { ok: true, data } : { ok: false };
