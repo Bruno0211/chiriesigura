@@ -116,6 +116,32 @@ describe('createWatcher', () => {
     expect(ask).toHaveBeenCalledTimes(2);
   });
 
+  it('asks a signed-out student to sign in, not that it could not check', async () => {
+    const w = watcher();
+    const run = w.run();
+    replies[0]!.resolve({ ok: false, reason: 'signed_out' });
+    await run;
+    expect(label()).toBe('Sign in to check listings');
+  });
+
+  it('checks again when a signed-out student comes back to the tab', async () => {
+    const w = watcher();
+    const run = w.run();
+    replies[0]!.resolve({ ok: false, reason: 'signed_out' });
+    await run;
+    w.recheckIfSignedOut();
+    expect(ask).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not check again on return when the badge already has a verdict', async () => {
+    const w = watcher();
+    const run = w.run();
+    replies[0]!.resolve({ ok: true, data: GREEN });
+    await run;
+    w.recheckIfSignedOut();
+    expect(ask).toHaveBeenCalledOnce();
+  });
+
   it('stays silent on pages that are not listings', async () => {
     page = NOT_A_LISTING;
     await watcher().run();

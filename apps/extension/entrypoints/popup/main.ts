@@ -23,7 +23,7 @@ async function main() {
     const opts = { appUrl: APP_URL, code: shown.code, phoneShown: shown.phoneShown, mode: 'popup' as const };
     if (!shown.reply) renderState(host, 'checking', opts);
     else if (shown.reply.ok) return renderBadge(host, shown.reply.data, opts);
-    else return renderState(host, 'unavailable', { ...opts, onRetry: () => tab?.id !== undefined && void browser.tabs.reload(tab.id) });
+    else return renderState(host, shown.reply.reason === 'signed_out' ? 'signed_out' : 'unavailable', { ...opts, onRetry: () => tab?.id !== undefined && void browser.tabs.reload(tab.id) });
     await new Promise((r) => setTimeout(r, 300));
   }
 }

@@ -146,6 +146,19 @@ describe('renderState', () => {
     expect(text()).toContain('Checking this listing');
   });
 
+  it('asks a signed-out student to sign in', () => {
+    const onRetry = vi.fn();
+    renderState(host, 'signed_out', { ...OPTS, onRetry });
+    expect(text()).toContain('Sign in to check listings');
+    expect(text()).not.toContain("Couldn't check");
+    root().querySelector<HTMLButtonElement>('button[aria-expanded]')!.click();
+    const link = [...root().querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Sign in');
+    expect(link?.href).toBe('http://localhost:3000/auth/login?returnTo=/signed-in');
+    expect(link?.target).toBe('_blank');
+    button('Try again')!.click();
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it('offers a retry when ChirieSigură cannot be reached', () => {
     const onRetry = vi.fn();
     renderState(host, 'unavailable', { ...OPTS, onRetry });

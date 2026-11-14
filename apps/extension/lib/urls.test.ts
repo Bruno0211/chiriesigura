@@ -1,5 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { askMessage, checkUrl, viewingUrl } from './urls';
+import { askMessage, checkUrl, isSignedInPage, signInUrl, viewingUrl } from './urls';
+
+describe('isSignedInPage', () => {
+  it("recognises the app's signed-in page, the one sign-in returns to", () => {
+    expect(isSignedInPage('http://localhost:3000', 'http://localhost:3000/signed-in')).toBe(true);
+    expect(isSignedInPage('https://cs.example/', 'https://cs.example/signed-in?x=1')).toBe(true);
+  });
+  it('ignores other pages and other sites', () => {
+    expect(isSignedInPage('http://localhost:3000', 'http://localhost:3000/check')).toBe(false);
+    expect(isSignedInPage('https://cs.example', 'https://evil.example/signed-in')).toBe(false);
+    expect(isSignedInPage('https://cs.example', 'not a url')).toBe(false);
+  });
+});
+
+describe('signInUrl', () => {
+  it("points at the site's Auth0 sign-in", () => {
+    expect(signInUrl('https://cs.example/')).toBe('https://cs.example/auth/login?returnTo=/signed-in');
+  });
+});
 
 describe('checkUrl', () => {
   it('sends the listing ref, code and the phone as shown', () => {

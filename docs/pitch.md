@@ -6,9 +6,10 @@ Track: Connected Communities (UniHack 8, Timișoara). Live URL: https://chiriesi
 
 1. Reset the demo: `pnpm --filter @cs/web seed:prod` (needs `apps/web/.env.prod.local`, see [checkpoints.md](checkpoints.md)).
 2. Laptop: Chrome with the extension loaded unpacked from `apps/extension/.output/chrome-mv3` (built with `WXT_APP_URL=https://chiriesigura.vercel.app`). Tabs open: `/demo/listing/d1`, `/demo/listing/d2`.
-3. Landlord phone: `https://chiriesigura.vercel.app/verify` open, on **mobile data**.
-4. Student phone: camera ready to scan the QR in the extension panel.
-5. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
+3. Laptop Chrome: sign in at `https://chiriesigura.vercel.app/auth/login` (the extension shows no badges until you do).
+4. Landlord phone: `https://chiriesigura.vercel.app/verify` open, on **mobile data**.
+5. Student phone: camera ready to scan the QR in the extension panel.
+6. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
 
 Demo inputs (mock mode accepts these):
 

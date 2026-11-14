@@ -2,7 +2,7 @@ import { reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
 import css from './badge.css?inline';
 import { icon, type IconName } from './icons';
 import { qrSvg } from './qr';
-import { askMessage, verifyUrl, viewingUrl } from './urls';
+import { askMessage, signInUrl, verifyUrl, viewingUrl } from './urls';
 
 /**
  * The listing badge, drawn in the phone pages' world ("The Confirmation Screen"): an indigo frame bar,
@@ -384,10 +384,10 @@ export function renderEmpty(host: HTMLElement, opts: { appUrl: string }): void {
   );
 }
 
-/** The two moments without an answer: the request in flight, and the server out of reach. */
+/** The moments without an answer: the request in flight, the student signed out, and the server out of reach. */
 export function renderState(
   host: HTMLElement,
-  state: 'checking' | 'unavailable',
+  state: 'checking' | 'unavailable' | 'signed_out',
   opts: BadgeOptions & { onRetry?: () => void },
 ): void {
   const doc = host.ownerDocument;
@@ -401,6 +401,22 @@ export function renderState(
   }
   const retry = el(doc, 'button', { type: 'button', class: 'secondary' }, icon(doc, 'retry'), 'Try again');
   if (opts.onRetry) retry.addEventListener('click', opts.onRetry);
+  if (state === 'signed_out') {
+    paint(
+      host,
+      {
+        tone: 'none',
+        label: 'Sign in to check listings',
+        panel: [
+          el(doc, 'p', { class: 'plain' }, 'ChirieSigură checks are for signed-in students. Sign in on the website, then try again.'),
+          el(doc, 'a', { class: 'primary', href: signInUrl(opts.appUrl), target: '_blank', rel: 'noopener noreferrer' }, 'Sign in', icon(doc, 'arrow')),
+          retry,
+        ],
+      },
+      opts,
+    );
+    return;
+  }
   paint(
     host,
     {

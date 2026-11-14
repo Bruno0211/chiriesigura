@@ -10,6 +10,12 @@ describe('fetchCheck', () => {
     const f = vi.fn().mockResolvedValue(json(GREEN));
     await expect(fetchCheck('https://cs.example', EX, f)).resolves.toEqual({ ok: true, data: GREEN });
     expect(f.mock.calls[0]![0]).toBe('https://cs.example/api/check?site=demo&listingId=d1&code=VC-7K3Q');
+    expect(f.mock.calls[0]![1]).toMatchObject({ credentials: 'include' });
+  });
+
+  it('reports a signed-out student, not a dead server', async () => {
+    const f = vi.fn().mockResolvedValue(json({ error: 'signed_out' }, 401));
+    await expect(fetchCheck('https://cs.example', EX, f)).resolves.toEqual({ ok: false, reason: 'signed_out' });
   });
 
   it('fails closed on a server error, so no verdict is shown', async () => {

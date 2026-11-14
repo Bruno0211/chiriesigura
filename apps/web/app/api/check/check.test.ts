@@ -1,10 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CheckResponse } from '@cs/shared';
 import { makeTestDb } from '@/lib/db/test-db';
 import { verification } from '@/lib/db/schema';
 import { addReports, seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
+import { isSignedIn } from '@/lib/auth0';
 import { GET } from './route';
+
+vi.mock('@/lib/auth0', () => ({ isSignedIn: vi.fn(async () => true) }));
 
 let db: Db;
 let seeded: Awaited<ReturnType<typeof seedVerified>>;
@@ -21,6 +24,13 @@ async function check(params: Record<string, string>) {
 const d1 = { site: 'demo', listingId: 'd1' };
 
 describe('GET /api/check', () => {
+  it('refuses a signed-out student, with CORS headers', async () => {
+    vi.mocked(isSignedIn).mockResolvedValueOnce(false);
+    const res = await GET(new Request('http://localhost:3000/api/check?site=demo&listingId=d1&code=VC-7K3Q'));
+    expect(res.status).toBe(401);
+    expect(await res.json()).toEqual({ error: 'signed_out' });
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
+  });
   it('cannot confirm a code without a listing', async () => {
     const { body } = await check({ code: 'VC-7K3Q' });
     expect(body).toMatchObject({ status: 'grey_cannot_confirm', label: "Can't confirm" });

@@ -23,6 +23,8 @@ export interface Watcher {
   schedule(): void;
   /** What the badge shows right now, for the popup. */
   shown(): Shown | null;
+  /** Checks again if the badge is waiting for sign-in: the student may have just signed in in another tab. */
+  recheckIfSignedOut(): void;
   destroy(): void;
 }
 
@@ -46,7 +48,7 @@ export function createWatcher(d: WatcherDeps): Watcher {
     const opts = { appUrl: d.appUrl, code: s.code, phoneShown: s.phoneShown };
     if (!s.reply) renderState(host, 'checking', opts);
     else if (s.reply.ok) renderBadge(host, s.reply.data, opts);
-    else renderState(host, 'unavailable', { ...opts, onRetry: () => void run(true) });
+    else renderState(host, s.reply.reason === 'signed_out' ? 'signed_out' : 'unavailable', { ...opts, onRetry: () => void run(true) });
   }
 
   function show(s: Shown | null) {
@@ -109,6 +111,9 @@ export function createWatcher(d: WatcherDeps): Watcher {
       maxWait ??= setTimeout(fire, maxWaitMs);
     },
     shown: () => current,
+    recheckIfSignedOut() {
+      if (current?.reply && !current.reply.ok && current.reply.reason === 'signed_out') void run(true);
+    },
     destroy() {
       dead = true;
       clearTimers();

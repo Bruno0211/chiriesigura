@@ -2,6 +2,7 @@ import {
   badgeLabel, decideBadge, emptyCounts, findCode, normalizeRoPhone, REPORT_CATEGORIES,
   type CheckResponse, type ListingRef, type Site,
 } from '@cs/shared';
+import { isSignedIn } from '@/lib/auth0';
 import { getDb } from '@/lib/db';
 import { phoneHash } from '@/lib/hash';
 import { findVerificationByCode, landlordReportCounts } from '@/lib/queries';
@@ -14,6 +15,7 @@ export function OPTIONS() {
 }
 
 export async function GET(req: Request) {
+  if (!(await isSignedIn())) return Response.json({ error: 'signed_out' }, { status: 401, headers: CORS });
   const q = new URL(req.url).searchParams;
   const site = q.get('site') as Site | null;
   const listingId = q.get('listingId');

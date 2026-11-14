@@ -56,6 +56,10 @@ export default function PrivacyPage() {
                 never receive coordinates.
               </li>
               <li><strong>Your phone number itself.</strong> Only the one-way hash above.</li>
+              <li>
+                <strong>Students&apos; email and name.</strong> Auth0, our sign-in provider, keeps your sign-in. ChirieSigură
+                only learns that you are signed in.
+              </li>
             </ul>
           </div>
         </section>
