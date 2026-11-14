@@ -25,19 +25,31 @@ describe('checkUrl', () => {
       listing: { site: 'demo', listingId: 'd1' },
       code: 'VC-7K3Q',
       phone: '+40 700 000 001',
+      place: null,
+      placeCoords: null,
     });
     expect(url).toBe('http://localhost:3000/api/check?site=demo&listingId=d1&code=VC-7K3Q&phone=%2B40+700+000+001');
     expect(new URL(url).searchParams.get('phone')).toBe('+40 700 000 001');
   });
 
+  it('sends the place and the page coordinates when the page has them', () => {
+    const url = new URL(checkUrl('http://localhost:3000', {
+      listing: { site: 'storia', listingId: 'IDJdUz' }, code: 'VC-7K3Q', phone: null,
+      place: 'Zona Soarelui, Timisoara, Timis', placeCoords: { lat: 45.73587, lng: 21.249695 },
+    }));
+    expect(url.searchParams.get('place')).toBe('Zona Soarelui, Timisoara, Timis');
+    expect(url.searchParams.get('placeLat')).toBe('45.73587');
+    expect(url.searchParams.get('placeLng')).toBe('21.249695');
+  });
+
   it('leaves out what the page did not have', () => {
-    expect(checkUrl('http://localhost:3000', { listing: null, code: null, phone: null })).toBe(
+    expect(checkUrl('http://localhost:3000', { listing: null, code: null, phone: null, place: null, placeCoords: null })).toBe(
       'http://localhost:3000/api/check',
     );
   });
 
   it('tolerates a trailing slash on the app URL', () => {
-    expect(checkUrl('https://cs.example/', { listing: { site: 'olx', listingId: 'a1' }, code: null, phone: null })).toBe(
+    expect(checkUrl('https://cs.example/', { listing: { site: 'olx', listingId: 'a1' }, code: null, phone: null, place: null, placeCoords: null })).toBe(
       'https://cs.example/api/check?site=olx&listingId=a1',
     );
   });

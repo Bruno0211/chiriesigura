@@ -5,9 +5,9 @@ import type { CheckReply, Shown } from './messages';
 import { createWatcher } from './watcher';
 
 const APP = 'http://localhost:3000';
-const NO_PHONE: Extracted = { listing: { site: 'olx', listingId: 'a1' }, code: 'VC-7K3Q', phone: null };
+const NO_PHONE: Extracted = { listing: { site: 'olx', listingId: 'a1' }, code: 'VC-7K3Q', phone: null, place: null, placeCoords: null };
 const WITH_PHONE: Extracted = { ...NO_PHONE, phone: '0799 999 999' };
-const NOT_A_LISTING: Extracted = { listing: null, code: null, phone: null };
+const NOT_A_LISTING: Extracted = { listing: null, code: null, phone: null, place: null, placeCoords: null };
 const GREEN: CheckResponse = { status: 'green', label: 'Verified landlord · near the address · 14 Nov 2026', verificationId: 'v1' };
 const MISMATCH: CheckResponse = { status: 'red_phone_mismatch', label: "Phone number doesn't match the verified landlord" };
 

@@ -12,12 +12,15 @@ export interface IssuedVerification {
   verifiedAt: string;
   locationResult: 'TRUE' | 'PARTIAL';
   banned: boolean;
+  lat: number;
+  lng: number;
+  city: string | null;
 }
 
 /** Only issued codes (verification completed) count. */
 export async function findVerificationByCode(db: Db, code: string): Promise<IssuedVerification | null> {
   const [v] = await db
-    .select({ id: verification.id, landlordId: verification.landlordId, verifiedAt: verification.verifiedAt, locationResult: verification.locationResult, phoneHash: landlord.phoneHash, bannedAt: landlord.bannedAt })
+    .select({ id: verification.id, landlordId: verification.landlordId, verifiedAt: verification.verifiedAt, locationResult: verification.locationResult, lat: verification.lat, lng: verification.lng, city: verification.city, phoneHash: landlord.phoneHash, bannedAt: landlord.bannedAt })
     .from(verification)
     .innerJoin(landlord, eq(landlord.id, verification.landlordId))
     .where(and(eq(verification.code, code), isNotNull(verification.verifiedAt)));
@@ -30,6 +33,9 @@ export async function findVerificationByCode(db: Db, code: string): Promise<Issu
     verifiedAt: v.verifiedAt.toISOString(),
     locationResult: v.locationResult as 'TRUE' | 'PARTIAL',
     banned: v.bannedAt !== null,
+    lat: v.lat,
+    lng: v.lng,
+    city: v.city,
     listings: rows.map((r) => ({ site: r.site as Site, listingId: r.listingId })),
   };
 }

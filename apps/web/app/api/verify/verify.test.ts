@@ -51,6 +51,8 @@ describe('landlord verification API', () => {
     expect(body.code).toMatch(/^VC-[A-HJ-NP-Z2-9]{4}$/);
     expect(body.pasteLine).toBe(`Proprietar verificat · ChirieSigură ${body.code}`);
     expect(body.accepted).toEqual([{ site: 'demo', listingId: 'd4' }]);
+    const [v] = await db.select().from(verification);
+    expect(v!.city).toBe('Timișoara');
   });
 
   it('stops on a swapped SIM without creating a verification', async () => {
