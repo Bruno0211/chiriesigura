@@ -12,6 +12,9 @@ const EARLIER_NO_SHOWS = ['+40711111118', '+40711111119'];
 // The banned-live scammer (docs/pitch.md): starts on hold with 3 "asked for money" reports.
 const SCAM_CODE = 'VC-BAN5';
 const SCAMMER = '+40700000009';
+// Radu: verified in Timișoara, his code on a flat that says Cluj (the place check, docs/pitch.md Q&A).
+const FAR_CODE = 'VC-CLJ7';
+const FAR_LANDLORD = '+40700000011';
 const SCAMMER_ID = { givenName: 'Mihai', familyName: 'Ionescu', birthdate: '1990-07-15', idDocument: 'TM654321' };
 const SCAM_REPORTERS = ['+40711111121', '+40711111122', '+40711111123'];
 
@@ -50,6 +53,7 @@ export async function seed(db: Db): Promise<void> {
   }
 
   await seedScammer(db, appUrl, now);
+  await seedFarListing(db, appUrl, now);
 }
 
 /** Mihai, the scammer: verified under his real ID, on hold for the team. Reseeding lifts any ban from a rehearsal. */
@@ -78,13 +82,33 @@ async function seedScammer(db: Db, appUrl: string, now: Date): Promise<void> {
   }
 }
 
+/** Radu: a verified landlord whose d7 listing says the flat is in Cluj. */
+async function seedFarListing(db: Db, appUrl: string, now: Date): Promise<void> {
+  const checks = { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now };
+  const [l] = await db
+    .insert(landlord)
+    .values({ phoneHash: phoneHash(FAR_LANDLORD), ...checks })
+    .onConflictDoUpdate({ target: landlord.phoneHash, set: checks })
+    .returning();
+  const fields = { landlordId: l!.id, addressText: DEMO_APARTMENT, ...DEMO_ADDRESSES[DEMO_APARTMENT]!, locationResult: 'TRUE', verifiedAt: now };
+  const [v] = await db
+    .insert(verification)
+    .values({ code: FAR_CODE, ...fields })
+    .onConflictDoUpdate({ target: verification.code, set: fields })
+    .returning();
+  await db
+    .insert(listing)
+    .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd7', url: `${appUrl}/demo/listing/d7` })
+    .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
+}
+
 // Run directly (`pnpm seed`), not when a test imports it.
 if (/[\\/]scripts[\\/]seed\.ts$/.test(process.argv[1] ?? '')) {
   // `vercel env pull` writes "[SENSITIVE]" for secrets; seeding with it silently breaks every phone match.
   if (process.env.PHONE_PEPPER?.startsWith('[')) throw new Error('PHONE_PEPPER is a placeholder: set the real team value');
   seed(getDb()).then(
     () => {
-      console.log(`Seeded: ${DEMO_CODE} on demo:d1 with ${EARLIER_NO_SHOWS.length} earlier no-shows; demo:d4 is free; ${SCAM_CODE} on demo:d5 on hold.`);
+      console.log(`Seeded: ${DEMO_CODE} on demo:d1 with ${EARLIER_NO_SHOWS.length} earlier no-shows; demo:d4 is free; ${SCAM_CODE} on demo:d5 on hold; ${FAR_CODE} on demo:d7 (far away).`);
       process.exit(0);
     },
     (e) => {

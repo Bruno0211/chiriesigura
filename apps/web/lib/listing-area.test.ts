@@ -56,6 +56,7 @@ describe('listingFarFrom', () => {
   it('demo place names resolve without the network', async () => {
     const f = stub(at(north(100)));
     expect(await lookupPlace('lugoj,  centru')).toEqual(DEMO_LISTINGS.d6!.coords);
+    expect(await lookupPlace('Cluj-Napoca, Centru')).toEqual(DEMO_LISTINGS.d7!.coords);
     expect(f).not.toHaveBeenCalled();
   });
   it('coordinates use the 5 km limit', async () => {

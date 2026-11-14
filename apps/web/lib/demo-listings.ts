@@ -78,6 +78,17 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
     contactName: 'Mihai', phone: '+40 700 000 009', photos: ['1600493505873-cddd69453072', '1629042306558-7d1e15cc02fa'].map(photo), posted: 'Postat azi la 07:55',
     coords: { lat: 45.7471, lng: 21.2384 },
   },
+  // A real code on a flat in another city: the place check turns it red.
+  d7: {
+    id: 'd7', title: 'Apartament 2 camere, zona Centru, Cluj-Napoca', price: '400 €/lună', area: 'Cluj-Napoca, Centru', rooms: '2 camere · 55 m² · etaj 3/4',
+    description: [
+      'Apartament 2 camere în centrul Clujului, aproape de Piața Unirii. Mobilat și utilat complet.',
+      'Disponibil imediat, ideal pentru studenți.',
+      'Proprietar verificat · ChirieSigură VC-CLJ7',
+    ],
+    contactName: 'Radu', phone: '+40 700 000 011', photos: FLAT_PHOTOS, posted: 'Postat azi la 10:05',
+    coords: { lat: 46.7712, lng: 23.6236 },
+  },
 };
 
 /** Another landlord's verified listing in the "similar" widget: its code must not count for this page. */

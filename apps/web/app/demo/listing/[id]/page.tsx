@@ -38,7 +38,7 @@ export default async function DemoListingPage({ params }: { params: Params }) {
               ))}
             </div>
             <h1 className={s.title} data-testid="title">{l.title}</h1>
-            <p className={s.meta}>{l.area} · {l.rooms}</p>
+            <p className={s.meta}><span data-testid="place">{l.area}</span> · {l.rooms}</p>
             <h2 className={s.h2}>Descriere</h2>
             <div className={s.description} data-testid="description">
               {l.description.map((p) => <p key={p}>{p}</p>)}

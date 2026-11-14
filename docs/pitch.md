@@ -59,6 +59,10 @@ Demo inputs (live on Nokia's simulator; mock mode accepts them too):
 >
 > ChirieSigură: the network already knows who's real. We let students see it.
 
+## Q&A
+
+**"Can a verified landlord list any flat?"** "He'd need his real ID, and the badge compares where the listing says the flat is with where the network found him." Open `/demo/listing/d7`: a real code (`VC-CLJ7`) on a flat in Cluj, from a landlord verified in Timișoara → 🔴 *Listing is far from where the landlord verified*. "A different flat in the same city is what the ANCPI ownership check closes."
+
 ## Slides (5)
 
 1. **Problem:** a student, a deposit, a vanished landlord, plus the three Romanian cases above.
