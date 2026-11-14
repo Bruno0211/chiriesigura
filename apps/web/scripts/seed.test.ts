@@ -1,11 +1,13 @@
 import { and, eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/check/route';
 import type { Db } from '@/lib/db';
 import { listing, verification, viewingReport } from '@/lib/db/schema';
 import { makeTestDb } from '@/lib/db/test-db';
 import { phoneHash } from '@/lib/hash';
 import { seed } from './seed';
+
+vi.mock('@/lib/auth0', () => ({ isSignedIn: vi.fn(async () => true) }));
 
 const check = async (listingId: string, phone?: string) => {
   const q = new URLSearchParams({ site: 'demo', listingId, code: 'VC-7K3Q', ...(phone ? { phone } : {}) });
