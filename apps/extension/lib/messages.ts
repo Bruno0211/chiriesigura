@@ -33,7 +33,12 @@ export interface StateRequest {
 
 export type ExtensionMessage = CheckRequest | ShowRequest;
 
-const STATUSES = new Set(['green', 'amber', 'red_fake_code', 'red_copied', 'red_phone_mismatch', 'grey_unverified', 'grey_cannot_confirm']);
+// A record, so adding a BadgeStatus without listing it here is a type error.
+const KNOWN: Record<BadgeStatus, true> = {
+  green: true, amber: true, red_fake_code: true, red_copied: true, red_phone_mismatch: true, red_banned: true,
+  grey_unverified: true, grey_cannot_confirm: true,
+};
+const STATUSES = new Set(Object.keys(KNOWN));
 
 /** Trust nothing from the network that the badge would render wrongly. */
 export function isCheckResponse(v: unknown): v is CheckResponse {
