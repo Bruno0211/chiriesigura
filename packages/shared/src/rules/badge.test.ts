@@ -63,7 +63,7 @@ describe('badgeLabel', () => {
 
 describe('reportLine', () => {
   it('lists each non-zero category', () => {
-    expect(reportLine(counts({ ok: 3, no_show: 1 }))).toBe("4 verified viewings: 3 ✅ · 1 didn't show up");
+    expect(reportLine(counts({ ok: 3, no_show: 1 }))).toBe("4 verified viewings: 3 all good · 1 didn't show up");
   });
   it('is null when there are no reports', () => {
     expect(reportLine(emptyCounts())).toBeNull();

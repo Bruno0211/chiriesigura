@@ -1,7 +1,8 @@
 /*
- * ChirieSigură listing badge: The Confirmation Screen, at badge scale.
- * Tokens are the phone pages' (apps/web/app/(phone)/phone.module.css). The badge reads as a code plate:
- * an indigo frame bar over a status cell, the only place state colour lives, and ruled tab-headed modules below.
+ * ChirieSigură listing badge: Tram Line, at badge scale.
+ * Tokens are the phone pages' (apps/web/app/(phone)/phone.module.css): a white card under the VC line badge,
+ * a status line that is the only place state colour lives, the listing's checks as a mini line diagram,
+ * and cobalt actions. It floats over a page it does not control, so it alone carries a soft shadow.
  */
 
 /* !important here outranks the listing site's own rules for this element (inner-context important wins). */
@@ -33,47 +34,47 @@
 }
 
 .cs {
-  --frame: #23205a;
-  --frame-hi: #322e7a;
-  --frame-ink-2: #d3cff4;
-  --ground: #f0eff6;
+  --line: #1f4fd6;
+  --line-hi: #1a43b8;
+  --line-tint: #eef2fd;
+  --ink: #141414;
+  --ink-2: #4b4f58;
+  --ink-3: #6a6f7a;
+  --ground: #f2f3f5;
   --surface: #ffffff;
-  --surface-2: #f8f7fc;
-  --tab: #e4e1f2;
-  --rule: #cfcbe3;
-  --rule-soft: #e7e5f1;
-  --field: #a9a4cc;
-  --ink: #15132b;
-  --ink-2: #45425e;
-  --ink-3: #575472;
-  --ok: #0f7a4a;
-  --ok-bg: #e2f2e9;
-  --fail: #b3261e;
-  --fail-bg: #fbe8e6;
-  --warn: #8a5300;
-  --warn-bg: #fdf0d5;
-  --radius: 6px;
+  --rule: #e2e4e9;
+  --track: #cdd1d8;
+  --ok: #13804b;
+  --ok-ink: #0f6f41;
+  --ok-bg: #e7f4ed;
+  --fail: #c4291c;
+  --fail-bg: #fdeceb;
+  --warn: #8a4f00;
+  --warn-bg: #fdf1d8;
+  --radius: 12px;
+  --radius-lg: 16px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --text: 'CS Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text: 'CS Atkinson Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'CS JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 32px);
   overflow: hidden;
-  border: 1px solid var(--frame);
-  border-radius: var(--radius);
-  background: var(--ground);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   box-shadow:
-    0 12px 32px rgb(21 19 43 / 0.22),
-    0 2px 6px rgb(21 19 43 / 0.14);
+    0 12px 32px rgb(20 20 20 / 0.16),
+    0 2px 6px rgb(20 20 20 / 0.1);
   color: var(--ink);
   font-family: var(--text);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
+  font-variant-numeric: tabular-nums;
   text-align: left;
-  caret-color: var(--frame);
+  caret-color: var(--line);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -85,12 +86,12 @@
 }
 
 ::selection {
-  background: #d3cff4;
+  background: #cfdafa;
   color: var(--ink);
 }
 
 :focus-visible {
-  outline: 3px solid var(--frame);
+  outline: 3px solid var(--line);
   outline-offset: 2px;
 }
 
@@ -103,7 +104,7 @@
   white-space: nowrap;
 }
 
-/* ── Head: frame bar + status cell ──────────────────────────────────── */
+/* ── Head: the line badge, then the status line ─────────────────────── */
 
 .head {
   display: block;
@@ -121,67 +122,90 @@ button.head {
 
 button.head:focus-visible {
   outline-offset: -3px;
+  border-radius: var(--radius-lg);
 }
 
 .bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 8px 12px;
-  background: var(--frame);
-  color: #ffffff;
-  transition: background-color 160ms var(--ease-out);
-}
-
-button.head:hover .bar {
-  background: var(--frame-hi);
+  gap: 8px;
+  min-height: 50px;
+  padding: 10px 12px 8px;
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.01em;
+}
+
+/* The VC line badge, drawn so the badge's text stays exactly as specified. */
+.brand::before {
+  content: 'VC';
+  content: 'VC' / '';
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--line);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .zone {
   margin-left: auto;
-  color: var(--frame-ink-2);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .chev {
   flex: none;
   width: 18px;
   height: 18px;
-  color: var(--frame-ink-2);
-  transition: transform 220ms var(--ease-out);
+  color: var(--ink-3);
+  transition:
+    transform 220ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+button.head:hover .chev,
+button.head:hover .zone {
+  color: var(--line);
 }
 
 .cs[data-open='true'] .chev {
   transform: rotate(180deg);
 }
 
+/* The status line: the one place state colour lives. */
 .status {
   --tone: var(--ink-3);
-  --tone-bg: var(--tab);
+  --tone-bg: var(--ground);
   --tone-ink: var(--ink);
 
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-columns: 30px minmax(0, 1fr);
   align-items: start;
   gap: 10px;
-  padding: 11px 12px 12px;
+  margin: 0 10px 10px;
+  padding: 10px;
+  border-radius: var(--radius);
   background: var(--tone-bg);
 }
 
 .status[data-tone='ok'] {
   --tone: var(--ok);
   --tone-bg: var(--ok-bg);
-  --tone-ink: var(--ok);
+  --tone-ink: var(--ok-ink);
 }
 
 .status[data-tone='warn'] {
@@ -196,24 +220,38 @@ button.head:hover .bar {
   --tone-ink: var(--fail);
 }
 
+/* A stop disc: filled in the state's colour with a drawn mark, or an empty grey ring while nothing is known. */
 .mark {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: var(--tone);
   color: #ffffff;
 }
 
+.mark svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+}
+
+/* Nothing to vouch for: the drawn ring with a dash, in grey. */
 .mark[data-tone='none'] {
   background: var(--surface);
   color: var(--ink-3);
 }
 
-.mark svg {
-  width: 20px;
-  height: 20px;
+.mark[data-tone='none'] svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+/* Busy only: the dotted ring turns, in the line colour. */
+.mark[data-busy='true'] {
+  color: var(--line);
 }
 
 .mark[data-busy='true'] svg {
@@ -223,14 +261,14 @@ button.head:hover .bar {
 .label {
   display: block;
   min-width: 0;
-  padding-top: 5px;
+  padding-top: 4px;
   color: var(--tone-ink);
 }
 
 .lead {
   display: block;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.3;
   text-wrap: balance;
 }
@@ -249,26 +287,17 @@ button.head:hover .bar {
 }
 
 .num {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
+  font-weight: 700;
 }
 
-/* A result posts into the badge like a printed line: the phone record's left-to-right wipe. */
-.posted {
-  animation: post 460ms var(--ease-out) backwards;
+/* The authored moment: the status stop lights up as the answer posts. */
+.posted .mark {
+  animation: light 560ms var(--ease-out) backwards;
 }
 
-@keyframes post {
+@keyframes light {
   from {
-    clip-path: inset(0 100% 0 0);
-    opacity: 0.35;
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
+    transform: scale(0.6);
   }
 }
 
@@ -288,7 +317,7 @@ button.head:hover .bar {
   padding: 0 10px 12px;
   border-top: 1px solid var(--rule);
   scrollbar-width: thin;
-  scrollbar-color: var(--field) transparent;
+  scrollbar-color: var(--track) transparent;
 }
 
 .panel[hidden] {
@@ -302,84 +331,105 @@ button.head:hover .bar {
 .module {
   margin-top: 10px;
   overflow: hidden;
-  border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: var(--surface);
+  background: var(--ground);
 }
 
 .tab {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   gap: 12px;
-  min-height: 30px;
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--rule);
-  background: var(--tab);
-  color: var(--ink-2);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: 10px 12px 0;
 }
 
 .tab h2 {
   color: var(--ink);
-  font: inherit;
-  letter-spacing: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
   white-space: nowrap;
 }
 
 .tab > span {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 600;
   text-align: right;
 }
 
 .foot {
-  padding: 7px 10px;
-  border-top: 1px solid var(--rule);
-  background: var(--surface-2);
+  padding: 0 12px 10px 38px;
   color: var(--ink-3);
-  font-family: var(--mono);
   font-size: 12px;
   line-height: 1.45;
-  font-variant-numeric: tabular-nums;
 }
 
-/* ── The listing record ─────────────────────────────────────────────── */
+/* ── The listing's checks: a mini line diagram ──────────────────────── */
 
 .rows {
   list-style: none;
+  padding: 10px 12px 2px;
 }
 
 .row {
+  position: relative;
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 8px;
-  row-gap: 2px;
-  padding: 9px 10px;
-  border-bottom: 1px solid var(--rule-soft);
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 10px;
+  row-gap: 1px;
+  padding-bottom: 10px;
 }
 
-.row:last-child {
-  border-bottom: 0;
+/* The segment to the next stop: cobalt where the check passed, grey otherwise. */
+.row::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: -12px;
+  left: 6px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--track);
 }
 
+.row:last-child::before {
+  display: none;
+}
+
+.row[data-row='ok']::before {
+  background: var(--line);
+}
+
+/* The stop disc; its number stays for screen readers only. */
 .idx {
-  color: var(--ink-3);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  overflow: hidden;
+  border: 4px solid var(--track);
+  border-radius: 50%;
+  background: var(--surface);
+  color: transparent;
+  font-size: 0;
+}
+
+.row[data-row='ok'] .idx {
+  border-color: var(--ok);
+  background: var(--ok);
 }
 
 .row[data-row='fail'] .idx {
-  color: var(--fail);
+  border-color: var(--fail);
 }
 
 .what {
+  padding-top: 3px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -387,6 +437,7 @@ button.head:hover .bar {
   grid-column: 2 / -1;
 }
 
+/* The code read from the listing: the code face. */
 .meta {
   color: var(--ink-2);
   font-family: var(--mono);
@@ -406,22 +457,16 @@ button.head:hover .bar {
   color: var(--ink);
 }
 
+/* The state in words, beside its stop. */
 .state {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   min-height: 24px;
-  padding: 3px 7px 3px 5px;
-  border: 1px solid var(--rule-soft);
-  border-radius: 4px;
-  background: var(--surface-2);
   color: var(--ink-3);
-  font-family: var(--mono);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -429,17 +474,14 @@ button.head:hover .bar {
   flex: none;
   width: 14px;
   height: 14px;
+  stroke-width: 2.5;
 }
 
 .state[data-state='ok'] {
-  border-color: transparent;
-  background: var(--ok-bg);
-  color: var(--ok);
+  color: var(--ok-ink);
 }
 
 .state[data-state='fail'] {
-  border-color: transparent;
-  background: var(--fail-bg);
   color: var(--fail);
 }
 
@@ -451,9 +493,9 @@ button.head:hover .bar {
 /* ── Reports ────────────────────────────────────────────────────────── */
 
 .reportLine {
-  padding: 10px;
+  padding: 8px 12px 10px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 
@@ -461,10 +503,24 @@ button.head:hover .bar {
   color: var(--warn);
 }
 
+/* A report phrase never splits ("1 didn't / show up"); the line wraps only at the gaps between phrases. */
+.phrase {
+  white-space: nowrap;
+}
+
+/* "All good" viewings: the drawn check beside the words, in the success ink for this grey block. */
+.okMark {
+  width: 17px;
+  height: 17px;
+  margin-right: 3px;
+  vertical-align: -3px;
+  color: var(--ok-ink);
+  stroke-width: 2.5;
+}
+
 .note {
-  padding: 7px 10px;
+  padding: 8px 12px 10px;
   border-top: 1px solid var(--rule);
-  background: var(--surface-2);
   color: var(--ink-2);
   font-size: 12.5px;
   line-height: 1.45;
@@ -474,16 +530,17 @@ button.head:hover .bar {
 
 .qrBody {
   display: grid;
-  grid-template-columns: 124px minmax(0, 1fr);
+  grid-template-columns: 120px minmax(0, 1fr);
   align-items: start;
   gap: 12px;
-  padding: 10px;
+  padding: 10px 12px 12px;
 }
 
 .qr svg {
   display: block;
-  width: 124px;
-  height: 124px;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
 }
 
 .qrText p {
@@ -499,7 +556,7 @@ button.head:hover .bar {
 .qrText .qrLead {
   color: var(--ink);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -508,11 +565,11 @@ button.head:hover .bar {
   align-items: center;
   gap: 4px;
   margin-top: 8px;
-  color: var(--frame);
+  color: var(--line);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
 }
 
@@ -526,14 +583,14 @@ button.head:hover .bar {
 .askBody {
   display: grid;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 12px 12px;
 }
 
 .message {
-  padding: 8px 10px;
-  border: 1px dashed var(--field);
-  border-radius: 4px;
-  background: var(--surface-2);
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--surface);
   font-size: 13px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -549,10 +606,10 @@ button.head:hover .bar {
   width: 100%;
   min-height: 44px;
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-family: var(--text);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.25;
   cursor: pointer;
   transition: background-color 160ms var(--ease-out);
@@ -560,23 +617,23 @@ button.head:hover .bar {
 
 .primary {
   border: 0;
-  background: var(--frame);
+  background: var(--line);
   color: #ffffff;
 }
 
 .primary:hover {
-  background: var(--frame-hi);
+  background: var(--line-hi);
 }
 
 .secondary {
   margin-top: 10px;
-  border: 1px solid var(--frame);
+  border: 2px solid var(--line);
   background: var(--surface);
-  color: var(--frame);
+  color: var(--line);
 }
 
 .secondary:hover {
-  background: #ebe9f8;
+  background: var(--line-tint);
 }
 
 .primary:active,
@@ -591,6 +648,14 @@ button.head:hover .bar {
   height: 18px;
 }
 
+a.primary {
+  text-decoration: none;
+}
+
+.plain + .primary {
+  margin-top: 10px;
+}
+
 .hint {
   color: var(--ink-2);
   font-size: 12.5px;
@@ -601,21 +666,18 @@ button.head:hover .bar {
 
 .sites {
   list-style: none;
+  padding-top: 4px;
 }
 
 .sites li {
-  padding: 9px 10px;
-  border-bottom: 1px solid var(--rule-soft);
+  padding: 8px 12px;
+  border-top: 1px solid var(--rule);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.sites li:last-child {
-  border-bottom: 0;
-}
-
-a.primary {
-  text-decoration: none;
+.sites li:first-child {
+  border-top: 0;
 }
 
 /* ── Warnings and plain lines ───────────────────────────────────────── */
@@ -625,13 +687,13 @@ a.primary {
   align-items: flex-start;
   gap: 8px;
   margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #efc3be;
+  padding: 10px 12px;
+  border: 1px solid #f3c4bf;
   border-radius: var(--radius);
   background: var(--fail-bg);
   color: var(--fail);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 
@@ -649,13 +711,12 @@ a.primary {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .posted,
+  .posted .mark,
   .mark[data-busy='true'] svg {
     animation: none;
   }
 
   .chev,
-  .bar,
   .primary,
   .secondary {
     transition: none;

@@ -3,87 +3,57 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=390">
-<title>Security Print — /verify step 1</title>
+<title>Tram Line · verify consent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --ground: #E3ECE6; --guilloche: #C7D3CC; --ink: #1C2B4A; --ink-2: #44506A; --rose: #7C3F7E; --paper: #F4F8F5; }
+  :root { --line: #1f4fd6; --ink: #141414; --ink-2: #4b4f58; --ink-3: #6a6f7a; --ground: #f2f3f5; --rule: #e2e4e9; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 390px; height: 844px; overflow: hidden; }
-  body {
-    color: var(--ink); font: 400 16px/1.45 "Archivo", system-ui, sans-serif;
-    background:
-      repeating-radial-gradient(circle at 110% -10%, transparent 0 7px, rgba(124,63,126,.07) 7px 8px),
-      repeating-radial-gradient(circle at -20% 120%, transparent 0 9px, rgba(28,43,74,.06) 9px 10px),
-      var(--ground);
-  }
-  .mono { font-family: "Martian Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-  .micro { font: 600 6px/1 "Martian Mono", monospace; letter-spacing: .18em; color: var(--rose); white-space: nowrap; overflow: hidden; }
-
-  header { padding: 14px 20px 12px; }
-  .brandline { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0; }
-  .brand { font-weight: 800; font-size: 20px; letter-spacing: .02em; }
-  .serial { font-size: 11px; color: var(--ink-2); }
-
-  main { padding: 6px 20px 0; }
-  h1 { font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; }
-  .lead { margin-top: 8px; color: var(--ink-2); }
-
-  .sheet { margin-top: 18px; background: var(--paper); border: 1px solid var(--guilloche); border-radius: 2px; padding: 14px 14px 10px; position: relative; }
-  .sheet::before { content: ""; position: absolute; inset: 4px; border: 1px solid rgba(124,63,126,.25); pointer-events: none; }
-  .sheet h2 { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); font-weight: 700; margin-bottom: 6px; }
-  .line { display: flex; align-items: baseline; gap: 8px; padding: 10px 0; border-bottom: 1px dotted #9AA9A0; }
-  .line:last-child { border-bottom: 0; }
-  .num { font-size: 13px; color: var(--rose); width: 26px; }
-  .what { font-weight: 700; font-size: 16px; }
-  .lead-dots { flex: 1; border-bottom: 2px dotted #B4C2B9; transform: translateY(-4px); }
-  .st { font-size: 11px; color: var(--ink-2); }
-
-  .sealrow { display: flex; gap: 14px; align-items: center; margin-top: 16px; }
-  .seal {
-    width: 104px; height: 104px; border-radius: 50%; flex: none;
-    background:
-      repeating-conic-gradient(from 0deg, rgba(124,63,126,.55) 0 1deg, transparent 1deg 6deg),
-      radial-gradient(circle, var(--paper) 0 30%, transparent 31%),
-      repeating-radial-gradient(circle, rgba(28,43,74,.35) 0 1px, transparent 1px 5px);
-    border: 1px solid var(--rose);
-  }
-  .sealtxt { font-size: 14px; color: var(--ink-2); }
-  .sealtxt b { color: var(--ink); display: block; font-size: 16px; }
-
-  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 24px; }
-  .primary { display: flex; align-items: center; justify-content: center; height: 54px; background: var(--ink); color: #F4F8F5; font-weight: 700; font-size: 17px; border-radius: 3px; text-decoration: none; letter-spacing: .01em; }
-  .link { display: block; text-align: center; margin-top: 12px; font-size: 14px; color: var(--ink); text-decoration: underline; }
+  body { font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: var(--ink); background: #fff; position: relative; }
+  header { padding: 18px 20px 0; display: flex; align-items: center; gap: 10px; }
+  .badge { width: 38px; height: 38px; border-radius: 10px; background: var(--line); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+  .brand { font-weight: 800; font-size: 18px; }
+  .stop { margin-left: auto; font-size: 14px; font-weight: 700; color: var(--ink-2); }
+  .chip { margin: 14px 20px 0; display: inline-flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 700; background: var(--ground); border-radius: 999px; padding: 6px 12px; }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: #13804b; }
+  h1 { margin: 18px 20px 0; font-size: 34px; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+  .lead { margin: 8px 20px 0; font-size: 16px; color: var(--ink-2); }
+  .route { margin: 22px 20px 0; position: relative; padding-left: 40px; }
+  .route::before { content: ''; position: absolute; left: 11px; top: 10px; bottom: 26px; width: 6px; border-radius: 3px; background: var(--line); }
+  .s { position: relative; padding-bottom: 16px; }
+  .s::before { content: ''; position: absolute; left: -36px; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 5px solid var(--line); }
+  .s .t { font-size: 17px; font-weight: 700; }
+  .s .h { font-size: 14.5px; color: var(--ink-2); margin-top: 2px; }
+  .s .w { position: absolute; right: 0; top: 2px; font-size: 13px; color: var(--ink-3); font-weight: 700; }
+  .end::before { width: 26px; height: 26px; left: -39px; top: -1px; border-radius: 7px; background: var(--line); border: 0; }
+  .end .t { color: var(--line); }
+  .data { margin: 6px 20px 0; padding: 14px; background: var(--ground); border-radius: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .data h3 { font-size: 14px; font-weight: 800; }
+  .data p { font-size: 13.5px; color: var(--ink-2); line-height: 1.4; margin-top: 3px; }
+  .via { margin: 10px 20px 0; font-size: 13px; color: var(--ink-3); }
+  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px 18px; background: #fff; border-top: 1px solid var(--rule); }
+  .primary { width: 100%; height: 56px; border: 0; border-radius: 14px; background: var(--line); color: #fff; font: inherit; font-size: 17px; font-weight: 700; }
+  .link { display: block; text-align: center; margin-top: 12px; font-size: 15px; font-weight: 700; color: var(--line); text-decoration: underline; }
 </style>
 </head>
 <body>
-  <header>
-    <div class="micro">CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ</div>
-    <div class="brandline"><span class="brand">ChirieSigură</span><span class="serial mono">STEP 1/6 · MOBILE DATA ✓</span></div>
-    <div class="micro">VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE·CHIRIESIGURĂ·VERIFICARE</div>
-  </header>
-
-  <main>
-    <h1>Verify as a landlord</h1>
-    <p class="lead">Do this at the apartment, on mobile data. About 3 minutes.</p>
-
-    <section class="sheet">
-      <h2>Checked by your mobile operator</h2>
-      <div class="line"><span class="num mono">I</span><span class="what">Phone number</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
-      <div class="line"><span class="num mono">II</span><span class="what">ID matches SIM owner</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
-      <div class="line"><span class="num mono">III</span><span class="what">No SIM change, 7 days</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
-      <div class="line"><span class="num mono">IV</span><span class="what">Near the apartment</span><span class="lead-dots"></span><span class="st mono">PENDING</span></div>
-    </section>
-
-    <div class="sealrow">
-      <div class="seal" aria-hidden="true"></div>
-      <p class="sealtxt"><b>Your code is printed here</b>Its pattern is generated from the code, so a copy shows.</p>
-    </div>
-  </main>
-
-  <div class="actions">
-    <a class="primary" href="#">I agree — start the checks</a>
-    <a class="link" href="#">What we keep, and what we never keep</a>
+  <header><span class="badge">VC</span><span class="brand">ChirieSigură</span><span class="stop">Stop 1 of 6</span></header>
+  <p class="chip"><i></i>On mobile data</p>
+  <h1>Verify as a landlord</h1>
+  <p class="lead">At the apartment, on mobile data. About 3 minutes.</p>
+  <div class="route">
+    <div class="s"><p class="t">Phone number</p><p class="h">Confirms this phone owns the number.</p><span class="w">Next</span></div>
+    <div class="s"><p class="t">ID matches the SIM owner</p><p class="h">A yes or no. Your ID is never saved.</p></div>
+    <div class="s"><p class="t">No recent SIM change</p><p class="h">No new SIM for this number in 7 days.</p></div>
+    <div class="s"><p class="t">Phone near the apartment</p><p class="h">Cell-level: near, never “inside”.</p></div>
+    <div class="s end"><p class="t">Your code</p></div>
   </div>
+  <div class="data">
+    <div><h3>We keep</h3><p>Results, times, one-way hashes, address, listing links</p></div>
+    <div><h3>Never kept</h3><p>ID number, name, birthdate, location, phone number</p></div>
+  </div>
+  <p class="via">Checked by your operator via Nokia Network as Code</p>
+  <div class="actions"><button class="primary">I agree — start the checks</button><a class="link">Read the privacy notice</a></div>
 </body>
 </html>

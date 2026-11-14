@@ -3,93 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=390">
-<title>Confirmation Screen — /verify step 1</title>
+<title>Starter Pack · verify consent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --frame: #23205A; --frame-2: #2F2B73; --ground: #F0EFF6; --surface: #FFFFFF;
-    --ink: #15132B; --ink-2: #4A4766; --rule: #CFCBE3; --tab: #E2DFF1;
-    --ok: #0F7A4A; --fail: #B3261E;
+    --sun: #ffd23f; --sun-deep: #f2bd14; --ink: #17150f; --ink-2: #4a473d; --ink-3: #6b675b;
+    --sheet: #ffffff; --ground: #eef0f3; --line: #e3e5ea; --ok: #13804b; --ok-bg: #e3f4ea;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 390px; height: 844px; overflow: hidden; }
-  body { background: var(--ground); color: var(--ink); font: 400 16px/1.45 "Public Sans", system-ui, sans-serif; }
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-
-  .frame { background: var(--frame); color: #fff; padding: 14px 20px 14px; }
-  .frame-top { display: flex; justify-content: space-between; align-items: baseline; }
-  .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
-  .zone { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #C9C5F0; }
-  .frame-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
-  .chip { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px; border-radius: 14px; background: var(--frame-2); font-size: 13px; font-weight: 500; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #5BD69A; }
-  .step { font-size: 13px; color: #C9C5F0; }
-
-  main { padding: 22px 20px 0; }
-  h1 { font-size: 28px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; }
-  .lead { margin-top: 8px; color: var(--ink-2); font-size: 16px; }
-
-  .module { margin-top: 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
-  .tab { display: flex; justify-content: space-between; align-items: center; height: 30px; padding: 0 12px; background: var(--tab); border-bottom: 1px solid var(--rule); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
-  .row { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; min-height: 54px; padding: 8px 12px; border-bottom: 1px solid #ECEAF5; }
-  .row:last-of-type { border-bottom: 0; }
-  .idx { font-size: 13px; color: var(--frame); font-weight: 600; }
-  .what { font-weight: 600; font-size: 16px; line-height: 1.25; }
-  .how { font-size: 13px; color: var(--ink-2); }
-  .state { font-size: 12px; color: #5A5775; letter-spacing: 0.04em; }
-  .foot { padding: 8px 12px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); background: #FAFAFD; }
-
-  .split { display: grid; grid-template-columns: 1fr 1fr; }
-  .split > div { padding: 10px 12px 12px; }
-  .split > div + div { border-left: 1px solid var(--rule); }
-  .split h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-  .split li { list-style: none; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-  .kept h3 { color: var(--ink); }
-  .never h3 { color: var(--fail); }
-
-  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px 26px; background: linear-gradient(to bottom, rgba(240,239,246,0), var(--ground) 22%); }
-  .primary { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; border: 0; border-radius: 8px; background: var(--frame); color: #fff; font: 600 17px/1 "Public Sans", sans-serif; }
-  .link { display: block; text-align: center; margin-top: 12px; font-size: 14px; color: var(--frame); text-decoration: underline; text-underline-offset: 3px; }
+  body { font-family: 'Archivo', system-ui, sans-serif; color: var(--ink); background: var(--sun); font-variant-numeric: tabular-nums; }
+  .band { padding: 18px 20px 52px; position: relative; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .brand { font-weight: 800; font-size: 19px; font-stretch: 112%; letter-spacing: -0.01em; }
+  .step { font-weight: 650; font-size: 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; background: #fff; border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 14px; font-weight: 600; }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+  h1 { margin-top: 22px; font-size: 40px; line-height: 0.98; font-weight: 850; font-stretch: 125%; letter-spacing: -0.025em; max-width: 9ch; }
+  .lead { margin-top: 12px; font-size: 16px; line-height: 1.4; color: var(--ink-2); max-width: 24ch; }
+  /* the four-contact chip: one pad per check, empty until it passes */
+  .simchip { position: absolute; right: 20px; top: 92px; width: 92px; height: 74px; border: 2.5px solid var(--ink); border-radius: 14px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%); background: var(--sun-deep);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 8px; }
+  .simchip::after { content: ''; position: absolute; right: -1px; top: 6px; width: 26px; height: 2.5px; background: var(--ink); transform: rotate(45deg); transform-origin: right; }
+  .pad { border: 2px solid var(--ink); border-radius: 6px; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+  .sheet { background: var(--sheet); border-radius: 26px 26px 0 0; margin-top: -26px; padding: 24px 20px 0; height: 600px; position: relative; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: baseline; }
+  h2 { font-size: 21px; font-weight: 800; font-stretch: 112%; letter-spacing: -0.015em; }
+  .by { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+  ol { list-style: none; margin-top: 14px; }
+  li { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: start; padding: 11px 0; }
+  li + li { border-top: 1px solid var(--line); }
+  .n { width: 30px; height: 30px; border-radius: 9px; background: var(--ground); display: grid; place-items: center; font-weight: 800; font-size: 14px;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
+  .what { font-size: 17px; font-weight: 700; line-height: 1.25; }
+  .how { font-size: 14.5px; color: var(--ink-2); line-height: 1.35; margin-top: 2px; }
+  .wait { font-size: 13px; color: var(--ink-3); font-weight: 600; padding-top: 3px; }
+  .data { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .box { background: var(--ground); border-radius: 16px; padding: 12px 14px; }
+  .box h3 { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+  .box p { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+  .no h3::before { content: '✕ '; color: #c4291c; }
+  .yes h3::before { content: '✓ '; color: var(--ok); }
+  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px 18px; background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 18px); }
+  .primary { display: block; width: 100%; height: 58px; border: 0; border-radius: 18px; background: var(--ink); color: #fff; font: inherit; font-size: 17px; font-weight: 700; }
+  .link { display: block; text-align: center; margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 </style>
 </head>
 <body>
-  <header class="frame">
-    <div class="frame-top">
-      <span class="brand">ChirieSigură</span>
-      <span class="zone">Secure verification</span>
-    </div>
-    <div class="frame-meta">
-      <span class="chip"><span class="dot"></span>On mobile data</span>
-      <span class="step mono">STEP 1 / 6</span>
-    </div>
-  </header>
-
-  <main>
+  <header class="band">
+    <div class="top"><span class="brand">ChirieSigură</span><span class="step">Step 1 of 6</span></div>
+    <p class="chip"><i></i>On mobile data</p>
     <h1>Verify as a landlord</h1>
-    <p class="lead">Do this at the apartment, on mobile data. About 3 minutes.</p>
-
-    <section class="module" aria-label="What will be checked">
-      <div class="tab"><span>What will be checked</span><span>By your operator</span></div>
-      <div class="row"><span class="idx mono">01</span><div><div class="what">Phone number</div><div class="how">This phone really owns the number</div></div><span class="state mono">PENDING</span></div>
-      <div class="row"><span class="idx mono">02</span><div><div class="what">ID matches the SIM owner</div><div class="how">Yes / no match, nothing returned</div></div><span class="state mono">PENDING</span></div>
-      <div class="row"><span class="idx mono">03</span><div><div class="what">No SIM change in 7 days</div><div class="how">Stops stolen or swapped SIMs</div></div><span class="state mono">PENDING</span></div>
-      <div class="row"><span class="idx mono">04</span><div><div class="what">Phone near the apartment</div><div class="how">Cell-level, not inside the flat</div></div><span class="state mono">PENDING</span></div>
-      <div class="foot mono">via Nokia Network as Code · CAMARA</div>
-    </section>
-
-    <section class="module" aria-label="Your data">
-      <div class="tab"><span>Your data</span><span>GDPR · consent</span></div>
-      <div class="split">
-        <div class="kept"><h3>Kept</h3><ul><li>Check results + times</li><li>One-way hash of your number</li><li>Apartment address</li></ul></div>
-        <div class="never"><h3>Never kept</h3><ul><li>ID number</li><li>Name, birthdate</li><li>Your phone's location</li></ul></div>
-      </div>
-    </section>
+    <p class="lead">At the apartment, on mobile data. About 3 minutes.</p>
+    <div class="simchip" aria-label="0 of 4 checks passed"><span class="pad">1</span><span class="pad">2</span><span class="pad">3</span><span class="pad">4</span></div>
+  </header>
+  <main class="sheet">
+    <div class="sheet-head"><h2>What your operator checks</h2></div>
+    <p class="by">Via Nokia Network as Code</p>
+    <ol>
+      <li><span class="n">1</span><div><p class="what">Phone number</p><p class="how">Confirms this phone owns the number.</p></div><span class="wait">Waiting</span></li>
+      <li><span class="n">2</span><div><p class="what">ID matches the SIM owner</p><p class="how">A yes or no. Your ID is never saved.</p></div><span class="wait">Waiting</span></li>
+      <li><span class="n">3</span><div><p class="what">No recent SIM change</p><p class="how">No new SIM for this number in 7 days.</p></div><span class="wait">Waiting</span></li>
+      <li><span class="n">4</span><div><p class="what">Phone near the apartment</p><p class="how">Cell-level: near, never “inside”.</p></div><span class="wait">Waiting</span></li>
+    </ol>
+    <div class="data">
+      <div class="box yes"><h3>We keep</h3><p>Results and times, one-way hashes, the address, listing links</p></div>
+      <div class="box no"><h3>Never kept</h3><p>ID number, name, birthdate, location, phone number</p></div>
+    </div>
+    <div class="actions">
+      <button class="primary">I agree — start the checks</button>
+      <a class="link">Read the privacy notice</a>
+    </div>
   </main>
-
-  <div class="actions">
-    <a class="primary" href="#">I agree — start the checks</a>
-    <a class="link" href="#">Read the privacy notice</a>
-  </div>
 </body>
 </html>

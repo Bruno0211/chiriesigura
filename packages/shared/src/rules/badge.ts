@@ -49,8 +49,11 @@ export function badgeLabel(status: BadgeStatus, verifiedAt?: string): string {
   return verifiedAt ? `Verified landlord · near the address · ${formatDate(verifiedAt)}` : 'Verified landlord · near the address';
 }
 
+/** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */
+export const REPORT_OK_TEXT = 'all good';
+
 const CATEGORY_TEXT: Record<ReportCategory, string> = {
-  ok: '✅',
+  ok: REPORT_OK_TEXT,
   no_show: "didn't show up",
   mismatch: "doesn't match the listing",
   money_upfront: 'asked for money first',

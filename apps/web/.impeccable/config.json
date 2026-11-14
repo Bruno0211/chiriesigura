@@ -19,7 +19,7 @@
           ".impeccable/mocks/decision/assigned.html"
         ],
         "createdAt": "2026-11-13T22:42:11.458Z",
-        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Atkinson Hyperlegible Next + JetBrains Mono (Tram Line))"
       },
       {
         "rule": "design-system-font",
@@ -28,7 +28,7 @@
           ".impeccable/mocks/decision/model-pick.html"
         ],
         "createdAt": "2026-11-13T22:42:12.125Z",
-        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Atkinson Hyperlegible Next + JetBrains Mono (Tram Line))"
       },
       {
         "rule": "design-system-font",
@@ -37,7 +37,7 @@
           ".impeccable/mocks/decision/challenger-crouwel.html"
         ],
         "createdAt": "2026-11-13T22:42:12.765Z",
-        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Atkinson Hyperlegible Next + JetBrains Mono (Tram Line))"
       },
       {
         "rule": "design-system-font",
@@ -46,7 +46,70 @@
           ".impeccable/mocks/decision/canon.html"
         ],
         "createdAt": "2026-11-13T22:42:13.460Z",
-        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Public Sans + JetBrains Mono per DESIGN.md)"
+        "reason": "agent decided: decision-round sketch, not shipped UI; alternative directions use their own fonts by design (shipped pages use Atkinson Hyperlegible Next + JetBrains Mono (Tram Line))"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-boarding.html"
+        ],
+        "createdAt": "2026-11-14T20:32:40.866Z",
+        "reason": "agent decided: decision-round sketch of an alternative direction, not shipped UI; it uses its own fonts by design"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-11-14T20:33:43.202Z",
+        "reason": "agent decided: the canon card depicts the category standard on purpose; throwaway decision sketch"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-11-14T20:33:44.021Z",
+        "reason": "agent decided: throwaway decision-round sketch, not shipped UI"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-boarding.html"
+        ],
+        "createdAt": "2026-11-14T20:33:44.844Z",
+        "reason": "agent decided: throwaway decision-round sketch, not shipped UI"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "app/demo/demo.module.css"
+        ],
+        "createdAt": "2026-11-14T21:09:34.669Z",
+        "reason": "agent decided: the /demo portal is a fictional third-party listings site, deliberately outside ChirieSigura's DESIGN.md (see surface brief app-demo-listing-id-page-tsx.md)"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "app/demo/demo.module.css"
+        ],
+        "createdAt": "2026-11-14T21:09:35.934Z",
+        "reason": "agent decided: the /demo portal is a fictional third-party listings site, deliberately outside ChirieSigura's DESIGN.md (see surface brief app-demo-listing-id-page-tsx.md)"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "app/demo/demo.module.css"
+        ],
+        "createdAt": "2026-11-14T21:09:37.377Z",
+        "reason": "agent decided: the /demo portal is a fictional third-party listings site, deliberately outside ChirieSigura's DESIGN.md (see surface brief app-demo-listing-id-page-tsx.md)"
       }
     ]
   }

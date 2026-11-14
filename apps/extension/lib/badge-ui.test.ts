@@ -86,7 +86,10 @@ describe('renderBadge', () => {
 
   it('shows the report line when viewers have reported', () => {
     renderBadge(host, res('green', { reports: { ok: 3, no_show: 1, mismatch: 0, money_upfront: 0, wrong_person: 0 } }), OPTS);
-    expect(text()).toContain("4 verified viewings: 3 ✅ · 1 didn't show up");
+    // No colour emoji: "all good" in words, with the badge's own drawn check beside them.
+    expect(text()).toContain("4 verified viewings: 3 all good · 1 didn't show up");
+    expect(text()).not.toContain('✅');
+    expect(root().querySelector('.reportLine svg.okMark')?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('shows no report section when there are no reports', () => {

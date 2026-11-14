@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { reportLine } from '@cs/shared';
 import type { HoldItem } from '@/lib/queries';
 import s from '../phone.module.css';
+import { ReportLine } from '../components/ReportLine';
 
 type Action = 'ban' | 'dismiss';
 type CardState = { kind: 'open'; confirming: boolean; error: boolean; busy: boolean } | { kind: 'done'; action: Action };
@@ -45,7 +46,9 @@ function HoldCard({ item }: { item: HoldItem }) {
         <span>Last report {day(item.lastReportAt)}</span>
       </div>
       <div className={s.moduleBody}>
-        <p className={s.lead}>{reportLine(item.reports)}</p>
+        <p className={s.lead}>
+          <ReportLine line={reportLine(item.reports) ?? ''} />
+        </p>
         <ul className={s.list}>
           {item.listings.map((l) => (
             <li key={l.url}>

@@ -19,8 +19,8 @@ function Svg(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export const CheckIcon = () => (
-  <Svg>
+export const CheckIcon = ({ className }: { className?: string }) => (
+  <Svg className={className}>
     <path d="M4.5 10.5l3.5 3.5 7.5-8" />
   </Svg>
 );

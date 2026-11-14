@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import s from '../phone.module.css';
 import { CopyIcon } from '../components/Icons';
 
 type CopyState = 'idle' | 'copied' | 'selected';
 
-/** The record's last line: the issued code in one-time-code cells, and the line to paste into each listing. */
-export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string }) {
+/** The terminus: the issued code on a destination sign, and the line to paste into each listing. */
+export function CodePlate({ code, pasteLine, issued }: { code: string; pasteLine: string; issued?: ReactNode }) {
   const [copy, setCopy] = useState<CopyState>('idle');
   const lineRef = useRef<HTMLParagraphElement>(null);
   const chars = code.replace(/^VC-/, '').split('');
@@ -38,19 +38,22 @@ export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string
 
   return (
     <section className={s.plate} aria-labelledby="code-title">
-      <div className={s.tab}>
-        <h2 id="code-title">Your code</h2>
-        <span>Public · paste it</span>
+      <div className={s.sign}>
+        <div className={s.signHead}>
+          <h2 id="code-title">Your code</h2>
+          <span>Public · paste it</span>
+        </div>
+        <p className={s.cells}>
+          <span className={s.srOnly}>{code}</span>
+          <span className={s.prefix} aria-hidden="true">VC-</span>
+          {chars.map((c, i) => (
+            <span key={i} className={s.cell} aria-hidden="true">
+              {c}
+            </span>
+          ))}
+        </p>
+        {issued && <p className={s.signFoot}>{issued}</p>}
       </div>
-      <p className={s.cells}>
-        <span className={s.srOnly}>{code}</span>
-        <span className={s.prefix} aria-hidden="true">VC-</span>
-        {chars.map((c, i) => (
-          <span key={i} className={`${s.cell} ${s.cellIn}`} style={{ '--i': i } as CSSProperties} aria-hidden="true">
-            {c}
-          </span>
-        ))}
-      </p>
       <div className={s.paste}>
         <p className={s.label}>The ChirieSigură extension looks for this line</p>
         <p ref={lineRef} className={s.pasteLine}>
@@ -65,7 +68,7 @@ export function CodePlate({ code, pasteLine }: { code: string; pasteLine: string
             pasteLine
           )}
         </p>
-        <button type="button" className={s.secondary} onClick={copyLine}>
+        <button type="button" className={s.primary} onClick={copyLine}>
           <CopyIcon />
           {copy === 'copied' ? 'Copied' : 'Copy the line'}
         </button>

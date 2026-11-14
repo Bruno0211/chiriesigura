@@ -1,4 +1,4 @@
-import { reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
+import { REPORT_OK_TEXT, reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
 import css from './badge.css?inline';
 import { icon, type IconName } from './icons';
 import { qrSvg } from './qr';
@@ -34,7 +34,7 @@ const TONE: Record<BadgeStatus, Tone> = {
   grey_unverified: 'none',
   grey_cannot_confirm: 'none',
 };
-const MARK: Record<Tone, IconName> = { ok: 'check', warn: 'alert', fail: 'cross', none: 'pending' };
+const MARK: Record<Tone, IconName> = { ok: 'check', warn: 'alert', fail: 'cross', none: 'ringDash' };
 const PANEL_ID = 'cs-panel';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -174,7 +174,7 @@ interface Row {
   message?: string;
 }
 
-const WORD_ICON: Record<RowState, IconName> = { ok: 'check', fail: 'cross', none: 'pending' };
+const WORD_ICON: Record<RowState, IconName> = { ok: 'check', fail: 'cross', none: 'ringDash' };
 
 /** A confirmation record in the phone pages' grammar: one ruled, numbered line per check with its state cell. */
 function record(doc: Document, title: string, aside: string, rows: Row[], foot?: Child[]): HTMLElement {
@@ -249,12 +249,30 @@ function landlordChecks(doc: Document, res: CheckResponse, opts: BadgeOptions): 
   ]);
 }
 
+/**
+ * The report line in whole phrases ("4 verified viewings:", "3 ✓ all good", "1 didn't show up"): only the gaps between
+ * them wrap. The badge's own drawn check sits beside the "all good" words, which carry the meaning.
+ */
+function reportText(doc: Document, line: string): Child[] {
+  const at = line.indexOf(': ');
+  if (at === -1) return [line];
+  const phrase = (part: string) => {
+    const span = el(doc, 'span', { class: 'phrase' });
+    const ok = part.indexOf(REPORT_OK_TEXT);
+    if (ok === -1) span.append(part);
+    else span.append(part.slice(0, ok), icon(doc, 'check', 'okMark'), part.slice(ok));
+    return span;
+  };
+  const parts = line.slice(at + 2).split(' · ');
+  return [phrase(line.slice(0, at + 1)), ' ', ...parts.flatMap((p, i) => (i ? [' · ', phrase(p)] : [phrase(p)]))];
+}
+
 function reports(doc: Document, line: string, warn: boolean): HTMLElement {
   return module(
     doc,
     'Viewing reports',
     'From the address',
-    el(doc, 'p', { class: warn ? 'reportLine reportWarn' : 'reportLine' }, line),
+    el(doc, 'p', { class: warn ? 'reportLine reportWarn' : 'reportLine' }, ...reportText(doc, line)),
     el(doc, 'p', { class: 'note' }, 'Each report came from a phone its operator placed at the address.'),
   );
 }

@@ -21,19 +21,22 @@ interface Props {
   copy?: Partial<Record<CheckStepName, { label: string; how: string }>>;
   data?: DataUse;
   acceptLabel?: string;
-  /** Context shown between the lead and the record, e.g. which listing is being reported. */
+  /** The route's last stop: what the ride ends in. */
+  terminus?: string;
+  /** Context shown between the lead and the route, e.g. which listing is being reported. */
   children?: ReactNode;
 }
 
-/** Names every check before any network call runs. Accepting is the only way forward. */
+/** Names every check before any network call runs, as the route the ride will take. Accepting is the only way forward. */
 export function ConsentScreen({
   checks,
   onAccept,
   heading = 'Verify as a landlord',
-  lead = 'At the apartment, on mobile data, 3 min.',
+  lead = 'At the apartment, on mobile data. About 3 minutes.',
   copy = {},
   data = LANDLORD_DATA,
   acceptLabel = 'I agree — start the checks',
+  terminus = 'Your code',
   children,
 }: Props) {
   const ordered = CHECK_ORDER.filter((c) => checks.includes(c));
@@ -43,45 +46,41 @@ export function ConsentScreen({
       <p className={s.lead}>{lead}</p>
       {children}
 
-      <section className={s.module} aria-labelledby="consent-checks">
-        <div className={s.tab}>
-          <h2 id="consent-checks">What will be checked</h2>
-          <span>By your operator</span>
-        </div>
-        <ol className={s.rows} aria-labelledby="consent-checks">
+      <section className={s.record} aria-labelledby="consent-checks">
+        <h2 id="consent-checks" className={s.srOnly}>What will be checked</h2>
+        <ol className={s.route} aria-labelledby="consent-checks">
           {ordered.map((name, i) => {
             const c = copy[name] ?? CHECK_COPY[name];
             return (
-              <li key={name} className={`${s.row} ${s.rowTight}`}>
-                <span className={s.idx}>{String(i + 1).padStart(2, '0')}</span>
-                <p className={s.what}>{c.label}</p>
-                <span className={s.stateWord}>Pending</span>
-                <div className={s.rowMore}>
-                  <p className={s.how}>{c.how}</p>
+              <li key={name} className={s.stop} data-state="planned" data-seg="planned">
+                <span className={s.disc} aria-hidden="true" />
+                <div className={s.stopHead}>
+                  <p className={s.what}>{c.label}</p>
+                  {i === 0 && <span className={s.word}>Next</span>}
                 </div>
+                <p className={s.how}>{c.how}</p>
               </li>
             );
           })}
         </ol>
-        <p className={s.foot}>via Nokia Network as Code · CAMARA</p>
+        <div className={s.terminus} data-state="planned">
+          <span className={s.terminusMark} aria-hidden="true" />
+          <p>{terminus}</p>
+        </div>
       </section>
 
-      <section className={s.module} aria-labelledby="consent-data">
-        <div className={s.tab}>
-          <h2 id="consent-data">Your data</h2>
-          <span>GDPR · consent</span>
+      <section className={s.data} aria-labelledby="consent-data">
+        <h2 id="consent-data" className={s.srOnly}>Your data</h2>
+        <div>
+          <h3>We keep</h3>
+          <ul>{data.kept.map((k) => <li key={k}>{k}</li>)}</ul>
         </div>
-        <div className={s.split}>
-          <div>
-            <h3>Kept</h3>
-            <ul>{data.kept.map((k) => <li key={k}>{k}</li>)}</ul>
-          </div>
-          <div>
-            <h3>Never kept</h3>
-            <ul>{data.neverKept.map((k) => <li key={k}>{k}</li>)}</ul>
-          </div>
+        <div>
+          <h3>Never kept</h3>
+          <ul>{data.neverKept.map((k) => <li key={k}>{k}</li>)}</ul>
         </div>
       </section>
+      <p className={s.via}>Checked by your operator via Nokia Network as Code</p>
 
       <div className={s.actionsSpacer} aria-hidden="true" />
       <div className={s.actions}>

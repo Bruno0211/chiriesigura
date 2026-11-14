@@ -19,6 +19,7 @@ import { ArrowIcon, CheckIcon } from '../components/Icons';
 import {
   CHECK_COPY,
   CHECK_ERROR,
+  CHECK_ORDER,
   clearState,
   clockTime,
   loadState,
@@ -27,6 +28,7 @@ import {
   readNvParam,
   saveState,
   shortDate,
+  simSwapRecovery,
   stripNvParam,
 } from '../components/flow';
 import { useStepFocus } from '../components/hooks';
@@ -405,6 +407,10 @@ function ChecksScreen({
   const addressNotFound = failed.some((x) => x.name === 'location');
   const steps = waitingForIdentity ? [NUMBER_STEP] : [...st.steps, ...(st.location ? [st.location] : [])];
   const located = st.location?.ok === true;
+  // Re-entering details can't change a SIM-swap result; only time can.
+  const simSwapped = failed.some((x) => x.name === 'simswap');
+  // Checks past the failure stay on the route, unlit, so the record still shows all four stops.
+  const notReached = identityFailed ? CHECK_ORDER.filter((n) => !steps.some((x) => x.name === n)) : [];
 
   const pending: CheckStepName[] = [];
   const waiting: CheckStepName[] = [];
@@ -441,8 +447,10 @@ function ChecksScreen({
         steps={steps}
         pending={pending}
         waiting={waiting}
+        notReached={notReached}
         times={st.times}
         details={masked ? { number: masked } : undefined}
+        terminus="Your code"
         footer="via Nokia Network as Code · CAMARA"
       />
 
@@ -457,7 +465,7 @@ function ChecksScreen({
         <div className={s.alert} role="alert">
           <p className={s.alertTitle}>No code was issued</p>
           <p className={s.alertBody}>
-            {failed.map((f) => CHECK_COPY[f.name].label).join(', ')} didn&apos;t pass.
+            {simSwapped ? simSwapRecovery() : <>{failed.map((f) => CHECK_COPY[f.name].label).join(', ')} didn&apos;t pass.</>}
           </p>
         </div>
       )}
@@ -472,6 +480,8 @@ function ChecksScreen({
           ) : (
             <button type="button" className={s.primary} onClick={onEdit}>Back to your details</button>
           )
+        ) : identityFailed && simSwapped ? (
+          <button type="button" className={s.primary} onClick={onStartOver}>Start over</button>
         ) : identityFailed ? (
           <>
             <button type="button" className={s.primary} onClick={onEdit}>
@@ -626,28 +636,27 @@ function DoneScreen({
   onStartOver: () => void;
 }) {
   const steps = [...st.steps, ...(st.location ? [st.location] : [])];
+  const signed = Boolean(st.code && st.pasteLine);
+  const issued =
+    masked || st.issuedAt ? (
+      <>
+        {masked}
+        {masked && st.issuedAt ? ' · ' : ''}
+        {st.issuedAt ? (
+          <>
+            issued <span className={s.nowrap}>{shortDate(st.issuedAt)}</span>, {clockTime(st.issuedAt).slice(0, 5)}
+          </>
+        ) : null}
+      </>
+    ) : undefined;
   return (
     <>
       <h1 id="step-heading" tabIndex={-1} className={s.h1}>You&apos;re verified</h1>
       <p className={s.lead}>Paste the line below into each listing.</p>
 
-      <StepList
-        steps={steps}
-        times={st.times}
-        compact
-        footer={
-          <>
-            {masked}
-            {masked && st.issuedAt ? ' · ' : ''}
-            {st.issuedAt ? (
-              <>
-                issued <span className={s.nowrap}>{shortDate(st.issuedAt)}</span>, {clockTime(st.issuedAt).slice(0, 5)}
-              </>
-            ) : null}
-          </>
-        }
-      />
-      {st.code && st.pasteLine && <CodePlate code={st.code} pasteLine={st.pasteLine} />}
+      {/* The line runs from the last stop into the destination sign. */}
+      <StepList steps={steps} times={st.times} compact continues={signed} footer={signed ? undefined : issued} />
+      {st.code && st.pasteLine && <CodePlate code={st.code} pasteLine={st.pasteLine} issued={issued} />}
 
       <section className={s.module} aria-labelledby="listings-title">
         <div className={s.tab}>

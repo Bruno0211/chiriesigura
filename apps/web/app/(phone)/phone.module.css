@@ -1,33 +1,36 @@
 /*
- * ChirieSigură phone pages: The Confirmation Screen.
- * A bank-confirmation secure zone: indigo frame over a lilac-grey ground, ruled white modules
- * headed by tabs, every number in tabular mono, state colour only in status cells and the code plate,
- * and indigo reserved for the step in hand.
+ * ChirieSigură phone pages: Tram Line.
+ * Verification is a short ride with four stops. The record is a route diagram whose stops light up as the
+ * mobile operator answers, and the issued code is the destination sign at the terminus.
+ * White page, one cobalt line colour (route, active stop, actions, links, focus), cool grey blocks.
+ * State colour lives only on stop discs, state words, alerts and the connection chip.
  */
 
 .phone {
-  --frame: #23205a;
-  --frame-hi: #322e7a;
-  --frame-ink: #ffffff;
-  --frame-ink-2: #d3cff4;
-  --ground: #f0eff6;
+  --line: #1f4fd6;
+  --line-hi: #1a43b8;
+  --line-tint: #eef2fd;
+  --line-soft: #dfe5f7;
+  --line-mute: #33427a;
+  --on-line: #dbe4fb;
+  --ink: #141414;
+  --ink-2: #4b4f58;
+  --ink-3: #6a6f7a;
+  --ground: #f2f3f5;
   --surface: #ffffff;
-  --surface-2: #f8f7fc;
-  --tab: #e4e1f2;
-  --selected: #ebe9f8;
-  --rule: #cfcbe3;
-  --rule-soft: #e7e5f1;
-  --field: #a9a4cc;
-  --ink: #15132b;
-  --ink-2: #45425e;
-  --ink-3: #575472;
-  --ok: #0f7a4a;
-  --ok-bg: #e2f2e9;
-  --fail: #b3261e;
-  --fail-bg: #fbe8e6;
-  --warn: #8a5300;
-  --warn-bg: #fdf0d5;
-  --radius: 6px;
+  --rule: #e2e4e9;
+  --track: #cdd1d8;
+  --field: #8a909b;
+  --ok: #13804b;
+  --ok-ink: #0f6f41;
+  --ok-bg: #e7f4ed;
+  --fail: #c4291c;
+  --fail-bg: #fdeceb;
+  --warn: #8a4f00;
+  --warn-dot: #d08700;
+  --warn-bg: #fdf1d8;
+  --radius: 12px;
+  --radius-lg: 16px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --mono: var(--font-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
@@ -37,25 +40,26 @@
   flex-direction: column;
   width: 100%;
   min-height: 100dvh;
-  background: var(--ground);
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--font-text), system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  caret-color: var(--frame);
+  font-variant-numeric: tabular-nums;
+  caret-color: var(--line);
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgb(35 32 90 / 0.12);
+  -webkit-tap-highlight-color: rgb(31 79 214 / 0.12);
 }
 
 .phone ::selection {
-  background: #d3cff4;
+  background: #cfdafa;
   color: var(--ink);
 }
 
 .phone :focus-visible {
-  outline: 3px solid var(--frame);
+  outline: 3px solid var(--line);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .phone [tabindex='-1']:focus {
@@ -74,64 +78,78 @@
   border: 0;
 }
 
-/* ── Frame: the secure zone ─────────────────────────────────────────── */
-
-.frame {
-  background: var(--frame);
-  color: var(--frame-ink);
-  padding: max(14px, env(safe-area-inset-top)) 20px 14px;
+.nowrap {
+  white-space: nowrap;
 }
 
-.frame :focus-visible {
-  outline-color: #ffffff;
+/* ── Header: the line badge, the stop count, the connection ────────── */
+
+.header {
+  padding: max(18px, env(safe-area-inset-top)) 20px 0;
+  background: var(--surface);
 }
 
-.frameInner {
+.headerInner {
   max-width: 480px;
   margin: 0 auto;
 }
 
-.frameTop {
+.headerTop {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
+}
+
+/* A tram line number: the product's mark. */
+.brandMark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--line);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
 }
 
 .brand {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
-.zone {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.where {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
   text-align: right;
-  color: var(--frame-ink-2);
+  color: var(--ink-2);
 }
 
-.frameMeta {
+.headerMeta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px 12px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 30px;
-  padding: 4px 12px;
-  border-radius: 15px;
-  background: var(--frame-hi);
-  font-size: 13px;
-  font-weight: 500;
+  min-height: 32px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -140,50 +158,37 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--frame-ink-2);
+  background: var(--ink-3);
 }
 
 .chip[data-connection='cellular'] .dot {
-  background: #5bd69a;
+  background: var(--ok);
 }
 
 .chip[data-connection='wifi'] {
   background: var(--warn-bg);
-  color: #5c3700;
+  color: var(--warn);
 }
 
 .chip[data-connection='wifi'] .dot {
-  background: #c27a00;
-}
-
-.frameNums {
-  display: flex;
-  gap: 16px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  color: var(--frame-ink-2);
-}
-
-.clock {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  background: var(--warn-dot);
 }
 
 .clock svg {
-  width: 14px;
-  height: 14px;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-2);
 }
 
-.clockLow {
-  color: #ffd38a;
+/* The last minute of the operator's 15-minute number session. */
+.clock[data-low='true'] {
+  background: var(--warn-bg);
+  color: var(--warn);
 }
 
-.nowrap {
-  white-space: nowrap;
+.clock[data-low='true'] svg {
+  color: currentColor;
 }
 
 /* ── Page column ────────────────────────────────────────────────────── */
@@ -195,13 +200,13 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 20px 20px 0;
+  padding: 18px 20px 0;
 }
 
 .h1 {
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.05;
+  font-weight: 800;
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
@@ -216,44 +221,58 @@
   margin-top: 16px;
   padding: 12px 14px;
   border-radius: var(--radius);
-  background: var(--tab);
+  background: var(--ground);
   color: var(--ink);
   font-size: 15px;
 }
 
 .confirmed {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: 8px;
-  margin-top: 14px;
-  line-height: 1.45;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.4;
   color: var(--ink-2);
 }
 
 .confirmed svg {
-  width: 16px;
-  height: 16px;
+  flex: none;
+  width: 18px;
+  height: 18px;
   color: var(--ok);
 }
 
-.guide {
-  margin-top: 16px;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--ink-2);
+/* "All good" viewings: a drawn check beside the words, never a colour emoji. */
+.okMark {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  vertical-align: -3px;
+  color: var(--ok-ink);
+  stroke-width: 2.5;
 }
 
-/* ── Ruled modules with a tab ───────────────────────────────────────── */
+/* Inside a report line a no-break space already follows the check. */
+.okMarkInLine {
+  margin-right: 0;
+}
+
+/* An issued code quoted on a page: the code face, never the word face. */
+.codeInline {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ── Grey blocks ────────────────────────────────────────────────────── */
 
 .module {
-  margin-top: 18px;
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  margin-top: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--ground);
   overflow: hidden;
 }
 
@@ -264,289 +283,351 @@
 .tab {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   gap: 12px;
-  min-height: 34px;
-  padding: 7px 12px;
-  background: var(--tab);
-  border-bottom: 1px solid var(--rule);
-  color: var(--ink-2);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: 14px 16px 0;
 }
 
 .tab > :first-child {
   flex: none;
-  white-space: nowrap;
-}
-
-.tab h2 {
-  font: inherit;
-  letter-spacing: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
   color: var(--ink);
 }
 
 .tab > :last-child:not(:first-child) {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
   text-align: right;
-}
-
-.foot {
-  padding: 9px 12px;
-  border-top: 1px solid var(--rule);
-  background: var(--surface-2);
   color: var(--ink-3);
-  font-family: var(--mono);
-  font-size: 12px;
 }
 
 .moduleBody {
-  padding: 14px 12px;
+  padding: 10px 16px 16px;
 }
 
-/* ── The record ─────────────────────────────────────────────────────── */
+/* ── The route: the record as a line diagram ────────────────────────── */
 
-.rows {
-  list-style: none;
+.record {
+  margin-top: 22px;
 }
 
-/* idx · label · state on the first line; the message and meta run under the label at full width. */
-.row {
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) auto;
-  column-gap: 10px;
-  row-gap: 3px;
-  align-items: center;
-  padding: 13px 12px;
-  border-bottom: 1px solid var(--rule-soft);
+.recordHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
-.rowMore {
-  grid-column: 2 / -1;
-}
-
-/* Consent: the whole story (record, footer, kept / never kept) fits above the pinned action at 390x844. */
-.rowTight {
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.rowTight .what {
+.recordHead h2 {
   font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
 }
 
-.rowTight .how {
-  font-size: 14px;
-}
-
-/* Nothing has run yet, so a plain word, not a progress ring. */
-.stateWord {
-  font-family: var(--mono);
-  font-size: 12px;
+.recordHead span {
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--ink-3);
 }
 
-.rowCompact {
-  grid-template-columns: 26px minmax(0, 1fr) auto auto;
-  padding: 9px 12px;
+.recordFoot {
+  margin-top: 12px;
+  padding-left: 40px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-3);
 }
 
-/* Narrow: the footer carries the issue time, so the code plate stays on the first screen. */
-@media (max-width: 430px) {
-  .rowCompact {
-    grid-template-columns: 26px minmax(0, 1fr) auto;
+/* The line's centre runs 14px in from the column edge; stops hang their text 40px in. */
+.route {
+  position: relative;
+  list-style: none;
+  padding-left: 40px;
+}
+
+.stop {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+/* The segment to the next stop, from this disc's centre to the next one's. */
+.stop::before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  bottom: -11px;
+  left: -29px;
+  width: 6px;
+  border-radius: 3px;
+  background: var(--track);
+}
+
+.stop[data-seg='none']::before {
+  display: none;
+}
+
+.stop[data-seg='planned']::before,
+.stop[data-seg='done']::before,
+.stop[data-seg='into']::before {
+  background: var(--line);
+}
+
+/* Past a failed stop the line is broken: dashed grey to the end. */
+.stop[data-seg='broken']::before {
+  border-radius: 0;
+  background: repeating-linear-gradient(to bottom, var(--track) 0 6px, transparent 6px 12px);
+}
+
+/* A request in flight: a small marker travels down the grey segment towards the stop it serves. */
+.stop[data-seg='moving']::before {
+  left: -31px;
+  width: 10px;
+  border-radius: 0;
+  background:
+    radial-gradient(circle, var(--line) 0 4px, transparent 4.5px) 0 0 / 10px 10px no-repeat,
+    linear-gradient(var(--track), var(--track)) center / 6px 100% no-repeat;
+  animation: travel 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes travel {
+  from {
+    background-position: 0 0, center;
   }
-
-  .rowCompact .meta {
-    display: none;
+  to {
+    background-position: 0 100%, center;
   }
 }
 
-.rowCompact .what {
-  font-size: 16px;
+/* On the done screen the line runs on into the destination sign below. */
+.stop[data-seg='into']::before {
+  bottom: -26px;
 }
 
-.rowCompact .meta {
-  margin-top: 0;
-}
-
-.stateIcon {
+.disc {
+  position: absolute;
+  top: 0;
+  left: -37px;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  background: var(--surface-2);
-  color: var(--ink-3);
+  width: 22px;
+  height: 22px;
+  border: 5px solid var(--track);
+  border-radius: 50%;
+  background: var(--surface);
+  color: #ffffff;
 }
 
-.stateIcon[data-state='ok'] {
-  background: var(--ok-bg);
-  color: var(--ok);
+.disc svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
 }
 
-.stateIcon[data-state='fail'] {
-  background: var(--fail-bg);
+.stop[data-state='planned'] .disc,
+.stop[data-state='checking'] .disc {
+  border-color: var(--line);
+}
+
+.stop[data-state='ok'] .disc {
+  border: 0;
+  background: var(--ok);
+}
+
+.stop[data-state='fail'] .disc {
+  border-width: 4px;
+  border-color: var(--fail);
   color: var(--fail);
 }
 
-.stateIcon svg {
-  width: 18px;
-  height: 18px;
+.stop[data-state='fail'] .disc svg {
+  width: 11px;
+  height: 11px;
 }
 
-.rowMore > :first-child {
-  margin-top: 0;
-}
-
-.row:last-child {
-  border-bottom: 0;
-}
-
-.idx {
-  padding-top: 1px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.6;
+/* A stop past the failure: never reached, so it stays unlit on the broken line. */
+.stop[data-state='skipped'] .what {
   color: var(--ink-3);
 }
 
-.row[data-state='checking'] .idx,
-.row[data-active='true'] .idx {
-  color: var(--frame);
-}
-
-.rowBody {
-  min-width: 0;
+.stopHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
 }
 
 .what {
+  min-width: 0;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
 }
 
 .how,
 .msg {
-  margin-top: 3px;
+  margin-top: 2px;
   font-size: 15px;
   line-height: 1.4;
   color: var(--ink-2);
 }
 
 .meta {
-  margin-top: 4px;
-  font-family: var(--mono);
+  margin-top: 3px;
   font-size: 13px;
-  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
   color: var(--ink-3);
 }
 
-.state {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 30px;
-  padding: 4px 9px 4px 7px;
-  border: 1px solid var(--rule-soft);
-  border-radius: 4px;
-  background: var(--surface-2);
-  color: var(--ink-3);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.state svg {
+/* The state in words, beside the stop it belongs to. */
+.word {
   flex: none;
-  width: 16px;
-  height: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink-3);
 }
 
-.state[data-state='ok'] {
-  border-color: transparent;
-  background: var(--ok-bg);
+.word[data-state='ok'] {
   color: var(--ok);
 }
 
-.state[data-state='fail'] {
-  border-color: transparent;
-  background: var(--fail-bg);
+.word[data-state='fail'] {
   color: var(--fail);
 }
 
-.state[data-state='checking'] {
-  border-color: var(--rule);
-  color: var(--frame);
+.word[data-state='checking'] {
+  color: var(--line);
 }
 
-.state[data-state='checking'] svg {
-  animation: turn 1.6s linear infinite;
+/* A finished record: one line per stop, the disc carries the drawn state. */
+.stopCompact {
+  padding-bottom: 12px;
 }
 
-@keyframes turn {
-  to {
-    transform: rotate(360deg);
+.stopCompact .what {
+  font-size: 16px;
+}
+
+.time {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+/* Narrow: the sign carries the issue time, so the code stays on the first screen. */
+@media (max-width: 430px) {
+  .time {
+    display: none;
   }
 }
 
-/* A result posts into the record like a printed line: a left-to-right wipe. */
-.posted {
-  animation: post 460ms var(--ease-out) backwards;
-  animation-delay: calc(var(--i, 0) * 170ms);
+/* The terminus: a rounded-square stop at the end of the line. */
+.terminus {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  padding-left: 40px;
 }
 
-@keyframes post {
+.terminusMark {
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--line);
+}
+
+.terminus p {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--line);
+}
+
+.terminus[data-state='ahead'] .terminusMark {
+  border: 5px solid var(--track);
+  background: var(--surface);
+}
+
+.terminus[data-state='broken'] .terminusMark {
+  border: 3px dashed var(--track);
+  background: var(--surface);
+}
+
+.terminus[data-state='ahead'] p,
+.terminus[data-state='broken'] p {
+  color: var(--ink-3);
+}
+
+/* The authored moment: a stop lights up as its result posts, one after another like a passing tram. */
+.lit .disc {
+  animation: light 560ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 180ms);
+}
+
+@keyframes light {
   from {
-    clip-path: inset(0 100% 0 0);
-    opacity: 0.35;
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
+    transform: scale(0.6);
+    border-color: var(--line);
+    background: var(--surface);
   }
 }
 
-/* ── Data split ─────────────────────────────────────────────────────── */
+.lit[data-state='ok'] .disc path {
+  stroke-dasharray: 18;
+  animation: draw 420ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 180ms + 220ms);
+}
 
-.split {
+@keyframes draw {
+  from {
+    stroke-dashoffset: 18;
+  }
+}
+
+/* ── Consent: what we keep ──────────────────────────────────────────── */
+
+.data {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--ground);
 }
 
-.split > div {
-  padding: 10px 12px;
+.data h3 {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
 }
 
-.split > div + div {
-  border-left: 1px solid var(--rule);
-}
-
-.split h3 {
-  margin-bottom: 2px;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.split ul {
+.data ul {
+  margin-top: 3px;
   list-style: none;
 }
 
-.split li {
-  padding: 1px 0;
-  font-size: 14px;
+.data li {
+  font-size: 13.5px;
   line-height: 1.4;
   color: var(--ink-2);
+}
+
+.via {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-3);
 }
 
 /* ── Actions ────────────────────────────────────────────────────────── */
@@ -558,13 +639,9 @@
   bottom: 0;
   left: 0;
   z-index: 10;
-  padding: 18px 20px max(12px, env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, rgb(240 239 246 / 0), var(--ground) 16px);
-}
-
-.actions .centerLink {
-  margin-top: 4px;
-  padding: 2px 0;
+  padding: 14px 20px max(16px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
 }
 
 .actions > * {
@@ -573,15 +650,20 @@
   margin-left: auto;
 }
 
+.actions .centerLink {
+  margin-top: 10px;
+  padding: 2px 0;
+}
+
 .actionsSpacer {
   flex: none;
-  height: 150px;
+  height: 140px;
 }
 
 .actionsInline {
   display: grid;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 24px;
   padding-bottom: max(28px, env(safe-area-inset-bottom));
 }
 
@@ -592,37 +674,39 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 54px;
-  padding: 12px 20px;
-  border-radius: 8px;
+  min-height: 56px;
+  padding: 14px 20px;
+  border-radius: 14px;
   font-family: inherit;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  transition:
+    background-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
 }
 
 .primary {
   border: 0;
-  background: var(--frame);
+  background: var(--line);
   color: #ffffff;
 }
 
-.primary:hover {
-  background: var(--frame-hi);
+.primary:hover:not(:disabled) {
+  background: var(--line-hi);
 }
 
 .secondary {
-  border: 1px solid var(--frame);
+  border: 2px solid var(--line);
   background: var(--surface);
-  color: var(--frame);
+  color: var(--line);
 }
 
-.secondary:hover {
-  background: var(--selected);
+.secondary:hover:not(:disabled) {
+  background: var(--line-tint);
 }
 
 .primary:active:not(:disabled),
@@ -631,7 +715,14 @@
 }
 
 .primary:disabled {
-  background: #8f8bb0;
+  background: var(--line-soft);
+  color: var(--line-mute);
+  cursor: not-allowed;
+}
+
+.secondary:disabled {
+  border-color: var(--line-soft);
+  color: var(--line-mute);
   cursor: not-allowed;
 }
 
@@ -653,11 +744,11 @@
 
 .centerLink,
 .textLink {
-  color: var(--frame);
+  color: var(--line);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 700;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
 }
 
@@ -673,8 +764,8 @@
 
 .fields {
   display: grid;
-  gap: 20px;
-  padding: 16px 12px 18px;
+  gap: 18px;
+  padding: 14px 16px 18px;
 }
 
 .field {
@@ -682,16 +773,21 @@
   gap: 6px;
 }
 
+/* One field on its own on the page, no block around it. */
+.fieldSolo {
+  margin-top: 22px;
+}
+
 .label {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .input {
   width: 100%;
-  min-height: 52px;
-  padding: 12px 14px;
-  border: 1px solid var(--field);
+  min-height: 54px;
+  padding: 13px 14px;
+  border: 1.5px solid var(--field);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
@@ -701,35 +797,32 @@
 }
 
 .input::placeholder {
-  color: #6b6888;
+  color: var(--ink-3);
 }
 
 .input:hover {
-  border-color: var(--ink-3);
+  border-color: var(--ink-2);
 }
 
 .input:focus-visible {
-  outline: 3px solid var(--frame);
+  outline: 3px solid var(--line);
   outline-offset: 1px;
-  border-color: var(--frame);
+  border-color: var(--line);
 }
 
 .input[aria-invalid='true'] {
   border-color: var(--fail);
 }
 
+/* Numbers and ID series: the word face, spaced and tabular. */
 .inputMono {
-  font-family: var(--mono);
-  font-size: 16px;
   letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
 }
 
 textarea.input {
   min-height: 148px;
   resize: vertical;
-  font-family: var(--mono);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -743,23 +836,9 @@ textarea.input {
   color: var(--ink-3);
 }
 
-.tag {
-  flex: none;
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: var(--tab);
-  color: var(--ink-2);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .fieldError {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--fail);
 }
 
@@ -767,19 +846,19 @@ textarea.input {
 
 .alert {
   margin-top: 16px;
-  padding: 14px;
-  border: 1px solid #efc3be;
-  border-radius: var(--radius);
+  padding: 14px 16px;
+  border: 1px solid #f3c4bf;
+  border-radius: 14px;
   background: var(--fail-bg);
 }
 
 .alert[data-tone='warn'] {
-  border-color: #ebcf98;
+  border-color: #efd49c;
   background: var(--warn-bg);
 }
 
 .alert[data-tone='ok'] {
-  border-color: #b8dfc9;
+  border-color: #b9dcc8;
   background: var(--ok-bg);
 }
 
@@ -795,7 +874,7 @@ textarea.input {
 }
 
 .alert[data-tone='ok'] .alertTitle {
-  color: var(--ok);
+  color: var(--ok-ink);
 }
 
 .alertBody {
@@ -804,95 +883,87 @@ textarea.input {
   color: var(--ink);
 }
 
-/* ── The code plate: the record's last line ─────────────────────────── */
+/* ── The destination sign: the code at the terminus ─────────────────── */
 
 .plate {
-  margin-top: 16px;
-  background: var(--surface);
-  border: 1px solid var(--frame);
-  border-radius: var(--radius);
-  overflow: hidden;
+  margin-top: 14px;
 }
 
-.plate .tab {
-  background: var(--frame);
-  border-bottom-color: var(--frame);
-  color: var(--frame-ink-2);
-}
-
-.plate .tab h2 {
+.sign {
+  padding: 16px 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--line);
   color: #ffffff;
+}
+
+.signHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.signHead h2 {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.signHead span,
+.signFoot {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--on-line);
 }
 
 .cells {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(5px, 2vw, 8px);
-  padding: 22px 12px 20px;
+  gap: clamp(5px, 1.8vw, 8px);
+  margin-top: 14px;
   font-family: var(--mono);
 }
 
 .prefix {
-  margin-right: 2px;
-  font-size: clamp(26px, 8vw, 32px);
-  font-weight: 600;
-  color: var(--ink-2);
+  margin-right: 4px;
+  font-size: clamp(24px, 7vw, 30px);
+  font-weight: 700;
+  color: var(--on-line);
 }
 
+/* The largest type on the screen: it has to read off a projector. */
 .cell {
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(44px, 13.5vw, 58px);
-  height: clamp(58px, 17vw, 74px);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  color: var(--frame);
-  font-size: clamp(32px, 10vw, 44px);
+  width: clamp(44px, 14vw, 60px);
+  height: clamp(58px, 18vw, 76px);
+  border-radius: 10px;
+  background: var(--line-hi);
+  color: #ffffff;
+  font-size: clamp(34px, 11vw, 48px);
   font-weight: 700;
   line-height: 1;
 }
 
-/* The one-time-code slot mark: an underline inside the cell, clear of its rounded corners. */
-.cell::after {
-  content: '';
-  position: absolute;
-  right: 9px;
-  bottom: 7px;
-  left: 9px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--frame);
-}
-
-.cellIn {
-  animation: cellIn 420ms var(--ease-out) backwards;
-  animation-delay: calc(var(--i, 0) * 110ms + 240ms);
-}
-
-@keyframes cellIn {
-  from {
-    clip-path: inset(100% 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
+.signFoot {
+  margin-top: 12px;
+  text-align: center;
 }
 
 .paste {
   display: grid;
   gap: 10px;
-  padding: 14px 12px 16px;
-  border-top: 1px solid var(--rule);
+  margin-top: 16px;
 }
 
 .pasteLine {
-  padding: 10px 12px;
-  border: 1px dashed var(--field);
-  border-radius: 4px;
-  background: var(--surface-2);
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--ground);
   font-family: var(--mono);
   font-size: 15px;
   line-height: 1.45;
@@ -900,7 +971,7 @@ textarea.input {
   user-select: all;
 }
 
-/* ── Lists of links ─────────────────────────────────────────────────── */
+/* ── Lists ──────────────────────────────────────────────────────────── */
 
 .list {
   list-style: none;
@@ -909,14 +980,15 @@ textarea.input {
 .item {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 2px 10px;
+  gap: 2px 12px;
   align-items: start;
-  padding: 11px 12px;
-  border-bottom: 1px solid var(--rule-soft);
+  padding: 12px 16px;
+  border-top: 1px solid var(--rule);
 }
 
-.item:last-child {
-  border-bottom: 0;
+.tab + .list .item:first-child {
+  margin-top: 6px;
+  border-top: 0;
 }
 
 .item > .state {
@@ -924,15 +996,14 @@ textarea.input {
 }
 
 .itemTitle {
-  font-weight: 600;
   font-size: 15px;
+  font-weight: 700;
 }
 
 .url {
-  font-family: var(--mono);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.45;
-  color: var(--ink-3);
+  color: var(--ink-2);
   overflow-wrap: anywhere;
 }
 
@@ -942,27 +1013,58 @@ textarea.input {
   color: var(--fail);
 }
 
-/* Viewing tally: one ruled row per category, a mono figure, the label in words. */
+/* A state in words on a pill, in its own colour. */
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.state svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.state[data-state='ok'] {
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+
+.state[data-state='fail'] {
+  background: var(--fail-bg);
+  color: var(--fail);
+}
+
+/* Viewing tally: one row per category, the figure first. */
 .tallyRow {
   display: grid;
   grid-template-columns: 3ch minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   min-height: 48px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--rule-soft);
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule);
   font-size: 16px;
 }
 
-.tallyRow:last-child {
-  border-bottom: 0;
+.tab + .list .tallyRow:first-child {
+  margin-top: 4px;
+  border-top: 0;
 }
 
 .tallyNum {
-  font-family: var(--mono);
-  font-size: 20px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 800;
   text-align: right;
 }
 
@@ -971,9 +1073,8 @@ textarea.input {
 }
 
 .footNote {
-  padding: 9px 12px;
+  padding: 12px 16px 14px;
   border-top: 1px solid var(--rule);
-  background: var(--surface-2);
   font-size: 14px;
   line-height: 1.45;
   color: var(--ink-2);
@@ -982,27 +1083,28 @@ textarea.input {
 /* ── Report options ─────────────────────────────────────────────────── */
 
 .options {
-  border: 0;
+  min-width: 0;
   margin: 0;
   padding: 0;
-  min-width: 0;
+  border: 0;
 }
 
 .option {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 58px;
-  padding: 12px;
-  border-bottom: 1px solid var(--rule-soft);
+  min-height: 56px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--rule);
   font-size: 16px;
   font-weight: 500;
   line-height: 1.35;
   cursor: pointer;
 }
 
-.option:last-child {
-  border-bottom: 0;
+.tab + .option {
+  margin-top: 6px;
+  border-top: 0;
 }
 
 .option input {
@@ -1010,16 +1112,17 @@ textarea.input {
   width: 22px;
   height: 22px;
   margin: 0;
-  accent-color: var(--frame);
+  accent-color: var(--line);
 }
 
 .option:has(input:checked) {
-  background: var(--selected);
+  background: var(--line-tint);
+  box-shadow: inset 0 0 0 2px var(--line);
   font-weight: 700;
 }
 
 .option:has(input:focus-visible) {
-  outline: 3px solid var(--frame);
+  outline: 3px solid var(--line);
   outline-offset: -3px;
 }
 
@@ -1035,7 +1138,7 @@ textarea.input {
 /* ── Reading pages ──────────────────────────────────────────────────── */
 
 .prose {
-  padding: 4px 12px 16px;
+  padding: 8px 16px 16px;
 }
 
 .prose p,
@@ -1055,7 +1158,11 @@ textarea.input {
 }
 
 .prose li + li {
-  margin-top: 4px;
+  margin-top: 6px;
+}
+
+.prose li::marker {
+  color: var(--line);
 }
 
 .prose strong {
@@ -1069,25 +1176,29 @@ textarea.input {
 /* ── Browser-only fallback ──────────────────────────────────────────── */
 
 .skeleton {
-  height: 28px;
   width: 70%;
-  border-radius: 4px;
-  background: var(--tab);
+  height: 34px;
+  border-radius: 8px;
+  background: var(--ground);
 }
 
 .skeletonBlock {
-  margin-top: 20px;
-  height: 260px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--surface);
+  height: 300px;
+  margin-top: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--ground);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .posted,
-  .cellIn,
-  .state[data-state='checking'] svg {
+  .lit .disc,
+  .lit[data-state='ok'] .disc path,
+  .stop[data-seg='moving']::before {
     animation: none;
+  }
+
+  /* Still in flight, so the marker stays on the line, parked halfway. */
+  .stop[data-seg='moving']::before {
+    background-position: 0 50%, center;
   }
 
   .primary,
