@@ -2,6 +2,7 @@ import type { BadgeStatus } from '@cs/shared';
 import { fetchCheck } from '@/lib/check';
 import { APP_URL } from '@/lib/config';
 import type { CheckReply, ExtensionMessage } from '@/lib/messages';
+import { isSignedInPage } from '@/lib/urls';
 
 /** The toolbar icon repeats the page's verdict, in the badge's state colours. */
 const ACTION: Partial<Record<BadgeStatus, { text: string; color: string }>> = {
@@ -33,8 +34,17 @@ export default defineBackground(() => {
     return true; // answer asynchronously
   });
 
-  // A tab that loads another page drops the old verdict from its icon.
-  browser.tabs.onUpdated.addListener((tabId, info) => {
+  browser.tabs.onUpdated.addListener((tabId, info, tab) => {
+    // A tab that loads another page drops the old verdict from its icon.
     if (info.status === 'loading') void setAction(tabId, null);
+    // Signed in from a badge's "Sign in" tab: go back to the listing, which re-checks when it is shown again.
+    // Without an opener (or without this extension) the student just stays on the signed-in page.
+    if (info.url && tab.openerTabId !== undefined && isSignedInPage(APP_URL, info.url)) {
+      const listingTab = tab.openerTabId;
+      void browser.tabs
+        .update(listingTab, { active: true })
+        .then(() => browser.tabs.remove(tabId))
+        .catch(() => undefined); // the listing tab was closed: stay on the signed-in page
+    }
   });
 });

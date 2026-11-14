@@ -24,6 +24,16 @@ export function viewingUrl(appUrl: string, verificationId: string, code: string 
 /** Back to a "you are signed in" page; the listing tab re-checks by itself when the student returns to it. */
 export const signInUrl = (appUrl: string): string => `${base(appUrl)}/auth/login?returnTo=/signed-in`;
 
+/** The page sign-in from the badge returns to; the background then takes the student back to their listing. */
+export function isSignedInPage(appUrl: string, url: string): boolean {
+  try {
+    const u = new URL(url);
+    return `${u.origin}${u.pathname}` === `${base(appUrl)}/signed-in`;
+  } catch {
+    return false;
+  }
+}
+
 export const verifyUrl = (appUrl: string): string => `${base(appUrl)}/verify`;
 
 export const askMessage = (appUrl: string): string =>

@@ -12,7 +12,7 @@ export default function SignedInPage() {
       <FrameBar zone="Signed in" />
       <main className={s.main}>
         <h1 id="step-heading" className={s.h1}>You&apos;re signed in</h1>
-        <p className={s.lead}>Go back to your listing tab. Its ChirieSigură badge updates by itself.</p>
+        <p className={s.lead}>Signed in from the ChirieSigură badge? Go back to your listing tab: it updates by itself.</p>
         <p className={s.lead}>
           No extension on this device? <Link className={s.textLink} href="/check">Check a listing here</Link>
         </p>
