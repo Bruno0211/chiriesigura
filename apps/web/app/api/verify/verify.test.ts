@@ -3,7 +3,7 @@ import type { IdentityResponse, ListingsResponse, LocationResponse } from '@cs/s
 import { makeTestDb } from '@/lib/db/test-db';
 import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_APARTMENT } from '@/lib/geocode';
-import { identityHashes } from '@/lib/hash';
+import { identityHashes, phoneHash } from '@/lib/hash';
 import { mockNetwork } from '@/lib/network/mock';
 import { issueNvCookie } from '@/lib/nv-session';
 import { seedVerified } from '@/lib/test-seed';
@@ -191,7 +191,7 @@ describe('landlord verification API', () => {
 
 describe('lifetime ban at the identity step', () => {
   const REFUSAL = "You can't verify with ChirieSigură. If you think this is a mistake, email privacy@chiriesigura.example.";
-  const banned = (h: Partial<{ idDocHash: string; nameBirthHash: string }>) =>
+  const banned = (h: Partial<{ phoneHash: string; idDocHash: string; nameBirthHash: string }>) =>
     db.insert(landlord).values({ phoneHash: 'banned-old-sim', bannedAt: new Date(), idDocHash: 'other', nameBirthHash: 'other', ...h });
   const kycStep = (r: IdentityResponse) => r.steps.find((s) => s.name === 'kyc');
 
@@ -214,6 +214,15 @@ describe('lifetime ban at the identity step', () => {
     await banned({ nameBirthHash: identityHashes(ID).nameBirthHash });
     const r = (await (await post(identity, idBody({ idDocument: 'TZ000001' }), '+40700000010')).json()) as IdentityResponse;
     expect(kycStep(r)).toEqual({ name: 'kyc', ok: false, message: REFUSAL });
+    expect(await db.select().from(verification)).toHaveLength(0);
+  });
+
+  it("never rewrites a banned number's fingerprints when someone else verifies on it", async () => {
+    await banned({ phoneHash: phoneHash('+40700000010'), idDocHash: 'scam-id', nameBirthHash: 'scam-name' });
+    const r = (await (await post(identity, idBody(), '+40700000010')).json()) as IdentityResponse;
+    expect(kycStep(r)).toEqual({ name: 'kyc', ok: false, message: REFUSAL });
+    const [row] = await db.select().from(landlord);
+    expect(row).toMatchObject({ idDocHash: 'scam-id', nameBirthHash: 'scam-name' });
     expect(await db.select().from(verification)).toHaveLength(0);
   });
 
