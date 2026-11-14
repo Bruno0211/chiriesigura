@@ -10,6 +10,22 @@ export interface SiteAdapter {
   descriptionSelector: string;
   /** The landlord's phone once it is shown on the page. */
   phoneSelector?: string;
+  /** Where the listing says the flat is, as text (each line of the element becomes one part). */
+  placeSelector?: string;
+  /** Exact coordinates of the flat, when the site puts them in the page. */
+  placeCoords?: (doc: Document) => { lat: number; lng: number } | null;
+}
+
+/** Storia's page data carries the flat's coordinates (checked on a real ad, 14 Nov 2026). */
+export function storiaCoords(doc: Document): { lat: number; lng: number } | null {
+  try {
+    const data = JSON.parse(doc.getElementById('__NEXT_DATA__')?.textContent ?? '');
+    const c = data?.props?.pageProps?.ad?.location?.coordinates;
+    const p = { lat: c?.latitude, lng: c?.longitude };
+    return typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng) ? p : null;
+  } catch {
+    return null;
+  }
 }
 
 export const ADAPTERS: SiteAdapter[] = [
@@ -19,12 +35,18 @@ export const ADAPTERS: SiteAdapter[] = [
     descriptionSelector: '[data-cy="ad_description"], [data-testid="ad_description"]',
     // OLX hides the number behind "Arată"; this link only exists once it is revealed.
     phoneSelector: '[data-testid="contact-phone"]',
+    // City and county lines next to the location icon in the sidebar (checked on a real ad, 14 Nov 2026).
+    placeSelector: '[data-testid="aside"] img[alt="Location"] + div',
   },
   {
     // Stretch: Storia shares OLX Group's ad page markup.
     site: 'storia',
     matches: ['*://*.storia.ro/*'],
     descriptionSelector: '[data-cy="adPageAdDescription"]',
+    // Before "Afișează numărul" is clicked the same data-cy sits on a button; the link only exists once revealed.
+    phoneSelector: 'a[data-cy="phone-number.number-button"]',
+    placeSelector: 'a[href="#map"]',
+    placeCoords: storiaCoords,
   },
 ];
 
@@ -36,6 +58,7 @@ export function demoAdapter(appUrl: string): SiteAdapter {
     matches: [`${protocol}//${hostname}/demo/listing/*`],
     descriptionSelector: '[data-testid="description"]',
     phoneSelector: '[data-testid="phone"]',
+    placeSelector: '[data-testid="place"]',
   };
 }
 

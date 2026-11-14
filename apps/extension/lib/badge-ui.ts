@@ -250,7 +250,7 @@ function recordRows(status: BadgeStatus, opts: BadgeOptions): Row[] {
  */
 function landlordChecks(doc: Document, res: CheckResponse, opts: BadgeOptions): HTMLElement {
   const rows = ['Phone number', 'ID matches the SIM owner', 'No recent SIM change', 'Phone near the apartment'].map(PASSED);
-  const issued = [opts.code, res.verifiedAt && `verified ${day(res.verifiedAt)}`].filter(Boolean).join(' · ');
+  const issued = [opts.code, res.verifiedAt && `verified ${day(res.verifiedAt)}`, res.city && `near ${res.city}`].filter(Boolean).join(' · ');
   return record(doc, "Landlord's checks", 'By their operator', rows, [
     issued && el(doc, 'span', { class: 'footLine' }, issued),
     el(doc, 'span', { class: 'footLine' }, 'via Nokia Network as Code · CAMARA'),

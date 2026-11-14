@@ -6,6 +6,9 @@ export interface Extracted {
   code: string | null;
   /** As shown on the page; the server normalises and hashes it, and never stores it. */
   phone: string | null;
+  /** Where the page says the flat is, as shown; the server looks it up and never stores it. */
+  place: string | null;
+  placeCoords: { lat: number; lng: number } | null;
 }
 
 /** Elements that sit inside a line of text; every other element (p, div, li, br, …) breaks the line. */
@@ -36,10 +39,14 @@ function lineText(el: Element): string {
 export function extractFromDocument(doc: Document, url: string, adapter: SiteAdapter, demoOrigin: string): Extracted {
   const description = doc.querySelector(adapter.descriptionSelector);
   const phoneText = adapter.phoneSelector ? doc.querySelector(adapter.phoneSelector)?.textContent?.trim() : null;
+  const placeEl = adapter.placeSelector ? doc.querySelector(adapter.placeSelector) : null;
+  const place = placeEl ? lineText(placeEl).split('\n').map((l) => l.trim()).filter(Boolean).join(', ') : '';
   return {
     listing: parseListingUrl(url, demoOrigin),
     code: description ? findCode(lineText(description)) : null,
     phone: phoneText || null,
+    place: place || null,
+    placeCoords: adapter.placeCoords?.(doc) ?? null,
   };
 }
 

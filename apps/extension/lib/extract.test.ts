@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ADAPTERS, demoAdapter, findAdapter } from './adapters';
+import { ADAPTERS, demoAdapter, findAdapter, storiaCoords } from './adapters';
 import { extractFromDocument, isListingPage } from './extract';
 
 const APP = 'http://localhost:3000';
@@ -20,6 +20,8 @@ describe('extractFromDocument', () => {
       listing: { site: 'demo', listingId: 'd1' },
       code: 'VC-7K3Q',
       phone: '+40 700 000 001',
+      place: null,
+      placeCoords: null,
     });
   });
 
@@ -41,7 +43,34 @@ describe('extractFromDocument', () => {
       listing: { site: 'olx', listingId: 'hXyZ1' },
       code: null,
       phone: null,
+      place: null,
+      placeCoords: null,
     });
+  });
+
+  it('reads the OLX place as one line', () => {
+    const doc = parse(fixture('olx-listing.html'));
+    doc.querySelector('[data-testid="aside"]')!.insertAdjacentHTML('beforeend', '<div><img alt="Location" src="x.svg"><div><p>Timisoara</p><p>Timis</p></div></div>');
+    expect(extractFromDocument(doc, OLX_URL, olx, APP).place).toBe('Timisoara, Timis');
+  });
+
+  it('reads the demo place', () => {
+    const doc = parse(fixture('demo-listing.html'));
+    doc.body.insertAdjacentHTML('beforeend', '<p><span data-testid="place">Timișoara, Centru</span> · 2 camere</p>');
+    expect(extractFromDocument(doc, DEMO_URL, demo, APP).place).toBe('Timișoara, Centru');
+  });
+
+  it('reads Storia coordinates from the page data', () => {
+    const doc = parse('<script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"ad":{"location":{"coordinates":{"latitude":45.73587,"longitude":21.249695}}}}}}</script>');
+    expect(storiaCoords(doc)).toEqual({ lat: 45.73587, lng: 21.249695 });
+  });
+
+  it('bad Storia page data gives no coordinates', () => {
+    for (const html of [
+      '<p>no data</p>',
+      '<script id="__NEXT_DATA__">{not json</script>',
+      '<script id="__NEXT_DATA__">{"props":{"pageProps":{"ad":{"location":{"coordinates":{"latitude":"x","longitude":21}}}}}}</script>',
+    ]) expect(storiaCoords(parse(html))).toBeNull();
   });
 
   it('reads the OLX phone once the visitor reveals it', () => {
@@ -81,8 +110,8 @@ describe('isListingPage', () => {
   });
 
   it('is true for a listing URL, and for a code on a page whose URL we cannot parse', () => {
-    expect(isListingPage({ listing: { site: 'olx', listingId: 'a1' }, code: null, phone: null })).toBe(true);
-    expect(isListingPage({ listing: null, code: 'VC-7K3Q', phone: null })).toBe(true);
+    expect(isListingPage({ listing: { site: 'olx', listingId: 'a1' }, code: null, phone: null, place: null, placeCoords: null })).toBe(true);
+    expect(isListingPage({ listing: null, code: 'VC-7K3Q', phone: null, place: null, placeCoords: null })).toBe(true);
   });
 });
 

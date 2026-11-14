@@ -11,6 +11,11 @@ export function checkUrl(appUrl: string, e: Extracted): string {
   }
   if (e.code) q.set('code', e.code);
   if (e.phone) q.set('phone', e.phone);
+  if (e.place) q.set('place', e.place);
+  if (e.placeCoords) {
+    q.set('placeLat', String(e.placeCoords.lat));
+    q.set('placeLng', String(e.placeCoords.lng));
+  }
   const qs = q.toString();
   return `${base(appUrl)}/api/check${qs ? `?${qs}` : ''}`;
 }

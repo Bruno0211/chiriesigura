@@ -93,6 +93,16 @@ describe('renderBadge', () => {
     expect(root().textContent).toContain('Registered to this listing');
   });
 
+  it.each(['green', 'amber'] as const)('%s names the city the landlord verified in', (status) => {
+    renderBadge(host, res(status, { city: 'Timișoara' }), OPTS);
+    expect(root().textContent).toContain('near Timișoara');
+  });
+
+  it('says nothing about a city it does not know', () => {
+    renderBadge(host, res('amber'), OPTS);
+    expect([...root().querySelectorAll('.footLine')].map((e) => e.textContent).join(' ')).not.toContain('near ');
+  });
+
   it('shows the report line when viewers have reported', () => {
     renderBadge(host, res('green', { reports: { ok: 3, no_show: 1, mismatch: 0, money_upfront: 0, wrong_person: 0 } }), OPTS);
     expect(text()).toContain("4 verified viewings: 3 ✅ · 1 didn't show up");
