@@ -6,6 +6,7 @@ export interface CheckResponse {
   label: string;                 // verbatim badge copy
   verificationId?: string;       // present for green/amber (for the viewing QR)
   verifiedAt?: string;           // ISO
+  city?: string;                 // the city the landlord verified in, for green/amber when known
   locationResult?: 'TRUE' | 'PARTIAL';
   reports?: ReportCounts;        // present for green/amber when any report exists
 }

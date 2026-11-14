@@ -31,6 +31,7 @@ const TONE: Record<BadgeStatus, Tone> = {
   red_copied: 'fail',
   red_phone_mismatch: 'fail',
   red_banned: 'fail',
+  red_far_away: 'fail',
   grey_unverified: 'none',
   grey_cannot_confirm: 'none',
 };
@@ -220,6 +221,13 @@ function recordRows(status: BadgeStatus, opts: BadgeOptions): Row[] {
       return [code, FAILED('Code issued by ChirieSigură', 'No landlord was ever given this code.')];
     case 'red_banned':
       return [code, PASSED('Code issued by ChirieSigură'), FAILED('Landlord in good standing', 'Our team banned this landlord after verified viewers reported them.')];
+    case 'red_far_away':
+      return [
+        code,
+        PASSED('Code issued by ChirieSigură'),
+        PASSED('Registered to this listing'),
+        FAILED('Flat in the same area', 'Where this listing says the flat is, is far from where the landlord verified.'),
+      ];
     case 'red_copied':
       return [
         code,

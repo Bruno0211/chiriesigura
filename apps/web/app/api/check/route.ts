@@ -26,7 +26,7 @@ export async function GET(req: Request) {
   const db = getDb();
   const v = code ? await findVerificationByCode(db, code) : null;
   const reports = v ? await landlordReportCounts(db, v.landlordId) : emptyCounts();
-  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, reports });
+  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, reports, listingFar: false });
 
   const body: CheckResponse = { status, label: badgeLabel(status, v?.verifiedAt) };
   if (v && (status === 'green' || status === 'amber')) {

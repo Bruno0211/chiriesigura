@@ -10,5 +10,5 @@ export type LocationResult = 'TRUE' | 'PARTIAL' | 'FALSE' | 'UNKNOWN';
 
 export type BadgeStatus =
   | 'green' | 'amber'
-  | 'red_fake_code' | 'red_copied' | 'red_phone_mismatch' | 'red_banned'
+  | 'red_fake_code' | 'red_copied' | 'red_phone_mismatch' | 'red_banned' | 'red_far_away'
   | 'grey_unverified' | 'grey_cannot_confirm';
