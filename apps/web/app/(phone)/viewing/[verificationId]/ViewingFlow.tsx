@@ -18,6 +18,7 @@ import { FrameBar } from '../../components/FrameBar';
 import { NumberStep } from '../../components/NumberStep';
 import { StepList } from '../../components/StepList';
 import { CheckIcon } from '../../components/Icons';
+import { ReportLine } from '../../components/ReportLine';
 import {
   CHECK_ERROR,
   clockTime,
@@ -34,7 +35,8 @@ type Stage = 'consent' | 'number' | 'report' | 'done';
 const STEP: Record<Stage, number> = { consent: 1, number: 2, report: 3, done: 4 };
 
 /** Labels are verbatim from the spec (§6.3). */
-const GOOD: { value: ReportCategory; label: string } = { value: 'ok', label: '✅ All good' };
+/** "All good" carries a drawn check beside it (no colour emoji); the words are the radio's accessible name. */
+const GOOD: { value: ReportCategory; label: string } = { value: 'ok', label: 'All good' };
 const PROBLEMS: { value: ReportCategory; label: string }[] = [
   { value: 'no_show', label: "Landlord didn't show up" },
   { value: 'mismatch', label: "Apartment doesn't match photos/description" },
@@ -104,7 +106,7 @@ export function ViewingFlow({ verificationId, code }: { verificationId: string; 
   const codeLine = listingCode && (
     <p className={s.confirmed}>
       <span>Listing</span>
-      <span>{listingCode}</span>
+      <span className={s.codeInline}>{listingCode}</span>
     </p>
   );
 
@@ -120,6 +122,7 @@ export function ViewingFlow({ verificationId, code }: { verificationId: string; 
           copy={STUDENT_COPY}
           data={STUDENT_DATA}
           acceptLabel="I agree — continue"
+          terminus="Your report"
         >
           {codeLine}
         </ConsentScreen>
@@ -223,7 +226,10 @@ function ReportForm({
         onChange={() => setCategory(c.value)}
         disabled={sending}
       />
-      <span>{c.label}</span>
+      <span>
+        {c.value === 'ok' && <CheckIcon className={s.okMark} />}
+        {c.label}
+      </span>
     </label>
   );
 
@@ -267,6 +273,7 @@ function ReportForm({
           details={masked ? { number: masked } : undefined}
           labels={RECORD_LABELS}
           title="Before it is sent"
+          terminus="Your report"
         />
 
         {problem === 'not_at_address' && (
@@ -335,7 +342,10 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
             <h2 id="your-report">Your report</h2>
             <span>{already ? 'Not sent again' : 'Sent'}</span>
           </div>
-          <p className={s.moduleBody}>{LABEL[st.category]}</p>
+          <p className={s.moduleBody}>
+            {st.category === 'ok' && <CheckIcon className={s.okMark} />}
+            {LABEL[st.category]}
+          </p>
         </section>
       )}
 
@@ -355,7 +365,10 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
             ))}
           </ul>
           <p className={s.footNote}>
-            On the listing badge: <span>{line}</span>
+            On the listing badge:{' '}
+            <span>
+              <ReportLine line={line} />
+            </span>
           </p>
         </section>
       )}

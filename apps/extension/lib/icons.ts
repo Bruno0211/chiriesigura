@@ -7,7 +7,13 @@ const SHAPES = {
   check: [['path', { d: 'M4.5 10.5l3.5 3.5 7.5-8' }]],
   cross: [['path', { d: 'M5.5 5.5l9 9M14.5 5.5l-9 9' }]],
   alert: [['path', { d: 'M10 4.5v7M10 15.25v.25' }]],
+  // Busy only: the "Checking this listing…" spinner.
   pending: [['circle', { cx: '10', cy: '10', r: '6.5', 'stroke-dasharray': '3 3.2' }]],
+  // Nothing to vouch for (unverified): a closed ring with a dash, never the spinner.
+  ringDash: [
+    ['circle', { cx: '10', cy: '10', r: '6.5' }],
+    ['path', { d: 'M7 10h6' }],
+  ],
   chevron: [['path', { d: 'M5.5 8l4.5 4.5L14.5 8' }]],
   copy: [
     ['rect', { x: '7', y: '7', width: '9.5', height: '9.5', rx: '1.5' }],

@@ -84,36 +84,28 @@ export function NumberStep({
       )}
 
       <form onSubmit={submit} noValidate>
-        <section className={s.module} aria-labelledby={`${id}-title`}>
-          <div className={s.tab}>
-            <h2 id={`${id}-title`}>Your number</h2>
-            <span>Kept as a one-way hash</span>
-          </div>
-          <div className={s.fields}>
-            <div className={s.field}>
-              <label htmlFor={id} className={s.label}>Your phone number</label>
-              <input
-                id={id}
-                className={`${s.input} ${s.inputMono}`}
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="07xx xxx xxx"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                aria-invalid={invalid || undefined}
-                aria-describedby={`${id}-hint`}
-              />
-              {invalid ? (
-                <p id={`${id}-hint`} className={s.fieldError} role="alert">
-                  Enter a Romanian mobile number, like 0722 123 456
-                </p>
-              ) : (
-                <p id={`${id}-hint`} className={s.note}>The number of the SIM in this phone.</p>
-              )}
-            </div>
-          </div>
-        </section>
+        <div className={`${s.field} ${s.fieldSolo}`}>
+          <label htmlFor={id} className={s.label}>Your phone number</label>
+          <input
+            id={id}
+            className={`${s.input} ${s.inputMono}`}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="07xx xxx xxx"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            aria-invalid={invalid || undefined}
+            aria-describedby={`${id}-hint`}
+          />
+          {invalid ? (
+            <p id={`${id}-hint`} className={s.fieldError} role="alert">
+              Enter a Romanian mobile number, like 0722 123 456
+            </p>
+          ) : (
+            <p id={`${id}-hint`} className={s.note}>The number of the SIM in this phone. Kept as a one-way hash.</p>
+          )}
+        </div>
         <div className={s.actionsInline}>
           <button type="submit" className={s.primary} disabled={leaving} aria-busy={leaving || undefined}>
             {leaving ? "Opening your operator's check…" : 'Confirm my number'}

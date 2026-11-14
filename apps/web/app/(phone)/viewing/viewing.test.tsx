@@ -47,7 +47,7 @@ describe('ViewingFlow', () => {
     readyToReport();
     render(<ViewingFlow verificationId={VID} />);
     for (const label of [
-      '✅ All good',
+      'All good',
       "Landlord didn't show up",
       "Apartment doesn't match photos/description",
       'Asked for money before the viewing',

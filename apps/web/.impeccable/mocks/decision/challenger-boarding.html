@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Boarding Pass · verify consent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0c0d10; --ink-2: #474b55; --ink-3: #6b707b; --ground: #f4f5f7; --rule: #dfe2e7; --alert: #ffb800; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 390px; height: 844px; overflow: hidden; }
+  body { font-family: 'Barlow', system-ui, sans-serif; color: var(--ink); background: var(--ground); position: relative; font-variant-numeric: tabular-nums; }
+  .cond { font-family: 'Barlow Semi Condensed', sans-serif; }
+  header { background: var(--ink); color: #fff; padding: 16px 20px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .brand { font-family: 'Barlow Semi Condensed'; font-weight: 800; font-size: 20px; }
+  .meta { font-family: 'Barlow Semi Condensed'; font-weight: 600; font-size: 14px; color: #c9ccd3; }
+  .chip { margin: 14px 20px 0; display: inline-flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 600; background: #fff; border: 1px solid var(--rule); border-radius: 999px; padding: 5px 12px; }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: #13804b; }
+  h1 { margin: 14px 20px 0; font-family: 'Barlow Semi Condensed'; font-size: 34px; font-weight: 800; line-height: 1.05; }
+  .lead { margin: 6px 20px 0; font-size: 16px; color: var(--ink-2); }
+  .board { margin: 16px 20px 0; background: #fff; border-radius: 10px; border: 1px solid var(--rule); }
+  .bh, .r { display: grid; grid-template-columns: 28px 1fr 84px; gap: 8px; padding: 0 12px; align-items: center; }
+  .bh { height: 32px; font-family: 'Barlow Semi Condensed'; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--rule); }
+  .r { padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+  .r:last-child { border-bottom: 0; }
+  .i { font-family: 'Barlow Semi Condensed'; font-weight: 700; color: var(--ink-3); }
+  .t { font-family: 'Barlow Semi Condensed'; font-size: 18px; font-weight: 700; }
+  .h { font-size: 14px; color: var(--ink-2); }
+  .st { font-family: 'Barlow Semi Condensed'; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); text-align: right; }
+  .next { background: #fff7df; }
+  .next .st { color: var(--ink); }
+  .next .st::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--alert); margin-right: 6px; }
+  .pass { margin: 14px 20px 0; background: #fff; border-radius: 10px; border: 1px solid var(--rule); display: grid; grid-template-columns: 1fr 96px; }
+  .seg { padding: 10px 14px; }
+  .seg + .seg { border-left: 2px dashed var(--rule); }
+  .lab { font-family: 'Barlow Semi Condensed'; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .val { font-family: 'Barlow Semi Condensed'; font-size: 22px; font-weight: 800; letter-spacing: 0.04em; }
+  .small { font-size: 13px; color: var(--ink-2); }
+  .actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px 18px; background: var(--ground); }
+  .primary { width: 100%; height: 56px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; font-family: 'Barlow Semi Condensed'; font-size: 19px; font-weight: 700; }
+  .link { display: block; text-align: center; margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: underline; }
+</style>
+</head>
+<body>
+  <header><span class="brand">ChirieSigură</span><span class="meta">Landlord check · 1 / 6</span></header>
+  <p class="chip"><i></i>On mobile data</p>
+  <h1>Verify as a landlord</h1>
+  <p class="lead">At the apartment, on mobile data. About 3 minutes.</p>
+  <section class="board">
+    <div class="bh"><span>#</span><span>Check · by your operator</span><span style="text-align:right">Status</span></div>
+    <div class="r next"><span class="i">01</span><div><p class="t">Phone number</p><p class="h">Confirms this phone owns the number.</p></div><span class="st">Next</span></div>
+    <div class="r"><span class="i">02</span><div><p class="t">ID matches the SIM owner</p><p class="h">A yes or no. Your ID is never saved.</p></div><span class="st">Waiting</span></div>
+    <div class="r"><span class="i">03</span><div><p class="t">No recent SIM change</p><p class="h">No new SIM in 7 days.</p></div><span class="st">Waiting</span></div>
+    <div class="r"><span class="i">04</span><div><p class="t">Phone near the apartment</p><p class="h">Cell-level: near, never “inside”.</p></div><span class="st">Waiting</span></div>
+  </section>
+  <section class="pass">
+    <div class="seg"><p class="lab">Your code</p><p class="val">VC-····</p><p class="small">Issued when all four pass</p></div>
+    <div class="seg"><p class="lab">Never kept</p><p class="small">ID, name, birthdate, location</p></div>
+  </section>
+  <div class="actions"><button class="primary">I agree — start the checks</button><a class="link">Read the privacy notice</a></div>
+</body>
+</html>

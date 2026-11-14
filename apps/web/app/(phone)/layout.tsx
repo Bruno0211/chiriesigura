@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Public_Sans } from 'next/font/google';
+import { Atkinson_Hyperlegible_Next, JetBrains_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import s from './phone.module.css';
 
-// latin-ext carries Romanian ș ț ă â î.
-const text = Public_Sans({ subsets: ['latin', 'latin-ext'], variable: '--font-text', display: 'swap' });
+// latin-ext carries Romanian ș ț ă â î. Atkinson sets every word and number; the mono only the issued code.
+const text = Atkinson_Hyperlegible_Next({ subsets: ['latin', 'latin-ext'], variable: '--font-text', display: 'swap' });
 const mono = JetBrains_Mono({ subsets: ['latin', 'latin-ext'], variable: '--font-mono', display: 'swap' });
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#23205a',
+  themeColor: '#ffffff',
   colorScheme: 'light',
 };
 

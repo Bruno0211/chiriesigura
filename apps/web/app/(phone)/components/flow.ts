@@ -1,5 +1,5 @@
 import type { CheckStepName, NvResult } from '@cs/shared';
-import { simSwapSpan } from '@/lib/sim-swap-window';
+import { simSwapFailMessage, simSwapSpan, simSwapWindowHours } from '@/lib/sim-swap-window';
 
 /** The order checks run in, and the order every record lists them. */
 export const CHECK_ORDER: readonly CheckStepName[] = ['number', 'kyc', 'simswap', 'location'];
@@ -11,6 +11,15 @@ export const CHECK_COPY: Record<CheckStepName, { label: string; how: string }> =
   simswap: { label: 'No recent SIM change', how: `No new SIM for this number in ${simSwapSpan()}.` },
   location: { label: 'Phone near the apartment', how: 'Cell-level: near, never “inside”.' },
 };
+
+/**
+ * After a SIM-swap failure, the only way forward is time: re-entering details can't change it.
+ * Names the same window the server checks, e.g. "… in the last 7 days. You can verify once 7 days have passed since the change."
+ */
+export function simSwapRecovery(hours: number = simSwapWindowHours()): string {
+  const wait = hours === 1 ? 'an hour has' : hours === 24 ? 'a day has' : `${simSwapSpan(hours)} have`;
+  return `${simSwapFailMessage(hours)}. You can verify once ${wait} passed since the change.`;
+}
 
 /** The Number Verification cookie lives 15 minutes (lib/nv-session.ts). */
 export const SESSION_MS = 15 * 60 * 1000;

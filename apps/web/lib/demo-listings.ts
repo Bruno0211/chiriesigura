@@ -1,4 +1,4 @@
-/** Demo classifieds listings served at /demo/listing/[id] (plan Task 13). Generic layout, no OLX branding. */
+/** Demo classifieds listings for the fictional "Anunțuri Timiș" portal at /demo and /demo/listing/[id] (plan Task 13). No real portal's branding. */
 export interface DemoListing {
   id: string;
   title: string;
@@ -12,9 +12,11 @@ export interface DemoListing {
   phone: string;
   photos: string[];
   posted: string;
+  /** Facility chips on the listing page; each one is stated in the description. */
+  amenities: string[];
 }
 
-const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=900&q=70&auto=format&fit=crop`;
+const photo = (id: string) => `https://images.unsplash.com/photo-${id}?w=1400&q=72&auto=format&fit=crop`;
 const PASTE = 'Proprietar verificat · ChirieSigură VC-7K3Q';
 
 const FLAT_TEXT = [
@@ -27,47 +29,53 @@ const FLAT_PHOTOS = ['1583847268964-b28dc8f51f92', '1613575831056-0acd5da8f085',
 
 export const DEMO_LISTINGS: Record<string, DemoListing> = {
   d1: {
+    amenities: ['Mobilat', 'Centrală proprie', 'Aer condiționat', 'Mașină de spălat', 'Internet inclus'],
     id: 'd1', title: 'Apartament 2 camere, mobilat, Centru', price: '450 €/lună', area: 'Timișoara, Centru', rooms: '2 camere · 54 m² · etaj 2/4',
     description: [...FLAT_TEXT, PASTE], contactName: 'Zoltan', phone: '+999 9999 2002', photos: FLAT_PHOTOS, posted: 'Postat azi la 09:12',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   // The scammer's copy: same text and code, cheaper, a different phone.
   d2: {
+    amenities: ['Mobilat', 'Centrală proprie', 'Aer condiționat', 'Mașină de spălat', 'Internet inclus'],
     id: 'd2', title: 'Apartament 2 camere, mobilat, Centru', price: '320 €/lună', area: 'Timișoara, Centru', rooms: '2 camere · 54 m² · etaj 2/4',
     description: [...FLAT_TEXT, PASTE], contactName: 'Zoltan', phone: '+40 799 999 999', photos: FLAT_PHOTOS, posted: 'Postat azi la 11:47',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   d3: {
+    amenities: ['Mobilat', 'Renovat 2025', 'Centrală proprie', 'Lângă tramvai'],
     id: 'd3', title: 'Garsonieră renovată, zona Iosefin', price: '300 €/lună', area: 'Timișoara, Iosefin', rooms: '1 cameră · 32 m² · parter',
     description: [
       'Garsonieră renovată complet în 2025, aproape de stația de tramvai.',
       'Mobilată, centrală proprie, fără animale. Disponibilă de la 1 decembrie.',
     ],
-    contactName: 'Mihaela', phone: '+40 733 333 333', photos: ['1600493505873-cddd69453072', '1629042306558-7d1e15cc02fa'].map(photo), posted: 'Postat ieri',
+    contactName: 'Mihaela', phone: '+40 733 333 333', photos: ['1513694203232-719a280e022f', '1595526114035-0d45ed16cfbf', '1484154218962-a197022b5858'].map(photo), posted: 'Postat ieri',
     coords: { lat: 45.7468, lng: 21.2116 },
   },
   // The same landlord's second flat, registered live during the demo.
   d4: {
+    amenities: ['Mobilat', 'Două băi', 'Balcon închis', 'Loc de parcare'],
     id: 'd4', title: 'Apartament 3 camere, decomandat, Centru', price: '580 €/lună', area: 'Timișoara, Centru', rooms: '3 camere · 72 m² · etaj 3/4',
     description: [
       'Apartament 3 camere decomandat, în aceeași clădire, renovat și mobilat modern.',
       'Două băi, balcon închis, loc de parcare. Potrivit pentru 3 studenți sau o familie.',
     ],
-    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1665249934445-1de680641f50', '1630699294897-723e02620662'].map(photo), posted: 'Postat azi la 08:30',
+    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1522708323590-d24dbb6b0267', '1665249934445-1de680641f50', '1630699294897-723e02620662'].map(photo), posted: 'Postat azi la 08:30',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   // A flat in another town: refused when a landlord verified at the Timișoara address tries to register it.
   d6: {
+    amenities: ['Mobilat', 'Centrală proprie', 'Disponibil imediat'],
     id: 'd6', title: 'Apartament 2 camere, Lugoj, zona Centru', price: '350 €/lună', area: 'Lugoj, Centru', rooms: '2 camere · 50 m² · etaj 1/4',
     description: [
       'Apartament 2 camere în centrul Lugojului, aproape de Podul de Fier.',
       'Mobilat, centrală proprie, disponibil imediat. Potrivit pentru un cuplu sau 2 studenți.',
     ],
-    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1630699294897-723e02620662', '1600493505873-cddd69453072'].map(photo), posted: 'Postat azi la 10:05',
+    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1493809842364-78817add7ffb', '1512918728675-ed5a9ecdebfd', '1505691938895-1758d7feb511'].map(photo), posted: 'Postat azi la 10:05',
     coords: { lat: 45.6886, lng: 21.9031 },
   },
   // The scammer: verified under his real ID, reported by viewers, banned live by the team.
   d5: {
+    amenities: ['Mobilat', 'Lângă Politehnica'],
     id: 'd5', title: 'Apartament 2 camere, mobilat, zona Complex Studențesc', price: '250 €/lună', area: 'Timișoara, Complex Studențesc', rooms: '2 camere · 50 m² · etaj 1/4',
     description: [
       'Apartament 2 camere, complet mobilat, la 5 minute de Universitatea Politehnica. Ideal pentru studenți.',
@@ -75,11 +83,12 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
       'Contact doar pe WhatsApp, nu răspund la apeluri.',
       'Proprietar verificat · ChirieSigură VC-BAN5',
     ],
-    contactName: 'Mihai', phone: '+40 700 000 009', photos: ['1600493505873-cddd69453072', '1629042306558-7d1e15cc02fa'].map(photo), posted: 'Postat azi la 07:55',
+    contactName: 'Mihai', phone: '+40 700 000 009', photos: ['1600493505873-cddd69453072', '1629042306558-7d1e15cc02fa', '1600210492486-724fe5c67fb0'].map(photo), posted: 'Postat azi la 07:55',
     coords: { lat: 45.7471, lng: 21.2384 },
   },
   // A real code on a flat in another city: the place check turns it red.
   d7: {
+    amenities: ['Mobilat', 'Disponibil imediat'],
     id: 'd7', title: 'Apartament 2 camere, zona Centru, Cluj-Napoca', price: '400 €/lună', area: 'Cluj-Napoca, Centru', rooms: '2 camere · 55 m² · etaj 3/4',
     description: [
       'Apartament 2 camere în centrul Clujului, aproape de Piața Unirii. Mobilat și utilat complet.',
@@ -92,4 +101,9 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
 };
 
 /** Another landlord's verified listing in the "similar" widget: its code must not count for this page. */
-export const SIMILAR = { title: 'Garsonieră zona Circumvalațiunii', price: '280 €/lună', line: 'Proprietar verificat · ChirieSigură VC-ZZZZ' };
+export const SIMILAR = {
+  title: 'Garsonieră zona Circumvalațiunii',
+  price: '280 €/lună',
+  line: 'Proprietar verificat · ChirieSigură VC-ZZZZ',
+  photo: photo('1502672260266-1c1ef2d93688'),
+};
