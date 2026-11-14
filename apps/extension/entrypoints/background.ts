@@ -12,6 +12,7 @@ const ACTION: Partial<Record<BadgeStatus, { text: string; color: string }>> = {
   red_copied: { text: '✕', color: '#b3261e' },
   red_phone_mismatch: { text: '✕', color: '#b3261e' },
   red_banned: { text: '✕', color: '#b3261e' },
+  red_far_away: { text: '✕', color: '#b3261e' },
 };
 
 async function setAction(tabId: number, status: BadgeStatus | null) {

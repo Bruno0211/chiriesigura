@@ -58,10 +58,43 @@ describe('GET /api/check', () => {
     for (const extra of [{}, { phone: '0700 000 001' }, { code: 'vc-7k3q' }] as Record<string, string>[]) {
       const { body } = await check({ ...d1, code: 'VC-7K3Q', ...extra });
       expect(body).toMatchObject({
-        status: 'green', label: 'Verified landlord · near the address · 14 Nov 2026',
+        status: 'green', label: 'Verified landlord · near Timișoara · 14 Nov 2026', city: 'Timișoara',
         verificationId: seeded.verificationId, locationResult: 'TRUE', verifiedAt: '2026-11-14T10:00:00.000Z',
       });
       expect(body.reports).toBeUndefined();
+    }
+  });
+  it('a listing whose page says Lugoj is far away', async () => {
+    const { body } = await check({ ...d1, code: 'VC-7K3Q', place: 'Lugoj, Centru' });
+    expect(body).toMatchObject({ status: 'red_far_away', label: 'Listing is far from where the landlord verified' });
+    expect(body.verificationId).toBeUndefined();
+    expect(body.city).toBeUndefined();
+  });
+  it('page coordinates win over the place name', async () => {
+    const { body } = await check({ ...d1, code: 'VC-7K3Q', place: 'Lugoj, Centru', placeLat: '45.75', placeLng: '21.21' });
+    expect(body.status).toBe('green');
+  });
+  it('a nearby place stays green and names the city', async () => {
+    const { body } = await check({ ...d1, code: 'VC-7K3Q', place: 'Timișoara, Centru' });
+    expect(body).toMatchObject({ status: 'green', label: 'Verified landlord · near Timișoara · 14 Nov 2026', city: 'Timișoara' });
+  });
+  it('a verification without a city keeps the old label', async () => {
+    await db.update(verification).set({ city: null }).where(eq(verification.id, seeded.verificationId));
+    const { body } = await check({ ...d1, code: 'VC-7K3Q' });
+    expect(body.label).toBe('Verified landlord · near the address · 14 Nov 2026');
+    expect(body.city).toBeUndefined();
+  });
+  it('hostile place params are ignored', async () => {
+    const f = vi.fn(async () => Response.json([]));
+    vi.stubGlobal('fetch', f);
+    try {
+      expect((await check({ ...d1, code: 'VC-7K3Q', place: 'a'.repeat(5000) })).body.status).toBe('green');
+      expect(f).not.toHaveBeenCalled();
+      for (const extra of [{ place: 'constructor' }, { placeLat: 'abc', placeLng: '21' }, { placeLat: '999', placeLng: '21' }] as Record<string, string>[]) {
+        expect((await check({ ...d1, code: 'VC-7K3Q', ...extra })).body.status).toBe('green');
+      }
+    } finally {
+      vi.unstubAllGlobals();
     }
   });
   it('never returns contact or address details', async () => {

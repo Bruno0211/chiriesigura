@@ -7,6 +7,8 @@ export interface BadgeInput {
   verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string; banned: boolean } | null;
   pagePhoneHash: string | null;
   reports: ReportCounts;
+  /** The listing's page puts the flat far from where the landlord verified (server-side check). */
+  listingFar: boolean;
 }
 
 export const AMBER_THRESHOLDS = { money_upfront: 2, no_show: 3, wrong_person: 3 } as const;
@@ -25,6 +27,7 @@ export function decideBadge(i: BadgeInput): BadgeStatus {
   const { site, listingId } = i.listing;
   if (!i.verification.listings.some((l) => l.site === site && l.listingId === listingId)) return 'red_copied';
   if (i.pagePhoneHash && i.pagePhoneHash !== i.verification.phoneHash) return 'red_phone_mismatch';
+  if (i.listingFar) return 'red_far_away';
   return isWarned(i.reports) ? 'amber' : 'green';
 }
 
@@ -40,13 +43,15 @@ const LABELS: Record<Exclude<BadgeStatus, 'green'>, string> = {
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
   red_banned: 'Landlord banned',
+  red_far_away: 'Listing is far from where the landlord verified',
   grey_unverified: 'Not verified',
   grey_cannot_confirm: "Can't confirm",
 };
 
-export function badgeLabel(status: BadgeStatus, verifiedAt?: string): string {
+export function badgeLabel(status: BadgeStatus, verifiedAt?: string, city?: string | null): string {
   if (status !== 'green') return LABELS[status];
-  return verifiedAt ? `Verified landlord · near the address · ${formatDate(verifiedAt)}` : 'Verified landlord · near the address';
+  const near = `Verified landlord · near ${city || 'the address'}`;
+  return verifiedAt ? `${near} · ${formatDate(verifiedAt)}` : near;
 }
 
 /** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */

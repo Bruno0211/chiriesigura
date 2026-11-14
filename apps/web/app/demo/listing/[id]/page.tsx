@@ -93,7 +93,8 @@ export default async function DemoListingPage({ params }: { params: Params }) {
           </h1>
           <p className={s.area}>
             <PinIcon />
-            {l.area}
+            {/* The extension reads where the listing says the flat is from this element. */}
+            <span data-testid="place">{l.area}</span>
           </p>
           <p className={s.price} data-testid="price">
             {amount}

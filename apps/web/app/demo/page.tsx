@@ -28,7 +28,9 @@ const one = (v: string | string[] | undefined): string => (Array.isArray(v) ? v[
 
 /** The search really filters: by town, top price, rooms and every keyword (diacritics optional). */
 function matches(l: DemoListing, f: Filters): boolean {
-  if (f.oras && !fold(l.area).startsWith(fold(f.oras))) return false;
+  // A Timiș portal: "Tot județul Timiș" means its towns. A flat elsewhere (d7, Cluj) is reached only by its own link.
+  const town = fold(l.area).split(',')[0]!.trim();
+  if (f.oras ? town !== f.oras : !(town in CITIES)) return false;
   if (f.tip && fold(propertyType(l.title)) !== f.tip) return false;
   if (f.pret && priceValue(l.price) > Number(f.pret)) return false;
   if (f.camere) {

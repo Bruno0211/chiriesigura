@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fetchCheck } from './check';
 
-const EX = { listing: { site: 'demo' as const, listingId: 'd1' }, code: 'VC-7K3Q', phone: null };
+const EX = { listing: { site: 'demo' as const, listingId: 'd1' }, code: 'VC-7K3Q', phone: null, place: null, placeCoords: null };
 const GREEN = { status: 'green', label: 'Verified landlord · near the address · 14 Nov 2026', verificationId: 'v1' };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 

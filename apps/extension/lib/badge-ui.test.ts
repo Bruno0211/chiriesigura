@@ -13,6 +13,7 @@ const LABELS: Record<BadgeStatus, string> = {
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
   red_banned: 'Landlord banned',
+  red_far_away: 'Listing is far from where the landlord verified',
   grey_unverified: 'Not verified',
   grey_cannot_confirm: "Can't confirm",
 };
@@ -63,7 +64,7 @@ describe('renderBadge', () => {
     expect(qr()).toBeNull();
   });
 
-  it.each(['red_fake_code', 'red_copied', 'red_phone_mismatch', 'red_banned', 'grey_cannot_confirm'] as const)(
+  it.each(['red_fake_code', 'red_copied', 'red_phone_mismatch', 'red_banned', 'red_far_away', 'grey_cannot_confirm'] as const)(
     '%s shows neither a QR code nor the ask button',
     (status) => {
       renderBadge(host, res(status), OPTS);
@@ -77,11 +78,29 @@ describe('renderBadge', () => {
     ['red_copied', 'Registered to this listing'],
     ['red_phone_mismatch', 'Phone matches the verified one'],
     ['red_banned', 'Landlord in good standing'],
+    ['red_far_away', 'Flat in the same area'],
     ['grey_cannot_confirm', 'Listing ID readable from the link'],
   ] as const)('%s names the check that failed: %s', (status, check) => {
     renderBadge(host, res(status), OPTS);
     expect(root().querySelectorAll('[data-state="fail"]')).toHaveLength(1);
     expect(failedRow()).toContain(check);
+  });
+
+  it('red_far_away explains the place mismatch and warns against paying', () => {
+    renderBadge(host, res('red_far_away'), OPTS);
+    expect(failedRow()).toContain('Where this listing says the flat is, is far from where the landlord verified.');
+    expect(root().textContent).toContain("Don't send a deposit");
+    expect(root().textContent).toContain('Registered to this listing');
+  });
+
+  it.each(['green', 'amber'] as const)('%s names the city the landlord verified in', (status) => {
+    renderBadge(host, res(status, { city: 'Timișoara' }), OPTS);
+    expect(root().textContent).toContain('near Timișoara');
+  });
+
+  it('says nothing about a city it does not know', () => {
+    renderBadge(host, res('amber'), OPTS);
+    expect([...root().querySelectorAll('.footLine')].map((e) => e.textContent).join(' ')).not.toContain('near ');
   });
 
   it('shows the report line when viewers have reported', () => {

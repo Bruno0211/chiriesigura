@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { isCheckResponse } from './messages';
 
 describe('isCheckResponse', () => {
+  it('accepts a far-away answer', () => {
+    expect(isCheckResponse({ status: 'red_far_away', label: 'Listing is far from where the landlord verified' })).toBe(true);
+  });
   it('accepts a banned-landlord answer', () => {
     expect(isCheckResponse({ status: 'red_banned', label: 'Landlord banned' })).toBe(true);
   });
