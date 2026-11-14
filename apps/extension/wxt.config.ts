@@ -24,10 +24,11 @@ export default defineConfig({
     ],
   }),
   hooks: {
-    // The demo listings live on the app's host, known only at build time.
-    'build:manifestGenerated': (_wxt, manifest) => {
-      for (const script of manifest.content_scripts ?? []) {
-        script.matches = [...(script.matches ?? []), `${appHost()}/demo/listing/*`];
+    // The demo listings live on the app's host, known only at build time. Set on the entrypoint, not the
+    // manifest: `wxt dev` registers content scripts at runtime from these options and never reads the manifest.
+    'entrypoints:resolved': (_wxt, entrypoints) => {
+      for (const e of entrypoints) {
+        if (e.type === 'content-script') e.options.matches = [...(e.options.matches ?? []), `${appHost()}/demo/listing/*`];
       }
     },
   },
