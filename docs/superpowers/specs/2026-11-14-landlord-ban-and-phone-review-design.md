@@ -84,7 +84,7 @@ Hashing:
 - either `review_dismissed_at` is null, or a report arrived after it.
 
 `POST /api/review` with `{ landlordId, action: 'ban' | 'dismiss' }`, team only:
-- **ban:** set `banned_at = now` on that landlord **and every landlord row sharing either hash**, so the person's other phone numbers are banned too.
+- **ban:** set `banned_at = now` on that landlord **and every landlord row sharing its ID card hash** (`id_doc_hash`), so the person's other phone numbers are banned too. A row sharing only the name + birthdate hash is **not** banned (see §4.9).
 - **dismiss:** set `review_dismissed_at = now`.
 
 ### 4.4 Badge
@@ -135,7 +135,7 @@ Hashing:
   - no rows are created.
 - Review API:
   - a non-team email gets 403;
-  - ban also bans a second landlord row with the same name hash;
+  - ban also bans a second landlord row with the same ID card hash, and leaves a row sharing only the name + birthdate hash alone;
   - dismiss takes the landlord off hold until a new report arrives.
 - `/check` shows the report link for green and amber only.
 
@@ -143,3 +143,18 @@ Hashing:
 - Exact copy and styling within the phone-page system.
 - Migration naming, query shape, and splitting the work into tasks.
 - `/check`: whether the button also shows on the signed-out state. Not required, since signed-out users get no verdict.
+
+## 4.9 Update 2026-11-14: a ban spreads only through the ID card number (team picked option C)
+
+**Why:** the whole-branch review found that spreading a ban through the name + birthdate hash bans an *already-verified* innocent namesake, publicly and with no human looking at them. That breaks the anti-goal "a ban without a human decision". Exact namesakes (same full name and birthdate) are rare per person but do exist for common Romanian names.
+
+**Options considered:**
+- **A. Spread and refuse on either hash** (as first built). Rejected: an innocent namesake's listings turn 🔴 with no review.
+- **B. Name + birthdate is only a hint.** A match sends the new verification to `/review` instead of refusing it. It's the fairest, but a scammer with a new ID card can post 🟠 listings until the team looks, and it's more work before the freeze. **Planned for before a real launch.**
+- **C. Spread only through the ID card hash; keep refusing new verifications on either hash.** **Picked.**
+
+**Design (C):**
+- `banPerson` bans the row and every row with the same non-null `id_doc_hash`. It no longer matches on `name_birth_hash`.
+- `/api/verify/identity` is unchanged: a match on either hash is still refused, with the contact message. A refused namesake is never shown publicly.
+- The demo, `/review`, badges, privacy text and pitch are unchanged. Mihai's new number is refused through his card hash.
+
