@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 import s from '../phone.module.css';
 import { FrameBar } from '../components/FrameBar';
+import { CONTACT } from '@/lib/contact';
 
 export const metadata: Metadata = { title: 'Privacy notice' };
-
-// Placeholder until the team picks a real inbox.
-const CONTACT = 'privacy@chiriesigura.example';
 
 export default function PrivacyPage() {
   return (

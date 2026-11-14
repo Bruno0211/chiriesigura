@@ -1,7 +1,8 @@
-import { and, eq, isNotNull, sql } from 'drizzle-orm';
+import { and, eq, isNotNull, or, sql } from 'drizzle-orm';
 import { emptyCounts, REPORT_CATEGORIES, type ListingRef, type ReportCategory, type ReportCounts, type Site } from '@cs/shared';
 import type { Db } from './db';
 import { landlord, listing, verification, viewingReport } from './db/schema';
+import type { IdentityHashes } from './hash';
 
 export interface IssuedVerification {
   id: string;
@@ -42,4 +43,14 @@ export async function landlordReportCounts(db: Db, landlordId: string): Promise<
   const counts = emptyCounts();
   for (const r of rows) if (REPORT_CATEGORIES.includes(r.category as ReportCategory)) counts[r.category as ReportCategory] = Number(r.n);
   return counts;
+}
+
+/** Whether either fingerprint belongs to someone the team banned. */
+export async function isBannedIdentity(db: Db, h: IdentityHashes): Promise<boolean> {
+  const [hit] = await db
+    .select({ id: landlord.id })
+    .from(landlord)
+    .where(and(isNotNull(landlord.bannedAt), or(eq(landlord.idDocHash, h.idDocHash), eq(landlord.nameBirthHash, h.nameBirthHash))))
+    .limit(1);
+  return !!hit;
 }

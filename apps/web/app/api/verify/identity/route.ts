@@ -2,9 +2,11 @@ import type { CheckStep, IdentityRequest, IdentityResponse } from '@cs/shared';
 import { getDb } from '@/lib/db';
 import { landlord, verification } from '@/lib/db/schema';
 import { geocode } from '@/lib/geocode';
-import { phoneHash } from '@/lib/hash';
+import { CONTACT } from '@/lib/contact';
+import { identityHashes, phoneHash } from '@/lib/hash';
 import { CHECK_ERROR, kycPasses, network } from '@/lib/network';
 import { readNv } from '@/lib/nv-session';
+import { isBannedIdentity } from '@/lib/queries';
 
 const SIM_SWAP_WINDOW_HOURS = 168;
 const FIELDS = ['givenName', 'familyName', 'birthdate', 'idDocument', 'address'] as const;
@@ -38,18 +40,25 @@ export async function POST(req: Request) {
   ];
   if (steps.some((s) => !s.ok)) return Response.json({ ok: false, steps } satisfies IdentityResponse);
 
+  // Only now are the ID fields operator-confirmed, so a ban can't be probed with someone else's details.
+  const ids = identityHashes(b);
+  const db = getDb();
+  if (await isBannedIdentity(db, ids)) {
+    steps[1] = { name: 'kyc', ok: false, message: `You can't verify with ChirieSigură. If you think this is a mistake, email ${CONTACT}.` };
+    return Response.json({ ok: false, steps } satisfies IdentityResponse);
+  }
+
   const coords = await geocode(b.address);
   if (!coords) {
     steps.push({ name: 'location', ok: false, message: "We couldn't find that address" });
     return Response.json({ ok: false, steps } satisfies IdentityResponse);
   }
 
-  const db = getDb();
   const now = new Date();
   const [l] = await db
     .insert(landlord)
-    .values({ phoneHash: phoneHash(nv.e164), numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now })
-    .onConflictDoUpdate({ target: landlord.phoneHash, set: { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now } })
+    .values({ phoneHash: phoneHash(nv.e164), numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now, ...ids })
+    .onConflictDoUpdate({ target: landlord.phoneHash, set: { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now, ...ids } })
     .returning();
   const [v] = await db.insert(verification).values({ landlordId: l!.id, addressText: b.address.trim(), ...coords }).returning();
   return Response.json({ ok: true, steps, verificationId: v!.id } satisfies IdentityResponse);
