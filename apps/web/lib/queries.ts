@@ -11,12 +11,13 @@ export interface IssuedVerification {
   phoneHash: string;
   verifiedAt: string;
   locationResult: 'TRUE' | 'PARTIAL';
+  banned: boolean;
 }
 
 /** Only issued codes (verification completed) count. */
 export async function findVerificationByCode(db: Db, code: string): Promise<IssuedVerification | null> {
   const [v] = await db
-    .select({ id: verification.id, landlordId: verification.landlordId, verifiedAt: verification.verifiedAt, locationResult: verification.locationResult, phoneHash: landlord.phoneHash })
+    .select({ id: verification.id, landlordId: verification.landlordId, verifiedAt: verification.verifiedAt, locationResult: verification.locationResult, phoneHash: landlord.phoneHash, bannedAt: landlord.bannedAt })
     .from(verification)
     .innerJoin(landlord, eq(landlord.id, verification.landlordId))
     .where(and(eq(verification.code, code), isNotNull(verification.verifiedAt)));
@@ -28,6 +29,7 @@ export async function findVerificationByCode(db: Db, code: string): Promise<Issu
     phoneHash: v.phoneHash,
     verifiedAt: v.verifiedAt.toISOString(),
     locationResult: v.locationResult as 'TRUE' | 'PARTIAL',
+    banned: v.bannedAt !== null,
     listings: rows.map((r) => ({ site: r.site as Site, listingId: r.listingId })),
   };
 }
