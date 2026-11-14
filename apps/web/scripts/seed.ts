@@ -1,4 +1,4 @@
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, ne, notInArray } from 'drizzle-orm';
 import { getDb, type Db } from '@/lib/db';
 import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_ADDRESSES, DEMO_APARTMENT } from '@/lib/geocode';
@@ -18,6 +18,9 @@ const FAR_LANDLORD = '+40700000011';
 const SCAMMER_ID = { givenName: 'Mihai', familyName: 'Ionescu', birthdate: '1990-07-15', idDocument: 'TM654321' };
 const SCAM_REPORTERS = ['+40711111121', '+40711111122', '+40711111123'];
 
+/** A demo landlord fresh from the checks, with any rehearsal ban or review dismissal lifted. */
+const CLEAN = (now: Date) => ({ numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now, bannedAt: null, reviewDismissedAt: null });
+
 /** Idempotent demo setup and reset: run before every rehearsal (plan Task 13). */
 export async function seed(db: Db): Promise<void> {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
@@ -29,8 +32,8 @@ export async function seed(db: Db): Promise<void> {
 
   const [l] = await db
     .insert(landlord)
-    .values({ phoneHash: phoneHash(LANDLORD), numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now })
-    .onConflictDoUpdate({ target: landlord.phoneHash, set: { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now } })
+    .values({ phoneHash: phoneHash(LANDLORD), ...CLEAN(now) })
+    .onConflictDoUpdate({ target: landlord.phoneHash, set: CLEAN(now) })
     .returning();
   const fields = { landlordId: l!.id, addressText: DEMO_APARTMENT, ...DEMO_ADDRESSES[DEMO_APARTMENT]!, locationResult: 'TRUE', verifiedAt: now };
   const [v] = await db
@@ -45,12 +48,7 @@ export async function seed(db: Db): Promise<void> {
     .insert(listing)
     .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd1', url: `${appUrl}/demo/listing/d1` })
     .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
-  for (const phone of EARLIER_NO_SHOWS) {
-    await db
-      .insert(viewingReport)
-      .values({ verificationId: v!.id, reporterPhoneHash: phoneHash(phone), locationResult: 'TRUE', category: 'no_show' })
-      .onConflictDoNothing();
-  }
+  await resetReports(db, v!.id, EARLIER_NO_SHOWS, 'no_show');
 
   await seedScammer(db, appUrl, now);
   await seedFarListing(db, appUrl, now);
@@ -74,17 +72,21 @@ async function seedScammer(db: Db, appUrl: string, now: Date): Promise<void> {
     .insert(listing)
     .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd5', url: `${appUrl}/demo/listing/d5` })
     .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
-  for (const phone of SCAM_REPORTERS) {
-    await db
-      .insert(viewingReport)
-      .values({ verificationId: v!.id, reporterPhoneHash: phoneHash(phone), locationResult: 'TRUE', category: 'money_upfront' })
-      .onConflictDoNothing();
+  await resetReports(db, v!.id, SCAM_REPORTERS, 'money_upfront');
+}
+
+/** Leaves exactly the seeded reports on a demo verification, dropping any a rehearsal added. */
+async function resetReports(db: Db, verificationId: string, phones: string[], category: 'no_show' | 'money_upfront'): Promise<void> {
+  const hashes = phones.map(phoneHash);
+  await db.delete(viewingReport).where(and(eq(viewingReport.verificationId, verificationId), notInArray(viewingReport.reporterPhoneHash, hashes)));
+  for (const h of hashes) {
+    await db.insert(viewingReport).values({ verificationId, reporterPhoneHash: h, locationResult: 'TRUE', category }).onConflictDoNothing();
   }
 }
 
 /** Radu: a verified landlord whose d7 listing says the flat is in Cluj. */
 async function seedFarListing(db: Db, appUrl: string, now: Date): Promise<void> {
-  const checks = { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now };
+  const checks = CLEAN(now);
   const [l] = await db
     .insert(landlord)
     .values({ phoneHash: phoneHash(FAR_LANDLORD), ...checks })

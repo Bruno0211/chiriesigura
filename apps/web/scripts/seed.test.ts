@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/check/route';
 import type { Db } from '@/lib/db';
-import { listing, verification, viewingReport } from '@/lib/db/schema';
+import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
 import { makeTestDb } from '@/lib/db/test-db';
 import { identityHashes, phoneHash } from '@/lib/hash';
 import { banPerson, findVerificationByCode, holdList, isBannedIdentity } from '@/lib/queries';
@@ -20,6 +20,29 @@ describe('seed', () => {
   let db: Db;
   beforeEach(async () => {
     db = await makeTestDb();
+  });
+
+  it('reseeding puts d1 and d5 back to exactly their seeded reports', async () => {
+    await seed(db);
+    for (const [code, category] of [['VC-7K3Q', 'no_show'], ['VC-7K3Q', 'money_upfront'], ['VC-BAN5', 'money_upfront']] as const) {
+      const v = await findVerificationByCode(db, code);
+      await db.insert(viewingReport).values({ verificationId: v!.id, reporterPhoneHash: `rehearsal-${code}-${category}`, locationResult: 'TRUE', category });
+    }
+    await seed(db);
+    expect(await check('d1')).toMatchObject({ status: 'green' });
+    const d1 = await findVerificationByCode(db, 'VC-7K3Q');
+    const d5 = await findVerificationByCode(db, 'VC-BAN5');
+    expect(await db.select().from(viewingReport).where(eq(viewingReport.verificationId, d1!.id))).toHaveLength(2);
+    expect(await db.select().from(viewingReport).where(eq(viewingReport.verificationId, d5!.id))).toHaveLength(3);
+  });
+
+  it('reseeding lifts a rehearsal ban or dismissal from every demo landlord', async () => {
+    await seed(db);
+    await db.update(landlord).set({ bannedAt: new Date(), reviewDismissedAt: new Date() });
+    await seed(db);
+    const rows = await db.select({ bannedAt: landlord.bannedAt, dismissed: landlord.reviewDismissedAt }).from(landlord);
+    expect(rows.length).toBeGreaterThanOrEqual(3);
+    expect(rows.filter((r) => r.bannedAt || r.dismissed)).toEqual([]);
   });
 
   it('seeds a verified landlord whose d7 listing says Cluj, which the badge flags', async () => {
