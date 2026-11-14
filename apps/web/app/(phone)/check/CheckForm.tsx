@@ -26,7 +26,9 @@ export function CheckForm({ signedIn }: { signedIn: boolean }) {
     e.preventDefault();
     // Same parameters as the extension's checkUrl; the server decides the verdict, including "Can't confirm".
     const q = new URLSearchParams();
-    const listing = parseListingUrl(link.trim(), window.location.origin);
+    // Apps share "title + link"; take the first link out of whatever was pasted.
+    const url = link.match(/https?:\/\/\S+/)?.[0] ?? link.trim();
+    const listing = parseListingUrl(url, window.location.origin);
     if (listing) {
       q.set('site', listing.site);
       q.set('listingId', listing.listingId);
@@ -84,7 +86,7 @@ export function CheckForm({ signedIn }: { signedIn: boolean }) {
           <div className={s.fields}>
             <div className={s.field}>
               <label htmlFor={`${id}-link`} className={s.label}>Listing link</label>
-              <input id={`${id}-link`} className={s.input} type="url" inputMode="url" required value={link} onChange={(e) => setLink(e.target.value)} />
+              <input id={`${id}-link`} className={s.input} type="text" inputMode="url" autoComplete="off" required value={link} onChange={(e) => setLink(e.target.value)} />
             </div>
             <div className={s.field}>
               <label htmlFor={`${id}-code`} className={s.label}>Code from the listing</label>

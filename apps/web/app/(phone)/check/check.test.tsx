@@ -48,6 +48,13 @@ describe('CheckForm', () => {
     expect(await screen.findByText("Can't confirm")).toBeTruthy();
   });
 
+  it("takes the link out of an app's share text", async () => {
+    const f = stubCheck(200, { status: 'grey_unverified', label: 'Not verified' });
+    render(<CheckForm signedIn />);
+    await fill('Garsonieră lângă Politehnica https://www.olx.ro/d/oferta/garsoniera-IDabc12.html', 'VC-7K3Q');
+    expect(f.mock.calls[0]![0]).toBe('/api/check?site=olx&listingId=abc12&code=VC-7K3Q');
+  });
+
   it('switches to sign-in when the session has expired', async () => {
     stubCheck(401, { error: 'signed_out' });
     render(<CheckForm signedIn />);
