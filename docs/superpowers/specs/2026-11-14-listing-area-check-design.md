@@ -29,6 +29,6 @@ A landlord could pass the location check at one address and then register a list
 - The listings route refuses a too-far listing with reason `far_from_address`. If nothing in the submission is registered, the location pass is given back, as it is for typos.
 - Listings without known coordinates (OLX, Storia, unknown demo ids) are not refused. This is the known gap that approach B closes.
 
-## Nokia location: live-ready, production on mock
+## Nokia location
 
-Nokia's simulator answers per test number and ignores the area (`+99999991001` is TRUE in both Timișoara and Budapest), and real numbers return 404 `IDENTIFIER_NOT_FOUND`. The adapter is covered by tests and the switch is documented in `docs/checkpoints.md`, but production stays on mock for the demo.
+Nokia's simulator answers per test number and ignores the area (`+99999991001` is TRUE in both Timișoara and Budapest), and real numbers return 404 `IDENTIFIER_NOT_FOUND`. The adapter is covered by tests. Later the same day the team chose to run production fully live against the simulator (`docs/checkpoints.md`, "Going live on Nokia"), so the 5 km area check is what ties a listing to a place: the simulator's location answer doesn't.

@@ -21,6 +21,7 @@ beforeEach(async () => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
 });
 
 const post = (fn: (r: Request) => Promise<Response>, body: unknown, phone?: string) =>
@@ -57,6 +58,14 @@ describe('landlord verification API', () => {
     expect(res.steps.find((s) => s.name === 'simswap')).toEqual({ name: 'simswap', ok: false, message: 'This SIM was changed in the last 7 days' });
     expect(res.verificationId).toBeUndefined();
     expect(await db.select().from(verification)).toHaveLength(0);
+  });
+
+  it('checks the configured SIM-swap window and names it in the message', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SIM_SWAP_WINDOW_HOURS', '1');
+    const swap = vi.spyOn(mockNetwork, 'simSwapped');
+    const res = (await (await post(identity, idBody(), '+40700000002')).json()) as IdentityResponse;
+    expect(swap).toHaveBeenCalledWith('+40700000002', 1);
+    expect(res.steps.find((s) => s.name === 'simswap')).toEqual({ name: 'simswap', ok: false, message: 'This SIM was changed in the last hour' });
   });
 
   it('stops on a KYC mismatch', async () => {

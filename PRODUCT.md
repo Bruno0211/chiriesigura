@@ -26,11 +26,11 @@ The mobile network vouches for the landlord, not an uploaded document or a text 
 - Landlord: at the apartment door or stairwell, one hand, about 3 minutes, inside a 15-minute number-verification session. Arrives from the "Ask the landlord to verify" message the extension copies.
 - Student: at the door of a viewing, possibly after a no-show. Arrives from a QR code in the extension popup (`/viewing/[verificationId]`).
 - Landlord pastes `Proprietar verificat · ChirieSigură VC-XXXX` into each listing's description.
-- Demo runs in mock mode / Nokia simulator with test numbers +40700000001…6.
+- Demo runs live against Nokia's simulator: landlord +99999992002 (test identity Zoltan Eszter), student +99999992000. Mock mode accepts the same numbers; its fixtures +40700000001…6 cover the failure cases in tests.
 
 ## Capabilities and Constraints
 
-- Location: TRUE passes, PARTIAL passes as "near", FALSE/UNKNOWN fails. KYC required fields: name, birthdate, ID document. SIM swap window 168 h.
+- Location: TRUE passes, PARTIAL passes as "near", FALSE/UNKNOWN fails. KYC required fields: name, birthdate, ID document. SIM swap window 168 h by default (NEXT_PUBLIC_SIM_SWAP_WINDOW_HOURS; 1 h against Nokia's simulator, where no test number is clean for 7 days).
 - A consent screen naming the checks comes before any network call.
 - Never stored: ID document number, name, birthdate, phone coordinates, raw phone numbers. Stored: check results, timestamps, peppered phone hashes, apartment address, listing URLs, report categories.
 - Wording: "near the address", never "inside the apartment". Reports are categories only, one per phone per verification, and only from the address.

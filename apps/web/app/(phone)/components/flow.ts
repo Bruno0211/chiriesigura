@@ -1,4 +1,5 @@
 import type { CheckStepName, NvResult } from '@cs/shared';
+import { simSwapSpan } from '@/lib/sim-swap-window';
 
 /** The order checks run in, and the order every record lists them. */
 export const CHECK_ORDER: readonly CheckStepName[] = ['number', 'kyc', 'simswap', 'location'];
@@ -7,7 +8,7 @@ export const CHECK_ORDER: readonly CheckStepName[] = ['number', 'kyc', 'simswap'
 export const CHECK_COPY: Record<CheckStepName, { label: string; how: string }> = {
   number: { label: 'Phone number', how: 'Confirms this phone owns the number.' },
   kyc: { label: 'ID matches the SIM owner', how: 'A yes or no. Your ID is never saved.' },
-  simswap: { label: 'No recent SIM change', how: 'No new SIM for this number in 7 days.' },
+  simswap: { label: 'No recent SIM change', how: `No new SIM for this number in ${simSwapSpan()}.` },
   location: { label: 'Phone near the apartment', how: 'Cell-level: near, never “inside”.' },
 };
 

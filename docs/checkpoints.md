@@ -4,7 +4,7 @@
 
 - App: https://chiriesigura.vercel.app (Vercel project `chiriesigura`, root `apps/web`, region `fra1`)
 - Database: Neon Postgres `chiriesigura-db` (free, `fra1`), connected to the project. `DATABASE_URL` is set on Vercel by the integration.
-- Env on Vercel: `PHONE_PEPPER` (team value, in the team chat), `NETWORK_MODE=mock`, `LOCATION_RADIUS_M=2000`, `NEXT_PUBLIC_APP_URL=https://chiriesigura.vercel.app`, and for student sign-in `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`, `APP_BASE_URL=https://chiriesigura.vercel.app`.
+- Env on Vercel: `PHONE_PEPPER` (team value, in the team chat), `NETWORK_MODE=mock` (to go live, see "Going live on Nokia" below), `LOCATION_RADIUS_M=2000`, `NEXT_PUBLIC_APP_URL=https://chiriesigura.vercel.app`, and for student sign-in `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`, `APP_BASE_URL=https://chiriesigura.vercel.app`.
 - Deploy: automatic. A push to `main` deploys production, and every pull request gets a preview URL. Previews have **no database** (it's connected to production and development only, so a PR can't touch the demo data): their pages render, but API calls fail. Manual fallback: `vercel deploy --prod` from the repo root.
 - Migrations: automatic. Every production deploy runs `apps/web/scripts/migrate.ts` before `next build`, so a merged PR with a new migration applies it. Migrations land before the new code goes live, so keep them additive (add columns or tables; don't drop or rename in the same PR). Manual fallback: `DATABASE_URL=<prod unpooled url> pnpm --filter @cs/web db:migrate`.
 - Demo reset: create `apps/web/.env.prod.local` (gitignored) with `DATABASE_URL`, `PHONE_PEPPER` and `NEXT_PUBLIC_APP_URL`, then run `pnpm --filter @cs/web seed:prod`. **Gotcha:** `vercel env pull` writes `PHONE_PEPPER="[SENSITIVE]"`; replace it with the real value. The seed refuses the placeholder.
@@ -28,7 +28,21 @@ Run by API calls from a script, not yet by hand on real phones.
 
 **Still to do by hand:** load the extension in Chrome and click through the same run on two real phones (QR scan, badge on the page), then record the backup video.
 
-**Nokia (plan Task 14 Step 3):** probed 14 Nov with a `NAC_TOKEN` against Nokia's simulator. Location Verification answers per test number and ignores the area: `+99999991001` and `+99999992000` are TRUE for both Timișoara and Budapest, and `+99999991000` is FALSE for both. Real numbers (`+40700000001`, any Romanian SIM) get 404 `IDENTIFIER_NOT_FOUND`, which the app shows as "We couldn't run this check". To switch location to live: set `NETWORK_MODE_LOCATION=nokia` and `NAC_TOKEN` on Vercel, then redeploy. **Production stays on mock for the demo:** the demo numbers would 404, and the simulator's answer doesn't depend on where the phone is. The switch also covers the student's viewing report, which calls the same location check.
+**Going live on Nokia (all four checks, against Nokia's simulator):** probed 14 Nov with the production callback URL. Nokia's test plan only answers for simulated subscribers: real numbers (`+40700000001`, any Romanian SIM) get 402 "Test plan not allowed for this CSP" from KYC and SIM Swap, and 404 `IDENTIFIER_NOT_FOUND` from Location.
+
+| Simulator number | Number Verification | SIM swapped (7 days / 1 hour) | Location | KYC (test identity) |
+|---|---|---|---|---|
+| `+99999992002` (demo landlord) | ✅ | swapped / clean | TRUE | ✅ |
+| `+99999992000` (demo student) | ✅ | swapped / swapped | TRUE | ✅ |
+| `+99999991001` | ❌ | clean / clean | TRUE | ✅ |
+| `+99999991003` | ✅ | swapped / swapped | PARTIAL | ✅ |
+| `+99999991000` | ✅ | swapped / swapped | FALSE | ✅ |
+
+- KYC matches only Nokia's test identity: Zoltan Eszter, born 1995-03-12, ID `66666666q`.
+- Location answers per number and ignores the area, so the 5 km listing area check is what ties a listing to a place.
+- No number passes Number Verification with a clean 7-day SIM history, so production uses a 1-hour window (`NEXT_PUBLIC_SIM_SWAP_WINDOW_HOURS=1`). Unset, it stays 7 days.
+
+To switch (Vercel project owner): for Production set `NETWORK_MODE=nokia`, `NAC_TOKEN` (Sensitive; it is a personal RapidAPI key, so every check counts against its quota) and `NEXT_PUBLIC_SIM_SWAP_WINDOW_HOURS=1`. Redeploy (the `NEXT_PUBLIC_` value is built into the pages), then run `seed:prod`. Rollback: set `NETWORK_MODE=mock`, delete the window variable, redeploy. The demo numbers pass in mock mode too.
 
 **Listing area check:** at registration, a listing more than 5 km from the address where the network located the landlord is refused (`apps/web/lib/listing-area.ts`). Only demo listings are checked: OLX answers server-side page fetches with 403, so OLX and Storia listings register without an area check. That's a known gap; the next step is an extension-side check once `feat/ai-scan` is merged.
 

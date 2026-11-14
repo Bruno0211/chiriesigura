@@ -11,13 +11,13 @@ Track: Connected Communities (UniHack 8, Timișoara). Live URL: https://chiriesi
 5. Student phone: camera ready to scan the QR in the extension panel.
 6. Backup: the recorded demo video, on the laptop desktop, in case the network fails.
 
-Demo inputs (mock mode accepts these):
+Demo inputs (live on Nokia's simulator; mock mode accepts them too):
 
 | Who | Phone | Other |
 |---|---|---|
-| Landlord | `0700000001` | Andrei Popescu, 1985-03-02, ID `TM123456`, address `Strada Alba Iulia 2, Timișoara`, listing `https://chiriesigura.vercel.app/demo/listing/d4` |
-| Student | `0711111111` | "Landlord didn't show up" |
-| Landlord, far-away listing (optional) | `0700000001` | after the location check, paste `https://chiriesigura.vercel.app/demo/listing/d6` (Lugoj): "This listing isn't near the address you verified" |
+| Landlord | `+99999992002` | Zoltan Eszter, 1995-03-12, ID `66666666q` (Nokia's test identity), address `Strada Alba Iulia 2, Timișoara`, listing `https://chiriesigura.vercel.app/demo/listing/d4` |
+| Student | `+99999992000` | "Landlord didn't show up" |
+| Landlord, far-away listing (optional) | `+99999992002` | after the location check, paste `https://chiriesigura.vercel.app/demo/listing/d6` (Lugoj): "This listing isn't near the address you verified" |
 
 ## Script
 
@@ -31,11 +31,11 @@ Demo inputs (mock mode accepts these):
 
 ### 0:30–2:20 · Live demo
 
-1. **Landlord verifies (phone, ~45 s).** "Andrei owns this flat. He opens ChirieSigură on his phone, on mobile data."
+1. **Landlord verifies (phone, ~45 s).** "Zoltan owns this flat. He opens ChirieSigură on his phone, on mobile data."
    - Consent screen: "it names every check before anything runs, and we keep the result, never the ID."
-   - Number Verification: "the operator confirms this SIM really is 0700 000 001. No SMS code to phish."
+   - Number Verification: "the operator confirms this SIM really is his number. No SMS code to phish."
    - ID details → **KYC Match**: "the operator checks the name, birthdate and ID number against the subscriber who owns this number. A stolen ID card fails here, because it doesn't belong to whoever holds the phone."
-   - **SIM Swap**: "no SIM change in the last 7 days, so this isn't a hijacked number."
+   - **SIM Swap**: "no recent SIM change, so this isn't a hijacked number." (The real rule is 7 days; on Nokia's simulator production checks the last hour.)
    - "I'm at the apartment" → **Location Verification**: "his phone is at the address he gave, according to the network, not GPS he can fake."
    - Paste the d4 listing URL → a code appears. "He pastes this line into his listing. The code only counts on the listings he registered."
 2. **Student sees a verified listing (laptop, ~20 s).** Open `d1`, a listing he verified earlier with `VC-7K3Q`. Badge: 🟢 *Verified landlord · near the address*. "It also matched the phone number shown on the page."

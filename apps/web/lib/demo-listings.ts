@@ -28,13 +28,13 @@ const FLAT_PHOTOS = ['1583847268964-b28dc8f51f92', '1613575831056-0acd5da8f085',
 export const DEMO_LISTINGS: Record<string, DemoListing> = {
   d1: {
     id: 'd1', title: 'Apartament 2 camere, mobilat, Centru', price: '450 €/lună', area: 'Timișoara, Centru', rooms: '2 camere · 54 m² · etaj 2/4',
-    description: [...FLAT_TEXT, PASTE], contactName: 'Andrei', phone: '+40 700 000 001', photos: FLAT_PHOTOS, posted: 'Postat azi la 09:12',
+    description: [...FLAT_TEXT, PASTE], contactName: 'Zoltan', phone: '+999 9999 2002', photos: FLAT_PHOTOS, posted: 'Postat azi la 09:12',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   // The scammer's copy: same text and code, cheaper, a different phone.
   d2: {
     id: 'd2', title: 'Apartament 2 camere, mobilat, Centru', price: '320 €/lună', area: 'Timișoara, Centru', rooms: '2 camere · 54 m² · etaj 2/4',
-    description: [...FLAT_TEXT, PASTE], contactName: 'Andrei', phone: '+40 799 999 999', photos: FLAT_PHOTOS, posted: 'Postat azi la 11:47',
+    description: [...FLAT_TEXT, PASTE], contactName: 'Zoltan', phone: '+40 799 999 999', photos: FLAT_PHOTOS, posted: 'Postat azi la 11:47',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   d3: {
@@ -53,7 +53,7 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
       'Apartament 3 camere decomandat, în aceeași clădire, renovat și mobilat modern.',
       'Două băi, balcon închis, loc de parcare. Potrivit pentru 3 studenți sau o familie.',
     ],
-    contactName: 'Andrei', phone: '+40 700 000 001', photos: ['1665249934445-1de680641f50', '1630699294897-723e02620662'].map(photo), posted: 'Postat azi la 08:30',
+    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1665249934445-1de680641f50', '1630699294897-723e02620662'].map(photo), posted: 'Postat azi la 08:30',
     coords: { lat: 45.7537, lng: 21.2257 },
   },
   // A flat in another town: refused when a landlord verified at the Timișoara address tries to register it.
@@ -63,7 +63,7 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
       'Apartament 2 camere în centrul Lugojului, aproape de Podul de Fier.',
       'Mobilat, centrală proprie, disponibil imediat. Potrivit pentru un cuplu sau 2 studenți.',
     ],
-    contactName: 'Andrei', phone: '+40 700 000 001', photos: ['1630699294897-723e02620662', '1600493505873-cddd69453072'].map(photo), posted: 'Postat azi la 10:05',
+    contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1630699294897-723e02620662', '1600493505873-cddd69453072'].map(photo), posted: 'Postat azi la 10:05',
     coords: { lat: 45.6886, lng: 21.9031 },
   },
 };

@@ -23,12 +23,12 @@ describe('seed', () => {
   it('sets up the demo: d1 green, d2 copied, one live no-show flips d1 amber, reseeding resets it', async () => {
     await seed(db);
     await seed(db);
-    const d1 = await check('d1', '+40 700 000 001');
+    const d1 = await check('d1', '+999 9999 2002');
     expect(d1.status).toBe('green');
     expect((await check('d2', '+40 799 999 999')).status).toBe('red_copied');
 
     // The live demo: a student reports a no-show, and the landlord registers d4 under a new verification.
-    await db.insert(viewingReport).values({ verificationId: d1.verificationId!, reporterPhoneHash: phoneHash('+40711111111'), locationResult: 'TRUE', category: 'no_show' });
+    await db.insert(viewingReport).values({ verificationId: d1.verificationId!, reporterPhoneHash: phoneHash('+99999992000'), locationResult: 'TRUE', category: 'no_show' });
     expect((await check('d1')).status).toBe('amber');
     const [d1v] = await db.select().from(verification).where(eq(verification.id, d1.verificationId!));
     const [live] = await db.insert(verification).values({ landlordId: d1v!.landlordId, code: 'VC-LIVE', addressText: 'x', lat: 0, lng: 0, locationResult: 'TRUE', verifiedAt: new Date() }).returning();
