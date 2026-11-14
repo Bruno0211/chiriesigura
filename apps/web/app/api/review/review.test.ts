@@ -67,14 +67,16 @@ describe('POST /api/review', () => {
     expect(((await res.json()) as CheckResponse).status).toBe('red_banned');
   });
 
-  it("a ban spreads to the person's other phone numbers", async () => {
+  it('a ban spreads through the ID card hash only', async () => {
     as('team@x.ro');
-    await db.update(landlord).set({ nameBirthHash: 'same-person' }).where(eq(landlord.id, seeded.landlordId));
-    const [other] = await db.insert(landlord).values({ phoneHash: 'second-sim', nameBirthHash: 'same-person' }).returning();
-    const [stranger] = await db.insert(landlord).values({ phoneHash: 'third-sim', nameBirthHash: 'someone-else' }).returning();
+    await db.update(landlord).set({ idDocHash: 'card-1', nameBirthHash: 'name-1' }).where(eq(landlord.id, seeded.landlordId));
+    const [sameCard] = await db.insert(landlord).values({ phoneHash: 'same-card', idDocHash: 'card-1', nameBirthHash: 'name-2' }).returning();
+    const [namesake] = await db.insert(landlord).values({ phoneHash: 'namesake', idDocHash: 'card-9', nameBirthHash: 'name-1' }).returning();
+    const [legacy] = await db.insert(landlord).values({ phoneHash: 'legacy' }).returning();
     await review({ landlordId: seeded.landlordId, action: 'ban' });
-    expect(await bannedAt(other!.id)).not.toBeNull();
-    expect(await bannedAt(stranger!.id)).toBeNull();
+    expect(await bannedAt(sameCard!.id)).not.toBeNull();
+    expect(await bannedAt(namesake!.id)).toBeNull();
+    expect(await bannedAt(legacy!.id)).toBeNull();
   });
 
   it('a second ban keeps the first date', async () => {

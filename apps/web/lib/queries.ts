@@ -90,13 +90,15 @@ export async function holdList(db: Db): Promise<HoldItem[]> {
   return items;
 }
 
-/** Bans the person behind this landlord row: every row sharing either fingerprint. False if the row doesn't exist. */
+/**
+ * Bans the person behind this landlord row: it and every row with the same ID card hash. Name + birthdate alone
+ * never spreads a ban, so an innocent namesake isn't banned without review (spec §4.9). False if the row doesn't exist.
+ */
 export async function banPerson(db: Db, landlordId: string): Promise<boolean> {
   const [l] = await db.select().from(landlord).where(eq(landlord.id, landlordId));
   if (!l) return false;
   const same: SQL[] = [eq(landlord.id, l.id)];
   if (l.idDocHash) same.push(eq(landlord.idDocHash, l.idDocHash));
-  if (l.nameBirthHash) same.push(eq(landlord.nameBirthHash, l.nameBirthHash));
   await db.update(landlord).set({ bannedAt: new Date() }).where(and(isNull(landlord.bannedAt), or(...same)));
   return true;
 }
