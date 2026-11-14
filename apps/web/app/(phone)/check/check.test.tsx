@@ -68,4 +68,19 @@ describe('CheckForm', () => {
     await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
     expect(await screen.findByText("Couldn't check this listing. Try again.")).toBeTruthy();
   });
+
+  const REPORT = "I'm at the viewing · Report it";
+  it.each(['green', 'amber'] as const)('%s: links to the viewing report for this verification', async (status) => {
+    stubCheck(200, { status, label: 'x', verificationId: 'v1' });
+    render(<CheckForm signedIn />);
+    await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
+    expect((await screen.findByRole('link', { name: REPORT })).getAttribute('href')).toBe('/viewing/v1');
+  });
+  it.each(['red_copied', 'red_banned'] as const)('%s: no report link', async (status) => {
+    stubCheck(200, { status, label: 'x' });
+    render(<CheckForm signedIn />);
+    await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
+    await screen.findByText('x');
+    expect(screen.queryByRole('link', { name: REPORT })).toBeNull();
+  });
 });

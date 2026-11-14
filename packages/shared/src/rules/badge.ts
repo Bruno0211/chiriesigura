@@ -4,14 +4,14 @@ export interface BadgeInput {
   listing: ListingRef | null;
   code: string | null;
   /** null = the code is unknown */
-  verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string } | null;
+  verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string; banned: boolean } | null;
   pagePhoneHash: string | null;
   reports: ReportCounts;
 }
 
 export const AMBER_THRESHOLDS = { money_upfront: 2, no_show: 3, wrong_person: 3 } as const;
 
-const warned = (r: ReportCounts) =>
+export const isWarned = (r: ReportCounts): boolean =>
   r.money_upfront >= AMBER_THRESHOLDS.money_upfront ||
   r.no_show >= AMBER_THRESHOLDS.no_show ||
   r.wrong_person >= AMBER_THRESHOLDS.wrong_person;
@@ -21,10 +21,11 @@ export function decideBadge(i: BadgeInput): BadgeStatus {
   if (!i.code) return 'grey_unverified';
   if (!i.listing) return 'grey_cannot_confirm';
   if (!i.verification) return 'red_fake_code';
+  if (i.verification.banned) return 'red_banned';
   const { site, listingId } = i.listing;
   if (!i.verification.listings.some((l) => l.site === site && l.listingId === listingId)) return 'red_copied';
   if (i.pagePhoneHash && i.pagePhoneHash !== i.verification.phoneHash) return 'red_phone_mismatch';
-  return warned(i.reports) ? 'amber' : 'green';
+  return isWarned(i.reports) ? 'amber' : 'green';
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -38,6 +39,7 @@ const LABELS: Record<Exclude<BadgeStatus, 'green'>, string> = {
   red_fake_code: 'Fake code',
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
+  red_banned: 'Landlord banned',
   grey_unverified: 'Not verified',
   grey_cannot_confirm: "Can't confirm",
 };

@@ -12,6 +12,7 @@ const LABELS: Record<BadgeStatus, string> = {
   red_fake_code: 'Fake code',
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
+  red_banned: 'Landlord banned',
   grey_unverified: 'Not verified',
   grey_cannot_confirm: "Can't confirm",
 };
@@ -62,7 +63,7 @@ describe('renderBadge', () => {
     expect(qr()).toBeNull();
   });
 
-  it.each(['red_fake_code', 'red_copied', 'red_phone_mismatch', 'grey_cannot_confirm'] as const)(
+  it.each(['red_fake_code', 'red_copied', 'red_phone_mismatch', 'red_banned', 'grey_cannot_confirm'] as const)(
     '%s shows neither a QR code nor the ask button',
     (status) => {
       renderBadge(host, res(status), OPTS);
@@ -75,6 +76,7 @@ describe('renderBadge', () => {
     ['red_fake_code', 'Code issued by ChirieSigură'],
     ['red_copied', 'Registered to this listing'],
     ['red_phone_mismatch', 'Phone matches the verified one'],
+    ['red_banned', 'Landlord in good standing'],
     ['grey_cannot_confirm', 'Listing ID readable from the link'],
   ] as const)('%s names the check that failed: %s', (status, check) => {
     renderBadge(host, res(status), OPTS);

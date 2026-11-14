@@ -4,7 +4,9 @@ import { GET } from '@/app/api/check/route';
 import type { Db } from '@/lib/db';
 import { listing, verification, viewingReport } from '@/lib/db/schema';
 import { makeTestDb } from '@/lib/db/test-db';
-import { phoneHash } from '@/lib/hash';
+import { identityHashes, phoneHash } from '@/lib/hash';
+import { banPerson, holdList, isBannedIdentity } from '@/lib/queries';
+import { DEMO_LISTINGS } from '@/lib/demo-listings';
 import { seed } from './seed';
 
 vi.mock('@/lib/auth0', () => ({ isSignedIn: vi.fn(async () => true) }));
@@ -37,5 +39,29 @@ describe('seed', () => {
     await seed(db);
     expect((await check('d1')).status).toBe('green');
     expect(await db.select().from(listing).where(and(eq(listing.site, 'demo'), eq(listing.siteListingId, 'd4')))).toHaveLength(0);
+  });
+
+  it('seeds the scammer on hold; a ban makes d5 red_banned and blocks the same ID; reseeding resets it', async () => {
+    const d5 = async () => {
+      const q = new URLSearchParams({ site: 'demo', listingId: 'd5', code: 'VC-BAN5', phone: '+40 700 000 009' });
+      return ((await (await GET(new Request(`http://localhost:3000/api/check?${q}`))).json()) as { status: string }).status;
+    };
+    const mihai = identityHashes({ givenName: 'Mihai', familyName: 'Ionescu', birthdate: '1990-07-15', idDocument: 'TM654321' });
+    expect(DEMO_LISTINGS.d5!.description.at(-1)).toBe('Proprietar verificat · ChirieSigură VC-BAN5');
+
+    await seed(db);
+    await seed(db);
+    expect(await d5()).toBe('amber');
+    const held = await holdList(db);
+    expect(held).toHaveLength(1);
+    expect(held[0]!.reports.money_upfront).toBe(3);
+
+    await banPerson(db, held[0]!.landlordId);
+    expect(await d5()).toBe('red_banned');
+    expect(await isBannedIdentity(db, mihai)).toBe(true);
+
+    await seed(db);
+    expect(await d5()).toBe('amber');
+    expect(await isBannedIdentity(db, mihai)).toBe(false);
   });
 });

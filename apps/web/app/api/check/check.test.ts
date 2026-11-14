@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CheckResponse } from '@cs/shared';
 import { makeTestDb } from '@/lib/db/test-db';
-import { verification } from '@/lib/db/schema';
+import { landlord, verification } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { addReports, seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
 import { isSignedIn } from '@/lib/auth0';
@@ -24,6 +25,12 @@ async function check(params: Record<string, string>) {
 const d1 = { site: 'demo', listingId: 'd1' };
 
 describe('GET /api/check', () => {
+  it('shows a banned landlord as red_banned, with no verificationId', async () => {
+    await db.update(landlord).set({ bannedAt: new Date() }).where(eq(landlord.id, seeded.landlordId));
+    const { body } = await check({ ...d1, code: 'VC-7K3Q' });
+    expect(body).toMatchObject({ status: 'red_banned', label: 'Landlord banned' });
+    expect(body.verificationId).toBeUndefined();
+  });
   it('refuses a signed-out student, with CORS headers', async () => {
     vi.mocked(isSignedIn).mockResolvedValueOnce(false);
     const res = await GET(new Request('http://localhost:3000/api/check?site=demo&listingId=d1&code=VC-7K3Q'));
