@@ -9,6 +9,8 @@ const appUrl = () => new URL(process.env.WXT_APP_URL || 'http://localhost:3000')
 const appHost = () => `${appUrl().protocol}//${appUrl().hostname}`;
 
 export default defineConfig({
+  // WXT's dev server otherwise takes the first free port from 3000 and can grab IPv6 localhost:3000 next to the web app.
+  dev: { server: { port: 3100 } },
   manifest: () => ({
     name: 'ChirieSigură',
     description: "Shows whether a rental listing's landlord was verified by their mobile operator.",
