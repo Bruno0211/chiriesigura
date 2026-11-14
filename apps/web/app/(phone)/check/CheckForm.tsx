@@ -71,6 +71,12 @@ export function CheckForm({ signedIn }: { signedIn: boolean }) {
           <p className={s.alertTitle}>{result.data.label}</p>
         </div>
       )}
+      {result?.kind === 'verdict' && result.data.verificationId && (
+        // Phones can't run the extension, so this is how a student at the address reaches the report.
+        <div className={s.actionsInline}>
+          <a className={s.primary} href={`/viewing/${encodeURIComponent(result.data.verificationId)}`}>I&apos;m at the viewing · Report it</a>
+        </div>
+      )}
       {result?.kind === 'error' && (
         <div className={s.alert} data-tone="fail" role="alert">
           <p className={s.alertTitle}>Couldn&apos;t check this listing. Try again.</p>

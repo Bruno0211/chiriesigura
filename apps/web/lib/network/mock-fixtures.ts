@@ -11,4 +11,5 @@ export const MOCK_FIXTURES: Record<string, Fixture> = {
   '+40700000004': { location: 'FALSE' },
   '+40700000005': { location: 'PARTIAL' },
   '+40700000006': { nv: 'wifi' },
+  // +40700000009 (Mihai, the seeded scammer) and +40700000010 (his new SIM in the demo) pass everything.
 };

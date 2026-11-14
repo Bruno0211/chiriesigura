@@ -66,6 +66,18 @@ export const DEMO_LISTINGS: Record<string, DemoListing> = {
     contactName: 'Zoltan', phone: '+999 9999 2002', photos: ['1630699294897-723e02620662', '1600493505873-cddd69453072'].map(photo), posted: 'Postat azi la 10:05',
     coords: { lat: 45.6886, lng: 21.9031 },
   },
+  // The scammer: verified under his real ID, reported by viewers, banned live by the team.
+  d5: {
+    id: 'd5', title: 'Apartament 2 camere, mobilat, zona Complex Studențesc', price: '250 €/lună', area: 'Timișoara, Complex Studențesc', rooms: '2 camere · 50 m² · etaj 1/4',
+    description: [
+      'Apartament 2 camere, complet mobilat, la 5 minute de Universitatea Politehnica. Ideal pentru studenți.',
+      'Momentan lucrez în Germania, așa că vizionarea o face un coleg. Pentru rezervare trimiteți un avans de 300 €.',
+      'Contact doar pe WhatsApp, nu răspund la apeluri.',
+      'Proprietar verificat · ChirieSigură VC-BAN5',
+    ],
+    contactName: 'Mihai', phone: '+40 700 000 009', photos: ['1600493505873-cddd69453072', '1629042306558-7d1e15cc02fa'].map(photo), posted: 'Postat azi la 07:55',
+    coords: { lat: 45.7471, lng: 21.2384 },
+  },
 };
 
 /** Another landlord's verified listing in the "similar" widget: its code must not count for this page. */

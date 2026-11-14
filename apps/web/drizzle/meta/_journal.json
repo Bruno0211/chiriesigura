@@ -15,6 +15,13 @@
       "when": 1794613207658,
       "tag": "0001_supreme_chronomancer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794679219333,
+      "tag": "0002_thick_princess_powerful",
+      "breakpoints": true
     }
   ]
 }

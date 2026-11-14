@@ -2,13 +2,18 @@ import { and, eq, ne } from 'drizzle-orm';
 import { getDb, type Db } from '@/lib/db';
 import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_ADDRESSES, DEMO_APARTMENT } from '@/lib/geocode';
-import { phoneHash } from '@/lib/hash';
+import { identityHashes, phoneHash } from '@/lib/hash';
 
 const DEMO_CODE = 'VC-7K3Q';
 // Nokia simulator numbers: they pass the live checks (docs/checkpoints.md) and, having no mock fixture, mock mode too.
 const LANDLORD = '+99999992002';
 const LIVE_REPORTER = '+99999992000';
 const EARLIER_NO_SHOWS = ['+40711111118', '+40711111119'];
+// The banned-live scammer (docs/pitch.md): starts on hold with 3 "asked for money" reports.
+const SCAM_CODE = 'VC-BAN5';
+const SCAMMER = '+40700000009';
+const SCAMMER_ID = { givenName: 'Mihai', familyName: 'Ionescu', birthdate: '1990-07-15', idDocument: 'TM654321' };
+const SCAM_REPORTERS = ['+40711111121', '+40711111122', '+40711111123'];
 
 /** Idempotent demo setup and reset: run before every rehearsal (plan Task 13). */
 export async function seed(db: Db): Promise<void> {
@@ -43,6 +48,34 @@ export async function seed(db: Db): Promise<void> {
       .values({ verificationId: v!.id, reporterPhoneHash: phoneHash(phone), locationResult: 'TRUE', category: 'no_show' })
       .onConflictDoNothing();
   }
+
+  await seedScammer(db, appUrl, now);
+}
+
+/** Mihai, the scammer: verified under his real ID, on hold for the team. Reseeding lifts any ban from a rehearsal. */
+async function seedScammer(db: Db, appUrl: string, now: Date): Promise<void> {
+  const person = { numberVerifiedAt: now, kycMatchedAt: now, simCheckedAt: now, ...identityHashes(SCAMMER_ID), bannedAt: null, reviewDismissedAt: null };
+  const [l] = await db
+    .insert(landlord)
+    .values({ phoneHash: phoneHash(SCAMMER), ...person })
+    .onConflictDoUpdate({ target: landlord.phoneHash, set: person })
+    .returning();
+  const fields = { landlordId: l!.id, addressText: DEMO_APARTMENT, ...DEMO_ADDRESSES[DEMO_APARTMENT]!, locationResult: 'TRUE', verifiedAt: now };
+  const [v] = await db
+    .insert(verification)
+    .values({ code: SCAM_CODE, ...fields })
+    .onConflictDoUpdate({ target: verification.code, set: fields })
+    .returning();
+  await db
+    .insert(listing)
+    .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd5', url: `${appUrl}/demo/listing/d5` })
+    .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
+  for (const phone of SCAM_REPORTERS) {
+    await db
+      .insert(viewingReport)
+      .values({ verificationId: v!.id, reporterPhoneHash: phoneHash(phone), locationResult: 'TRUE', category: 'money_upfront' })
+      .onConflictDoNothing();
+  }
 }
 
 // Run directly (`pnpm seed`), not when a test imports it.
@@ -51,7 +84,7 @@ if (/[\\/]scripts[\\/]seed\.ts$/.test(process.argv[1] ?? '')) {
   if (process.env.PHONE_PEPPER?.startsWith('[')) throw new Error('PHONE_PEPPER is a placeholder: set the real team value');
   seed(getDb()).then(
     () => {
-      console.log(`Seeded: ${DEMO_CODE} on demo:d1 with ${EARLIER_NO_SHOWS.length} earlier no-shows; demo:d4 is free.`);
+      console.log(`Seeded: ${DEMO_CODE} on demo:d1 with ${EARLIER_NO_SHOWS.length} earlier no-shows; demo:d4 is free; ${SCAM_CODE} on demo:d5 on hold.`);
       process.exit(0);
     },
     (e) => {

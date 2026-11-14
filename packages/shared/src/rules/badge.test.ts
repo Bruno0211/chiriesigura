@@ -4,13 +4,19 @@ import { AMBER_THRESHOLDS, badgeLabel, decideBadge, reportLine, type BadgeInput 
 
 const L1: ListingRef = { site: 'demo', listingId: 'd1' };
 const L2: ListingRef = { site: 'demo', listingId: 'd2' };
-const V = { listings: [L1], phoneHash: 'h1', verifiedAt: '2026-11-14T10:00:00Z' };
+const V = { listings: [L1], phoneHash: 'h1', verifiedAt: '2026-11-14T10:00:00Z', banned: false };
 const counts = (c: Partial<ReportCounts>): ReportCounts => ({ ...emptyCounts(), ...c });
 const input = (i: Partial<BadgeInput>): BadgeInput => ({
   listing: L1, code: 'VC-7K3Q', verification: V, pagePhoneHash: null, reports: emptyCounts(), ...i,
 });
 
 describe('decideBadge (spec §6.2, in order)', () => {
+  it('a banned landlord shows red_banned on their own listing', () => {
+    expect(decideBadge(input({ verification: { ...V, banned: true } }))).toBe('red_banned');
+  });
+  it('a banned landlord shows red_banned even on a copied listing', () => {
+    expect(decideBadge(input({ listing: L2, verification: { ...V, banned: true } }))).toBe('red_banned');
+  });
   it('1: code but no parseable listing → cannot confirm', () => {
     expect(decideBadge(input({ listing: null }))).toBe('grey_cannot_confirm');
   });
@@ -43,6 +49,7 @@ describe('decideBadge (spec §6.2, in order)', () => {
 });
 
 describe('badgeLabel', () => {
+  it('labels red_banned', () => expect(badgeLabel('red_banned')).toBe('Landlord banned'));
   it('uses the spec copy verbatim', () => {
     expect(badgeLabel('grey_cannot_confirm')).toBe("Can't confirm");
     expect(badgeLabel('red_fake_code')).toBe('Fake code');

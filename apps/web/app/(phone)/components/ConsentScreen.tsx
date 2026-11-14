@@ -8,7 +8,7 @@ import { CHECK_COPY, CHECK_ORDER } from './flow';
 export interface DataUse { kept: string[]; neverKept: string[] }
 
 export const LANDLORD_DATA: DataUse = {
-  kept: ['Check results, times', 'Number hash (one-way)', 'Apartment address', 'Listing links'],
+  kept: ['Check results, times', 'Number hash (one-way)', 'ID fingerprints (one-way)', 'Apartment address', 'Listing links'],
   neverKept: ['ID card number', 'Name, birthdate', 'Phone location', 'Phone number'],
 };
 
