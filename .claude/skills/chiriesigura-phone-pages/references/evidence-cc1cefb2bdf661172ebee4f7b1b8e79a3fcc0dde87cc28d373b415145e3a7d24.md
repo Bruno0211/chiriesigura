@@ -1,0 +1,1 @@
+user: "change the All good option to the check icon too" — and earlier: "use the drawn check icon instead of the emoji". Assistant final summary: "As you asked, the ✅ emoji is now a drawn check, both on the badge ("3 ✓ all good") and on the "All good" report option."

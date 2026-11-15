@@ -1,0 +1,28 @@
+---
+name: chiriesigura-demo-listings-portal
+description: Use when editing the /demo portal, its results or listing pages, the listing photo gallery, or its badge hooks.
+category: frontend
+---
+
+The /demo portal is a stage prop: a fictional regional classifieds site ("Anunțuri Timiș") that the ChirieSigură extension badges during the pitch. Restyle freely, but keep its extension hooks fixed.
+
+- `[data-testid="description"]` holds only the listing text and its pasted code. `[data-testid="phone"]` holds the visible phone with no reveal gate. Keep `data-testid` on title, price and similar. The URL stays `/demo/listing/<id>`.
+- The "similar listings" widget (decoy code VC-ZZZZ) stays outside the description element.
+- `seed.test.ts` pins the last description line of d5. If the copy changes, update that test in the same edit.
+- The listing-area check in the verify API also reads the demo coordinates (d6 is the "too far" case). After changing `lib/demo-listings.ts`, also run `npx vitest run app/api/verify` from `apps/web`.
+- The badge floats fixed top-right (16 px inset, 360 px wide). Do not put controls the judge must click under that slot.
+- Copy is Romanian (`lang="ro"`) with a "Pagină demo" marker on every page. Load Figtree with subsets `latin` and `latin-ext` so ă â î ș ț render.
+- Photos: only the verified Unsplash ids (HTTP 200 plus a contact-sheet look at interiors). Each listing gets its own set; no id may appear on two listings, except the scammer copy that is meant to mirror another listing. Check every listing's ids against the others before shipping.
+- Next 16 with Cache Components: read `searchParams` inside `<Suspense>`, not at the top of the page, or `/demo` fails to prerender. Check `node_modules/next/dist/docs/01-app/02-guides/instant-navigation.md` for the current rule.
+- The listing segment `app/demo/listing/[id]/page.tsx` sets `export const instant = false` on purpose: it reads `params` at the top so an unknown id stays a real 404. Do not move that read under `<Suspense>` just to clear the dev blocking-route notice; keep the `instant = false` and its comment.
+- Landlord edit (spec `docs/superpowers/specs/2026-11-15-demo-listing-edit-design.md`): only ids in `EDITABLE_DEMO_LISTINGS` (`d4`) accept a PUT to `/api/demo/listings/[id]/description`. The pitch listings d1, d2, d5 and d7 stay fixed. Edited text renders inside `[data-testid="description"]`, one `<p>` per line.
+- Listing data lives in `lib/demo-listings.ts`. Each listing has an `amenities` array, and every chip must also be stated in its description.
+- Every control the brief promises must work. A filter, sort or header link that is shown must change the results or go somewhere. The results form carries keywords, city, price, rooms and property type (`tip`: Apartament / Garsonieră); sort is `sort` (Cele mai noi, Preț crescător, Preț descrescător); Favorite / Mesaje / Contul meu are real links. A control that cannot work on a stage prop says so in place: "Trimite mesaj" states that messages are off on the demo site.
+- Visual canon: match the craft of big listing portals (OLX, Storia / imobiliare.ro), never their branding. The direction brief is `.impeccable/surfaces/app-demo-listing-id-page-tsx.md`.
+- Phone gallery (max-width 560px): show only the hero. A bare `.galleryThumb { display: none }` loses to `.gallery img { display: block }`, so hide thumbs with `.gallery .galleryThumb { display: none }` inside the media query. Verify at 390 px that the hero fills the gallery (358x260 measured at 390 px).
+- `impeccable detect` flags design-system colour, font-size and radius advisories on the portal CSS. The portal is a third-party stage prop outside DESIGN.md, so do not edit DESIGN.md for it. Scope each advisory to the stylesheet with `impeccable hooks ignore-value RULE "*" --file app/demo/demo.module.css --reason "WHY"`, once per rule.
+- The listing page drops any listing with the same title as the current one from "similar", and collapses other duplicate titles to their first copy (a `seen` Set in `app/demo/listing/[id]/page.tsx`). The scammer clone d2 must never show as similar to d1, and the strip must never show two identical cards side by side.
+- The map is OpenStreetMap's embed around the flat. Its tiles load only once scrolled into view; judge the map after scrolling and waiting about 8 s.
+- Do not invent platform stats (view counts, "member since") or fake pagination. Show only facts the listing data carries. Price per m² is derived with `pricePerSquareMeter` (450 €/lună over 54 m² reads 8,33 €/m²). The Distribuie button copies the listing URL.
+- Listing gallery: each photo is a link that opens the full-size image. On desktop the mosaic takes no fixed height and stretches to end level with the summary panel (`.listingTop { align-items: stretch }`); at one column it takes a definite height, because there is nothing to stretch against.
+- Results cards lay title, location and price out as a grid (`.cardBody` grid, price spanning both rows). A flex row let the price block set the title-to-location gap (51 px on a one-line title, 32 px on a two-line one). The grid keeps it at 8 px for both. Similar-listing cards stay fully clickable through `.miniTitle a::after` (`demo.module.css:705`), except the VC-ZZZZ decoy, which stays unlinked. The fifth search field pushes the first results card below the 390 px fold on phones; collapsing the filters into a "Filtre" button is the open fix.
