@@ -1,4 +1,4 @@
-import { REPORT_OK_TEXT, reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
+import { REPORT_OK_TEXT, UNDER_REVIEW_TEXT, reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
 import css from './badge.css?inline';
 import { icon, type IconName } from './icons';
 import { qrSvg } from './qr';
@@ -21,12 +21,11 @@ export interface BadgeOptions {
   mode?: BadgeMode;
 }
 
-type Tone = 'ok' | 'warn' | 'fail' | 'none';
+type Tone = 'ok' | 'fail' | 'none';
 type RowState = 'ok' | 'fail' | 'none';
 
 const TONE: Record<BadgeStatus, Tone> = {
   green: 'ok',
-  amber: 'warn',
   red_fake_code: 'fail',
   red_copied: 'fail',
   red_phone_mismatch: 'fail',
@@ -35,7 +34,7 @@ const TONE: Record<BadgeStatus, Tone> = {
   grey_unverified: 'none',
   grey_cannot_confirm: 'none',
 };
-const MARK: Record<Tone, IconName> = { ok: 'check', warn: 'alert', fail: 'cross', none: 'ringDash' };
+const MARK: Record<Tone, IconName> = { ok: 'check', fail: 'cross', none: 'ringDash' };
 const PANEL_ID = 'cs-panel';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -275,12 +274,12 @@ function reportText(doc: Document, line: string): Child[] {
   return [phrase(line.slice(0, at + 1)), ' ', ...parts.flatMap((p, i) => (i ? [' · ', phrase(p)] : [phrase(p)]))];
 }
 
-function reports(doc: Document, line: string, warn: boolean): HTMLElement {
+function reports(doc: Document, line: string): HTMLElement {
   return module(
     doc,
     'Viewing reports',
     'From the address',
-    el(doc, 'p', { class: warn ? 'reportLine reportWarn' : 'reportLine' }, ...reportText(doc, line)),
+    el(doc, 'p', { class: 'reportLine' }, ...reportText(doc, line)),
     el(doc, 'p', { class: 'note' }, 'Each report came from a phone its operator placed at the address.'),
   );
 }
@@ -355,14 +354,19 @@ function dontPay(doc: Document): HTMLElement {
   return el(doc, 'p', { class: 'alert' }, icon(doc, 'alert'), "Don't send a deposit or ID details to this advertiser.");
 }
 
+/** A caution, not the red "don't pay" alert: a landlord with an open case is still verified. */
+function underReview(doc: Document): HTMLElement {
+  return el(doc, 'p', { class: 'alert caution', role: 'note' }, icon(doc, 'alert'), UNDER_REVIEW_TEXT);
+}
+
 function panelFor(doc: Document, res: CheckResponse, opts: BadgeOptions): Child[] {
   const line = res.reports ? reportLine(res.reports) : null;
   switch (res.status) {
     case 'green':
-    case 'amber':
       return [
         landlordChecks(doc, res, opts),
-        line && reports(doc, line, res.status === 'amber'),
+        res.underReview && underReview(doc),
+        line && reports(doc, line),
         res.verificationId && viewingQr(doc, res.verificationId, opts),
       ];
     case 'grey_unverified':

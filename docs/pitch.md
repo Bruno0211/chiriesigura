@@ -41,12 +41,14 @@ Pause, then click.
 
 > ChirieSigură asks the landlord's operator four questions through Nokia's Network as Code: is it his phone, is it his ID, was the SIM swapped, and is he at the flat. Pass all four and he gets a code for his listings. Let me show you.
 
+
 ### 0:45–2:15 · Slide 4, live demo (90 s)
 
 1. **Landlord verifies (phone, ~45 s).** "Zoltan owns this flat. On mobile data, he opens ChirieSigură. Every check is named before anything runs." Tap *I agree*. "The operator confirms this SIM is his number: no SMS code to phish." Enter the ID details. "It matches his name, birthdate and ID against the SIM's owner: a stolen ID card fails here. No recent SIM swap." Tap *I'm at the apartment*. "And his phone is at the address, by the network, not GPS he can fake." Paste the `d4` link. "Here's his code. It only counts on the listings he registered."
 2. **Verified listing (laptop, ~15 s).** Open `d1`. "A student browsing sees this: Verified landlord, near the address. It also matched the phone number on the page."
 3. **The scammer's copy (laptop, ~15 s).** Open `d2`. "Same photos, same code, €130 cheaper. Red: copied from a verified listing. Copying the code doesn't help."
 4. **Viewer report (student phone, ~15 s).** "After a viewing, only a phone the network places at the address can report." Tap *I'm at the viewing*, pick "Landlord didn't show up", reload `d1` on the laptop: "Now every student sees the warning."
+
 
 ### 2:15–2:35 · Slide 5, why we win
 

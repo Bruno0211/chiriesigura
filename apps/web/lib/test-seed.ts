@@ -1,6 +1,8 @@
 import { phoneHash } from './hash';
-import { landlord, listing, verification, viewingReport } from './db/schema';
+import { eq } from 'drizzle-orm';
+import { landlord, listing, reportCase, verification, viewingReport } from './db/schema';
 import type { Db } from './db';
+import type { CaseStatus } from './cases';
 
 /** Minimal verified landlord for API tests: +40700000001, code VC-7K3Q, listing demo:d1. */
 export async function seedVerified(db: Db) {
@@ -17,4 +19,20 @@ export async function addReports(db: Db, verificationId: string, category: strin
   for (let i = 0; i < n; i++) {
     await db.insert(viewingReport).values({ verificationId, reporterPhoneHash: `r-${category}-${i}`, locationResult: 'TRUE', category });
   }
+}
+
+/** n reports of one category, each with its own case. Returns the case ids. */
+export async function addCases(
+  db: Db, verificationId: string, category: string, n: number, status: CaseStatus = 'ready', decidedAt?: Date,
+): Promise<string[]> {
+  const [v] = await db.select({ landlordId: verification.landlordId }).from(verification).where(eq(verification.id, verificationId));
+  const ids: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const [r] = await db.insert(viewingReport).values({
+      verificationId, reporterPhoneHash: `c-${category}-${i}`, reporterAccountHash: `a-${category}-${i}`, locationResult: 'TRUE', category,
+    }).returning();
+    const [c] = await db.insert(reportCase).values({ reportId: r!.id, landlordId: v!.landlordId, status, decidedAt: decidedAt ?? null }).returning();
+    ids.push(c!.id);
+  }
+  return ids;
 }

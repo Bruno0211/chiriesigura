@@ -36,8 +36,13 @@ export default function PrivacyPage() {
               <li><strong>The apartment address</strong>: you publish it in your listing anyway. It is never shown in the extension.</li>
               <li><strong>Your listing links</strong>, so the extension can tell your listings from copies.</li>
               <li>
-                <strong>Viewing reports</strong>: the category picked, when, and a one-way hash of the reporter&apos;s number so
-                each phone reports once.
+                <strong>Viewing reports</strong>: the category picked, when, one-way hashes of the reporter&apos;s number and
+                sign-in, and whether the SIM changed in the last 30 days, so each phone reports once and our team can spot
+                fake reports.
+              </li>
+              <li>
+                <strong>False-report bars</strong>: one-way hashes of a reporter&apos;s number and sign-in, kept 2 years when
+                our team finds a report was false.
               </li>
             </ul>
           </div>
@@ -61,7 +66,7 @@ export default function PrivacyPage() {
               <li><strong>Your phone number itself.</strong> Only the one-way hash above.</li>
               <li>
                 <strong>Students&apos; email and name.</strong> Auth0, our sign-in provider, keeps your sign-in. ChirieSigură
-                only learns that you are signed in.
+                learns that you are signed in and, when you report, keeps a one-way hash of your sign-in ID.
               </li>
             </ul>
           </div>
@@ -95,7 +100,8 @@ export default function PrivacyPage() {
               remove it.
             </p>
             <p>
-              When verified viewers report a landlord repeatedly, our team reviews the reports and may ban that person for
+              Problem reports never change your listings&apos; verdict on their own: while our team reviews one, your
+              listings show a note that a report is under review. Only a ban by our team changes the verdict. When our team confirms a report, it may ban that person for
               life: their listings show as banned, and verifying again with any phone number is refused. If you were refused
               and think it is a mistake, email us.
             </p>

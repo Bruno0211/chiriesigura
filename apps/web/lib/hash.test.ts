@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { identityHashes, phoneHash } from './hash';
+import { accountHash, identityHashes, phoneHash } from './hash';
 
 const original = process.env.PHONE_PEPPER;
 afterEach(() => { process.env.PHONE_PEPPER = original; });
@@ -41,5 +41,13 @@ describe('identityHashes', () => {
   it('the two kinds never collide', () => {
     const h = identityHashes({ givenName: 'x', familyName: 'y', birthdate: 'z', idDocument: 'X|Y|Z' });
     expect(h.idDocHash).not.toBe(h.nameBirthHash);
+  });
+});
+
+describe('accountHash', () => {
+  it('is keyed, stable, and never equals the phone hash of the same string', () => {
+    expect(accountHash('google-oauth2|123')).toBe(accountHash('google-oauth2|123'));
+    expect(accountHash('google-oauth2|123')).not.toContain('123');
+    expect(accountHash('x')).not.toBe(phoneHash('x'));
   });
 });

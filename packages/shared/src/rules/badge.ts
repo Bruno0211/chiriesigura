@@ -6,17 +6,9 @@ export interface BadgeInput {
   /** null = the code is unknown */
   verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string; banned: boolean } | null;
   pagePhoneHash: string | null;
-  reports: ReportCounts;
   /** The listing's page puts the flat far from where the landlord verified (server-side check). */
   listingFar: boolean;
 }
-
-export const AMBER_THRESHOLDS = { money_upfront: 2, no_show: 3, wrong_person: 3 } as const;
-
-export const isWarned = (r: ReportCounts): boolean =>
-  r.money_upfront >= AMBER_THRESHOLDS.money_upfront ||
-  r.no_show >= AMBER_THRESHOLDS.no_show ||
-  r.wrong_person >= AMBER_THRESHOLDS.wrong_person;
 
 /** Spec §6.2 rules, evaluated in order. */
 export function decideBadge(i: BadgeInput): BadgeStatus {
@@ -28,7 +20,7 @@ export function decideBadge(i: BadgeInput): BadgeStatus {
   if (!i.verification.listings.some((l) => l.site === site && l.listingId === listingId)) return 'red_copied';
   if (i.pagePhoneHash && i.pagePhoneHash !== i.verification.phoneHash) return 'red_phone_mismatch';
   if (i.listingFar) return 'red_far_away';
-  return isWarned(i.reports) ? 'amber' : 'green';
+  return 'green';
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -38,7 +30,6 @@ const formatDate = (iso: string) => {
 };
 
 const LABELS: Record<Exclude<BadgeStatus, 'green'>, string> = {
-  amber: 'Verified, but warnings from viewers',
   red_fake_code: 'Fake code',
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
@@ -54,10 +45,13 @@ export function badgeLabel(status: BadgeStatus, verifiedAt?: string, city?: stri
   return verifiedAt ? `${near} · ${formatDate(verifiedAt)}` : near;
 }
 
+/** The soft note shown while a viewer's report awaits a team decision. */
+export const UNDER_REVIEW_TEXT = "Viewers reported a problem · under review · never pay before you've seen the flat.";
+
 /** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */
 export const REPORT_OK_TEXT = 'all good';
 
-const CATEGORY_TEXT: Record<ReportCategory, string> = {
+export const REPORT_CATEGORY_TEXT: Record<ReportCategory, string> = {
   ok: REPORT_OK_TEXT,
   no_show: "didn't show up",
   mismatch: "doesn't match the listing",
@@ -68,6 +62,6 @@ const CATEGORY_TEXT: Record<ReportCategory, string> = {
 export function reportLine(c: ReportCounts): string | null {
   const total = REPORT_CATEGORIES.reduce((n, k) => n + c[k], 0);
   if (total === 0) return null;
-  const parts = REPORT_CATEGORIES.filter((k) => c[k] > 0).map((k) => `${c[k]} ${CATEGORY_TEXT[k]}`);
+  const parts = REPORT_CATEGORIES.filter((k) => c[k] > 0).map((k) => `${c[k]} ${REPORT_CATEGORY_TEXT[k]}`);
   return `${total} verified viewing${total === 1 ? '' : 's'}: ${parts.join(' · ')}`;
 }

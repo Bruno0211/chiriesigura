@@ -1,5 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { landlord, listing, verification, viewingReport } from './schema';
+import { landlord, listing, reportCase, reporterBar, verification, viewingReport } from './schema';
 import { makeTestDb } from './test-db';
 import type { Db } from './index';
 
@@ -30,5 +31,25 @@ describe('schema constraints', () => {
     await db.insert(verification).values([base, base]);
     await db.insert(verification).values({ ...base, code: 'VC-7K3Q' });
     await expect(db.insert(verification).values({ ...base, code: 'VC-7K3Q' })).rejects.toThrow();
+  });
+
+  it('a report has at most one case', async () => {
+    const [l] = await db.insert(landlord).values({ phoneHash: 'h3' }).returning();
+    const [r] = await db.insert(viewingReport).values({ verificationId, reporterPhoneHash: 's1', locationResult: 'TRUE', category: 'no_show' }).returning();
+    const row = { reportId: r!.id, landlordId: l!.id, status: 'ready' };
+    await db.insert(reportCase).values(row);
+    await expect(db.insert(reportCase).values(row)).rejects.toThrow();
+  });
+  it('deleting a report deletes its case', async () => {
+    const [l] = await db.insert(landlord).values({ phoneHash: 'h3' }).returning();
+    const [r] = await db.insert(viewingReport).values({ verificationId, reporterPhoneHash: 's1', locationResult: 'TRUE', category: 'no_show' }).returning();
+    await db.insert(reportCase).values({ reportId: r!.id, landlordId: l!.id, status: 'ready' });
+    await db.delete(viewingReport).where(eq(viewingReport.id, r!.id));
+    expect(await db.select().from(reportCase)).toHaveLength(0);
+  });
+  it('one bar per kind and hash', async () => {
+    const row = { kind: 'phone', hash: 'h', expiresAt: new Date('2030-01-01') };
+    await db.insert(reporterBar).values(row);
+    await expect(db.insert(reporterBar).values(row)).rejects.toThrow();
   });
 });

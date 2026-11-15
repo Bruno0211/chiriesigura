@@ -1,4 +1,4 @@
-import { doublePrecision, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import { boolean, doublePrecision, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
 const createdAt = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
 
@@ -12,7 +12,6 @@ export const landlord = pgTable('landlord', {
   idDocHash: text('id_doc_hash'),
   nameBirthHash: text('name_birth_hash'),
   bannedAt: timestamp('banned_at', { withTimezone: true }),
-  reviewDismissedAt: timestamp('review_dismissed_at', { withTimezone: true }),
   createdAt: createdAt(),
 });
 
@@ -48,5 +47,26 @@ export const viewingReport = pgTable('viewing_report', {
   reporterPhoneHash: text('reporter_phone_hash').notNull(),
   locationResult: text('location_result').notNull(),
   category: text('category').notNull(),
+  reporterAccountHash: text('reporter_account_hash'),
+  simSwapped: boolean('sim_swapped'),
   createdAt: createdAt(),
 }, (t) => [unique('report_once').on(t.verificationId, t.reporterPhoneHash)]);
+
+export const reportCase = pgTable('report_case', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  reportId: uuid('report_id').notNull().unique().references(() => viewingReport.id, { onDelete: 'cascade' }),
+  landlordId: uuid('landlord_id').notNull().references(() => landlord.id),
+  status: text('status').notNull(),
+  decidedAt: timestamp('decided_at', { withTimezone: true }),
+  decidedBy: text('decided_by'),
+  createdAt: createdAt(),
+});
+
+export const reporterBar = pgTable('reporter_bar', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  kind: text('kind').notNull(),
+  hash: text('hash').notNull(),
+  caseId: uuid('case_id').references(() => reportCase.id, { onDelete: 'set null' }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: createdAt(),
+}, (t) => [unique('bar_once').on(t.kind, t.hash)]);

@@ -10,6 +10,7 @@ import {
   type ReportCounts,
   type ReportResponse,
 } from '@cs/shared';
+import { CONTACT } from '@/lib/contact';
 import { use, useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { browser } from 'react-dom';
 import s from '../../phone.module.css';
@@ -47,10 +48,11 @@ const LABEL = Object.fromEntries([GOOD, ...PROBLEMS].map((c) => [c.value, c.labe
 
 const STUDENT_COPY = {
   number: { label: 'Phone number', how: 'Your operator confirms this phone owns the number.' },
+  simswap: { label: 'SIM not changed recently', how: "Your operator says whether this number's SIM changed in the last 30 days. It never blocks your report." },
   location: { label: 'Phone at the viewing address', how: 'Checked when you send. Cell-level: near the address, never "inside".' },
 };
 const STUDENT_DATA: DataUse = {
-  kept: ['Your report, its time', 'Number hash (one-way)'],
+  kept: ['Your report, its time', 'Number hash (one-way)', 'Sign-in hash (one-way)', 'Whether your SIM changed recently (yes/no)'],
   neverKept: ['Phone number', 'Phone location', 'Any free text'],
 };
 const TALLY_LABEL: Record<ReportCategory, string> = { ...LABEL, ok: 'All good' };
@@ -61,7 +63,11 @@ const AT_ADDRESS: CheckStep = { name: 'location', ok: true, message: 'Your phone
 const NOT_AT_ADDRESS: CheckStep = { name: 'location', ok: false, message: "Your phone isn't near the viewing address" };
 const EXPIRED = 'Your number check expired after 15 minutes. Confirm it again, it only takes a few seconds.';
 
-type Problem = null | 'not_at_address' | 'not_found' | 'error';
+type Problem = null | 'not_at_address' | 'signed_out' | 'barred' | 'own_listing' | 'not_found' | 'error';
+
+/** Signing in returns to this page, with the listing code from the QR link when there is one. */
+const signInHref = (verificationId: string, code?: string | null) =>
+  `/auth/login?returnTo=${encodeURIComponent(`/viewing/${verificationId}${code ? `?code=${code}` : ''}`)}`;
 
 interface Saved {
   stage: Stage;
@@ -76,7 +82,15 @@ interface Saved {
 
 const EMPTY: Saved = { stage: 'consent', times: {} };
 
-export function ViewingFlow({ verificationId, code }: { verificationId: string; code?: string | null }) {
+export function ViewingFlow({
+  verificationId,
+  signedIn,
+  code,
+}: {
+  verificationId: string;
+  signedIn: boolean;
+  code?: string | null;
+}) {
   use(browser('The viewing report reads the operator result and its own progress from this browser.'));
 
   const key = `cs.viewing.${verificationId}`;
@@ -110,12 +124,27 @@ export function ViewingFlow({ verificationId, code }: { verificationId: string; 
     </p>
   );
 
+  if (!signedIn) {
+    return (
+      <>
+        <FrameBar zone="Viewing report" step={{ n: 1, of: 4 }} />
+        <main className={s.main}>
+          <h1 id="step-heading" className={s.h1}>Sign in to report a viewing</h1>
+          <p className={s.lead}>Reports are for signed-in students. Sign in, and you come straight back here.</p>
+          <div className={s.actionsInline}>
+            <a className={s.primary} href={signInHref(verificationId, listingCode)}>Sign in</a>
+          </div>
+        </main>
+      </>
+    );
+  }
+
   let screen;
   switch (st.stage) {
     case 'consent':
       screen = (
         <ConsentScreen
-          checks={['number', 'location']}
+          checks={['number', 'simswap', 'location']}
           onAccept={() => update({ stage: 'number' })}
           heading="Report a viewing"
           lead="For a verified landlord's listing. You need to be at the apartment, on mobile data."
@@ -151,6 +180,7 @@ export function ViewingFlow({ verificationId, code }: { verificationId: string; 
           st={st}
           masked={masked}
           codeLine={codeLine}
+          signInUrl={signInHref(verificationId, listingCode)}
           onSent={(category, counts) =>
             update({ stage: 'done', outcome: 'sent', category, counts, times: { ...st.times, location: clockTime() } })
           }
@@ -181,6 +211,7 @@ function ReportForm({
   st,
   masked,
   codeLine,
+  signInUrl,
   onSent,
   onAlready,
   onExpired,
@@ -189,6 +220,7 @@ function ReportForm({
   st: Saved;
   masked?: string;
   codeLine: ReactNode;
+  signInUrl: string;
   onSent: (category: ReportCategory, counts: ReportCounts) => void;
   onAlready: (category: ReportCategory) => void;
   onExpired: () => void;
@@ -210,8 +242,11 @@ function ReportForm({
     setSending(false);
     if (r.status === 200 && r.data?.counts) return onSent(category, r.data.counts);
     if (r.status === 409) return onAlready(category);
-    if (r.status === 401) return onExpired();
-    if (r.status === 403) return setProblem('not_at_address');
+    if (r.status === 401) return r.data?.reason === 'signed_out' ? setProblem('signed_out') : onExpired();
+    if (r.status === 403) {
+      const reason = r.data?.reason;
+      return setProblem(reason === 'barred' || reason === 'own_listing' ? reason : 'not_at_address');
+    }
     if (r.status === 404) return setProblem('not_found');
     setProblem('error');
   }
@@ -282,6 +317,29 @@ function ReportForm({
             <p className={s.alertBody}>Open this page at the address, with mobile data on, then send it again.</p>
           </div>
         )}
+        {problem === 'signed_out' && (
+          <div className={s.alert} role="alert">
+            <p className={s.alertTitle}>Sign in to report</p>
+            <p className={s.alertBody}>
+              Your sign-in has ended. <a className={s.textLink} href={signInUrl}>Sign in</a> and you come
+              straight back here.
+            </p>
+          </div>
+        )}
+        {problem === 'barred' && (
+          <div className={s.alert} role="alert">
+            <p className={s.alertTitle}>You can&apos;t report on ChirieSigură</p>
+            <p className={s.alertBody}>
+              If you think this is a mistake, email <a className={s.textLink} href={'mailto:' + CONTACT}>{CONTACT}</a>.
+            </p>
+          </div>
+        )}
+        {problem === 'own_listing' && (
+          <div className={s.alert} role="alert">
+            <p className={s.alertTitle}>You can&apos;t report your own listing</p>
+            <p className={s.alertBody}>Reports come from students who went to the viewing.</p>
+          </div>
+        )}
         {problem === 'not_found' && (
           <div className={s.alert} role="alert">
             <p className={s.alertTitle}>We can&apos;t find this verification</p>
@@ -323,7 +381,11 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
           <p className={s.alertBody}>Each phone can report a viewing once, so the first report stands.</p>
         </div>
       ) : (
-        <p className={s.lead}>Thank you. Reports attach to the landlord and show on all of their listings.</p>
+        <p className={s.lead}>
+          {st.category === 'ok'
+            ? "Your report shows on all of this landlord's listings."
+            : 'Thank you. Our team checks every problem report. If it confirms a scam, the landlord is banned on all of their listings.'}
+        </p>
       )}
 
       {!already && (

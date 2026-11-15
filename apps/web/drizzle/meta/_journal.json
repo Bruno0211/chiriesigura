@@ -29,6 +29,20 @@
       "when": 1794687034789,
       "tag": "0003_huge_boomer",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794731858511,
+      "tag": "0004_dapper_maestro",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794735008168,
+      "tag": "0005_premium_runaways",
+      "breakpoints": true
     }
   ]
 }

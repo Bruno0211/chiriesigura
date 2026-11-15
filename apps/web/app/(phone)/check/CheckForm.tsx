@@ -1,6 +1,6 @@
 'use client';
 
-import { parseListingUrl, type CheckResponse } from '@cs/shared';
+import { parseListingUrl, UNDER_REVIEW_TEXT, type CheckResponse } from '@cs/shared';
 import { useId, useState, type FormEvent } from 'react';
 import s from '../phone.module.css';
 
@@ -69,6 +69,11 @@ export function CheckForm({ signedIn }: { signedIn: boolean }) {
       {result?.kind === 'verdict' && (
         <div className={s.alert} data-tone={tone(result.data.status)} data-status={result.data.status} role="status">
           <p className={s.alertTitle}>{result.data.label}</p>
+        </div>
+      )}
+      {result?.kind === 'verdict' && result.data.underReview && (
+        <div className={s.alert} data-tone="warn" role="note">
+          <p className={s.alertTitle}>{UNDER_REVIEW_TEXT}</p>
         </div>
       )}
       {result?.kind === 'verdict' && result.data.verificationId && (

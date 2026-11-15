@@ -261,3 +261,22 @@ The build has to do what's below. A lawyer still needs to check it before a real
   - **Confirm warning** turns `d1` 🟠 in the extension;
   - from stage 2, the pass flow (create, claim, review) shows a good tag on the badge;
   - from stage 3, a no-pass report without evidence is refused, and an SMS lands in the mock outbox.
+
+## 8. Update 2026-11-15: a landlord is verified or banned (team decision)
+
+**Why:** the team wants no grey zone. A reported landlord stays verified until the team bans them or clears the report.
+
+**Decided:**
+- **No 🟠 state.** `amber` ("Verified, but warnings from viewers") is removed from the badge, the extension and `/check`. A verified landlord is 🟢 until a ban, which turns them 🔴 *Landlord banned* as today. This replaces §4.8's "🟠 when the landlord has at least one upheld case".
+- **No Confirm warning.** `/review` offers three decisions per case:
+  - **Ban for life:** runs `banPerson`.
+  - **Dismiss:** no effect, and the reporter isn't penalised.
+  - **False report:** the reporter is barred for 2 years.
+  - This replaces the four decisions in §4.5 and §4.6.
+- **Problem counts are never published.** The badge's counts line shows only "all good" reports. A problem report's only public effect is the soft note while it is open, then a ban if the team decides one.
+
+**Calls made with the change** (the team accepted the proposal "keep the note"):
+- **The soft note stays.** While a case is open, the green badge keeps *"Viewers reported a problem · under review · never pay before you've seen the flat."* (§4.8).
+- **A ban's case is stored with status `banned`** (was `upheld`). Case statuses are `awaiting_landlord | ready | dismissed | false_report | banned`.
+- **Retention (§4.13):** a ban's case record is kept as the ban's decision record. The "upheld: 2 years" row no longer applies.
+- **Stage 3:** Ban still needs the case to be `ready`. Dismiss and False report work on any open case.

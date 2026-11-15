@@ -1,0 +1,1 @@
+ALTER TABLE "landlord" DROP COLUMN "review_dismissed_at";

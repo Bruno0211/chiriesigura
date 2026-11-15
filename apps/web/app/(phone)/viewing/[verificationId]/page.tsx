@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { isSignedIn } from '@/lib/auth0';
 import { PageFallback } from '../../components/PageFallback';
 import { ViewingFlow } from './ViewingFlow';
 
@@ -17,5 +18,5 @@ export default function ViewingPage({ params }: { params: Params }) {
 
 async function Flow({ params }: { params: Params }) {
   const { verificationId } = await params;
-  return <ViewingFlow verificationId={verificationId} />;
+  return <ViewingFlow verificationId={verificationId} signedIn={await isSignedIn()} />;
 }
