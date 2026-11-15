@@ -12,7 +12,6 @@ export const landlord = pgTable('landlord', {
   idDocHash: text('id_doc_hash'),
   nameBirthHash: text('name_birth_hash'),
   bannedAt: timestamp('banned_at', { withTimezone: true }),
-  reviewDismissedAt: timestamp('review_dismissed_at', { withTimezone: true }),
   createdAt: createdAt(),
 });
 

@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/check/route';
 import type { Db } from '@/lib/db';
-import { landlord, listing, reportCase, verification, viewingReport } from '@/lib/db/schema';
+import { landlord, listing, reporterBar, reportCase, verification, viewingReport } from '@/lib/db/schema';
 import { makeTestDb } from '@/lib/db/test-db';
 import { identityHashes, phoneHash } from '@/lib/hash';
 import { caseList, decideCase } from '@/lib/cases';
@@ -25,7 +25,7 @@ describe('seed', () => {
 
   it('reseeding puts d1 and d5 back to exactly their seeded reports', async () => {
     await seed(db);
-    for (const [code, category] of [['VC-7K3Q', 'no_show'], ['VC-7K3Q', 'money_upfront'], ['VC-BAN5', 'money_upfront']] as const) {
+    for (const [code, category] of [['VC-7K3Q', 'ok'], ['VC-7K3Q', 'money_upfront'], ['VC-BAN5', 'money_upfront']] as const) {
       const v = await findVerificationByCode(db, code);
       await db.insert(viewingReport).values({ verificationId: v!.id, reporterPhoneHash: `rehearsal-${code}-${category}`, locationResult: 'TRUE', category });
     }
@@ -37,13 +37,42 @@ describe('seed', () => {
     expect(await db.select().from(viewingReport).where(eq(viewingReport.verificationId, d5!.id))).toHaveLength(3);
   });
 
-  it('reseeding lifts a rehearsal ban or dismissal from every demo landlord', async () => {
+  it('reseeding lifts a rehearsal ban, an upheld warning and a false-report bar', async () => {
     await seed(db);
-    await db.update(landlord).set({ bannedAt: new Date(), reviewDismissedAt: new Date() });
+    const d1 = (await findVerificationByCode(db, 'VC-7K3Q'))!;
+    const d5 = (await findVerificationByCode(db, 'VC-BAN5'))!;
+    const live = await db.insert(viewingReport).values({ verificationId: d1.id, reporterPhoneHash: phoneHash('+99999992000'), locationResult: 'TRUE', category: 'no_show' }).returning();
+    const [c1] = await db.insert(reportCase).values({ reportId: live[0]!.id, landlordId: d1.landlordId, status: 'ready' }).returning();
+    const [c2] = await db.insert(reportCase).values({ reportId: (await db.insert(viewingReport).values({ verificationId: d1.id, reporterPhoneHash: 'rehearsal-2', locationResult: 'TRUE', category: 'no_show' }).returning())[0]!.id, landlordId: d1.landlordId, status: 'ready' }).returning();
+    const scamCases = (await caseList(db)).filter((c) => c.landlordId === d5.landlordId);
+    expect(await decideCase(db, scamCases[0]!.caseId, 'ban', 'team@x.ro')).toBe('ok');
+    expect(await decideCase(db, c1!.id, 'uphold', 'team@x.ro')).toBe('ok');
+    expect(await decideCase(db, c2!.id, 'false_report', 'team@x.ro')).toBe('ok');
+    expect((await db.select().from(reporterBar)).length).toBeGreaterThan(0);
+
     await seed(db);
-    const rows = await db.select({ bannedAt: landlord.bannedAt, dismissed: landlord.reviewDismissedAt }).from(landlord);
+    const rows = await db.select({ bannedAt: landlord.bannedAt }).from(landlord);
     expect(rows.length).toBeGreaterThanOrEqual(3);
-    expect(rows.filter((r) => r.bannedAt || r.dismissed)).toEqual([]);
+    expect(rows.filter((r) => r.bannedAt)).toEqual([]);
+    const cases = await db.select({ status: reportCase.status }).from(reportCase);
+    expect(cases.length).toBeGreaterThan(0);
+    expect(cases.filter((c) => c.status !== 'ready')).toEqual([]);
+    expect(await db.select().from(reporterBar)).toEqual([]);
+  });
+
+  it('d1 starts green with two all-good reports and no note', async () => {
+    await seed(db);
+    const body = (await (await GET(new Request(`http://localhost:3000/api/check?${new URLSearchParams({ site: 'demo', listingId: 'd1', code: 'VC-7K3Q' })}`))).json()) as { status: string; reports: { ok: number }; underReview?: true };
+    expect(body.status).toBe('green');
+    expect(body.reports.ok).toBe(2);
+    expect(body.underReview).toBeUndefined();
+  });
+
+  it("the scammer's three reports are days apart, so no burst", async () => {
+    await seed(db);
+    const cases = await caseList(db);
+    expect(cases).toHaveLength(3);
+    expect(cases.filter((c) => c.signs.includes('burst'))).toEqual([]);
   });
 
   it('seeds a verified landlord whose d7 listing says Cluj, which the badge flags', async () => {
@@ -76,8 +105,8 @@ describe('seed', () => {
 
     await seed(db);
     expect(await check('d1')).toMatchObject({ status: 'green' });
-    // The two seeded earlier no-shows stay open cases; only the live reporter's case is gone.
-    expect(await db.select().from(reportCase).where(eq(reportCase.landlordId, d1v!.landlordId))).toHaveLength(2);
+    // d1's seeded reports are all good, so no case stays open; the live reporter's case is gone.
+    expect(await db.select().from(reportCase).where(eq(reportCase.landlordId, d1v!.landlordId))).toHaveLength(0);
     expect(await db.select().from(listing).where(and(eq(listing.site, 'demo'), eq(listing.siteListingId, 'd4')))).toHaveLength(0);
   });
 
