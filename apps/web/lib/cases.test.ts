@@ -26,47 +26,47 @@ async function secondLandlord(idDocHash: string | null) {
 }
 
 describe('landlordStanding', () => {
-  it('an open case puts the landlord under review without warning', async () => {
+  it('an open case puts the landlord under review without publishing a count', async () => {
     await addCases(db, seeded.verificationId, 'money_upfront', 3);
     const s = await landlordStanding(db, seeded.landlordId);
-    expect(s).toMatchObject({ warned: false, underReview: true });
+    expect(s).toMatchObject({ underReview: true });
     expect(s.counts.money_upfront).toBe(0);
   });
-  it('an upheld case warns and counts publicly', async () => {
-    await addCases(db, seeded.verificationId, 'no_show', 1, 'upheld', new Date());
+  it('a banned case publishes no problem count', async () => {
+    await addCases(db, seeded.verificationId, 'no_show', 1, 'banned', new Date());
     const s = await landlordStanding(db, seeded.landlordId);
-    expect(s).toMatchObject({ warned: true, underReview: false });
-    expect(s.counts.no_show).toBe(1);
+    expect(s).toMatchObject({ underReview: false });
+    expect(s.counts.no_show).toBe(0);
+  });
+  it('a legacy upheld case is neither open nor published', async () => {
+    await addCases(db, seeded.verificationId, 'no_show', 1, 'upheld' as string as CaseStatus, new Date());
+    const s = await landlordStanding(db, seeded.landlordId);
+    expect(s).toMatchObject({ underReview: false });
+    expect(s.counts.no_show).toBe(0);
+    expect(await caseList(db)).toEqual([]);
   });
   it('dismissed and false reports count for nothing', async () => {
     await addCases(db, seeded.verificationId, 'no_show', 2, 'dismissed', new Date());
     await addCases(db, seeded.verificationId, 'money_upfront', 2, 'false_report', new Date());
     const s = await landlordStanding(db, seeded.landlordId);
-    expect(s).toMatchObject({ warned: false, underReview: false });
+    expect(s).toMatchObject({ underReview: false });
     expect(s.counts).toMatchObject({ no_show: 0, money_upfront: 0, mismatch: 0, wrong_person: 0 });
   });
   it('ok reports count at once', async () => {
     await addReports(db, seeded.verificationId, 'ok', 2);
     expect((await landlordStanding(db, seeded.landlordId)).counts.ok).toBe(2);
   });
-  it('an upheld case older than 2 years no longer counts', async () => {
-    const now = new Date();
-    await addCases(db, seeded.verificationId, 'no_show', 1, 'upheld', new Date(now.getTime() - 731 * DAY));
-    const s = await landlordStanding(db, seeded.landlordId, now);
-    expect(s.warned).toBe(false);
-    expect(s.counts.no_show).toBe(0);
-  });
   it('standing follows the ID card hash', async () => {
     await db.update(landlord).set({ idDocHash: 'same-id' }).where(eq(landlord.id, seeded.landlordId));
     const other = await secondLandlord('same-id');
-    await addCases(db, other.verificationId, 'no_show', 1, 'upheld', new Date());
-    expect((await landlordStanding(db, seeded.landlordId)).warned).toBe(true);
+    await addReports(db, other.verificationId, 'ok', 1);
+    expect((await landlordStanding(db, seeded.landlordId)).counts.ok).toBe(1);
     expect((await personLandlordIds(db, seeded.landlordId)).sort()).toEqual([seeded.landlordId, other.landlordId].sort());
   });
   it('a legacy landlord with no ID hash stands alone', async () => {
     const other = await secondLandlord(null);
-    await addCases(db, other.verificationId, 'no_show', 1, 'upheld', new Date());
-    expect((await landlordStanding(db, seeded.landlordId)).warned).toBe(false);
+    await addReports(db, other.verificationId, 'ok', 1);
+    expect((await landlordStanding(db, seeded.landlordId)).counts.ok).toBe(0);
     expect(await personLandlordIds(db, seeded.landlordId)).toEqual([seeded.landlordId]);
   });
 });
@@ -147,7 +147,7 @@ describe('caseList', () => {
     const readyNew = await fileCase(seeded.verificationId, { phone: 'r2', at: readyNewAt });
     const awaitingOld = await fileCase(seeded.verificationId, { phone: 'r3', status: 'awaiting_landlord', at: ago(5) });
     const awaitingNew = await fileCase(seeded.verificationId, { phone: 'r4', status: 'awaiting_landlord', at: ago(0) });
-    for (const [i, status] of (['dismissed', 'false_report', 'upheld'] as const).entries()) {
+    for (const [i, status] of (['dismissed', 'false_report', 'banned'] as const).entries()) {
       await fileCase(seeded.verificationId, { phone: `d${i}`, status, at: ago(10 + i) });
     }
 
@@ -168,6 +168,12 @@ describe('caseList', () => {
 });
 
 describe('decideCase', () => {
+  it('ban stores the case as banned', async () => {
+    const [id] = (await addCases(db, seeded.verificationId, 'money_upfront', 1)) as [string];
+    expect(await decideCase(db, id, 'ban', 'team@x.ro')).toBe('ok');
+    expect((await db.select().from(reportCase).where(eq(reportCase.id, id)))[0]!.status).toBe('banned');
+  });
+
   it('a second ban on the same person keeps the first ban time', async () => {
     const [first, second] = (await addCases(db, seeded.verificationId, 'money_upfront', 2)) as [string, string];
     const t1 = new Date('2026-11-15T10:00:00Z');

@@ -42,12 +42,12 @@ export async function GET(req: Request) {
 
   const db = getDb();
   const v = code ? await findVerificationByCode(db, code) : null;
-  const standing = v ? await landlordStanding(db, v.landlordId) : { counts: emptyCounts(), warned: false, underReview: false };
+  const standing = v ? await landlordStanding(db, v.landlordId) : { counts: emptyCounts(), underReview: false };
   const listingFar = v ? await listingFarFrom({ text: placeText(q.get('place')), coords: placeCoords(q.get('placeLat'), q.get('placeLng')) }, v) : false;
-  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, warned: standing.warned, listingFar });
+  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, listingFar });
 
   const body: CheckResponse = { status, label: badgeLabel(status, v?.verifiedAt, v?.city) };
-  if (v && (status === 'green' || status === 'amber')) {
+  if (v && status === 'green') {
     Object.assign(body, { verificationId: v.id, verifiedAt: v.verifiedAt, locationResult: v.locationResult });
     if (v.city) body.city = v.city;
     if (standing.underReview) body.underReview = true;

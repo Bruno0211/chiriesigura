@@ -165,7 +165,7 @@ describe('ViewingFlow', () => {
     mockReport(200, { ok: true, counts: emptyCounts() });
     render(<ViewingFlow verificationId={VID} signedIn />);
     await sendNoShow();
-    expect(await screen.findByText('Our team checks every problem report before it shows on the listing.')).toBeTruthy();
+    expect(await screen.findByText('Thank you. Our team checks every problem report. If it confirms a scam, the landlord is banned on all of their listings.')).toBeTruthy();
   });
 
   it('an ok report says it shows on the listings', async () => {

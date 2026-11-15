@@ -75,22 +75,26 @@ describe('ReviewList', () => {
     expect(await within(card('a')).findByText('Marked false')).toBeTruthy();
   });
 
-  it('confirm warning and dismiss post at once', async () => {
+  it('a card has exactly three action buttons and no Confirm warning', () => {
+    render(<ReviewList items={[item('a')]} />);
+    const names = within(card('a')).getAllByRole('button').map((b) => b.textContent);
+    expect(names).toEqual(['Ban for life', 'Dismiss', 'False report']);
+    expect(within(card('a')).queryByRole('button', { name: 'Confirm warning' })).toBeNull();
+  });
+
+  it('dismiss posts at once', async () => {
     const fetchMock = stubPost();
-    render(<ReviewList items={[item('a'), item('b')]} />);
+    render(<ReviewList items={[item('b')]} />);
     const user = userEvent.setup();
-    await user.click(within(card('a')).getByRole('button', { name: 'Confirm warning' }));
-    expect(fetchMock).toHaveBeenCalledWith('/api/review', posted('a', 'uphold'));
-    expect(await within(card('a')).findByText('Warning confirmed')).toBeTruthy();
     await user.click(within(card('b')).getByRole('button', { name: 'Dismiss' }));
     expect(fetchMock).toHaveBeenCalledWith('/api/review', posted('b', 'dismiss'));
     expect(await within(card('b')).findByText('Dismissed')).toBeTruthy();
   });
 
-  const BUTTONS = ['Confirm warning', 'Ban for life', 'Dismiss', 'False report'];
+  const BUTTONS = ['Ban for life', 'Dismiss', 'False report'];
 
   it.each([
-    ['upheld', 'Warning confirmed'],
+    ['banned', 'Banned'],
     ['dismissed', 'Dismissed'],
     ['false_report', 'Marked false'],
   ])('409 already_decided (%s) names the outcome and removes the buttons', async (status, words) => {
@@ -107,7 +111,9 @@ describe('ReviewList', () => {
   it('409 not_ready says the report waits for the landlord and keeps the buttons', async () => {
     stubPost(409, { error: 'not_ready' });
     render(<ReviewList items={[item('a')]} />);
-    await userEvent.setup().click(within(card('a')).getByRole('button', { name: 'Confirm warning' }));
+    const user = userEvent.setup();
+    await user.click(within(card('a')).getByRole('button', { name: 'Ban for life' }));
+    await user.click(within(card('a')).getByRole('button', { name: 'Yes, ban for life' }));
     expect(await within(card('a')).findByText("This report is waiting for the landlord's answer.")).toBeTruthy();
     for (const name of BUTTONS) expect(within(card('a')).getByRole('button', { name })).toBeTruthy();
   });

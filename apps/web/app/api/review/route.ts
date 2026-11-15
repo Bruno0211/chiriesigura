@@ -4,9 +4,9 @@ import { getDb } from '@/lib/db';
 import { reviewerEmail } from '@/lib/review';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ACTIONS: readonly ReviewAction[] = ['dismiss', 'false_report', 'uphold', 'ban'];
+const ACTIONS: readonly ReviewAction[] = ['dismiss', 'false_report', 'ban'];
 
-/** The team decides one report's case: dismiss, mark it false, confirm the warning, or ban the person. */
+/** The team decides one report's case: dismiss, mark it false, or ban the person. */
 export async function POST(req: Request) {
   const reviewer = await reviewerEmail();
   if (!reviewer) return Response.json({ error: 'forbidden' }, { status: 403 });

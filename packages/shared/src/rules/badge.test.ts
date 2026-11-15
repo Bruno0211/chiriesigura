@@ -7,7 +7,7 @@ const L2: ListingRef = { site: 'demo', listingId: 'd2' };
 const V = { listings: [L1], phoneHash: 'h1', verifiedAt: '2026-11-14T10:00:00Z', banned: false };
 const counts = (c: Partial<ReportCounts>): ReportCounts => ({ ...emptyCounts(), ...c });
 const input = (i: Partial<BadgeInput>): BadgeInput => ({
-  listing: L1, code: 'VC-7K3Q', verification: V, pagePhoneHash: null, warned: false, listingFar: false, ...i,
+  listing: L1, code: 'VC-7K3Q', verification: V, pagePhoneHash: null, listingFar: false, ...i,
 });
 
 describe('decideBadge (spec §6.2, in order)', () => {
@@ -18,9 +18,6 @@ describe('decideBadge (spec §6.2, in order)', () => {
     expect(decideBadge(input({ listingFar: true, verification: { ...V, banned: true } }))).toBe('red_banned');
     expect(decideBadge(input({ listingFar: true, listing: L2 }))).toBe('red_copied');
     expect(decideBadge(input({ listingFar: true, pagePhoneHash: 'h2' }))).toBe('red_phone_mismatch');
-  });
-  it('far away wins over amber', () => {
-    expect(decideBadge(input({ listingFar: true, warned: true }))).toBe('red_far_away');
   });
   it('a banned landlord shows red_banned on their own listing', () => {
     expect(decideBadge(input({ verification: { ...V, banned: true } }))).toBe('red_banned');
@@ -44,10 +41,6 @@ describe('decideBadge (spec §6.2, in order)', () => {
     expect(decideBadge(input({}))).toBe('green');
     expect(decideBadge(input({ pagePhoneHash: 'h1' }))).toBe('green');
   });
-  it('5: an upheld warning turns green into amber; open reports never do', () => {
-    expect(decideBadge(input({ warned: true }))).toBe('amber');
-    expect(decideBadge(input({ warned: false }))).toBe('green');
-  });
   it('the soft note copy is verbatim', () => {
     expect(UNDER_REVIEW_TEXT).toBe("Viewers reported a problem · under review · never pay before you've seen the flat.");
   });
@@ -70,7 +63,6 @@ describe('badgeLabel', () => {
     expect(badgeLabel('red_copied')).toBe('Copied from a verified listing');
     expect(badgeLabel('red_phone_mismatch')).toBe("Phone number doesn't match the verified landlord");
     expect(badgeLabel('green', '2026-11-14T10:00:00Z')).toBe('Verified landlord · near the address · 14 Nov 2026');
-    expect(badgeLabel('amber')).toBe('Verified, but warnings from viewers');
     expect(badgeLabel('grey_unverified')).toBe('Not verified');
   });
 });

@@ -35,7 +35,7 @@ export type ExtensionMessage = CheckRequest | ShowRequest;
 
 // A record, so adding a BadgeStatus without listing it here is a type error.
 const KNOWN: Record<BadgeStatus, true> = {
-  green: true, amber: true, red_fake_code: true, red_copied: true, red_phone_mismatch: true, red_banned: true, red_far_away: true,
+  green: true, red_fake_code: true, red_copied: true, red_phone_mismatch: true, red_banned: true, red_far_away: true,
   grey_unverified: true, grey_cannot_confirm: true,
 };
 const STATUSES = new Set(Object.keys(KNOWN));

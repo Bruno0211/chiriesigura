@@ -32,7 +32,6 @@ const ASK: Record<Confirmable, { question: string; yes: string }> = {
 };
 
 const DONE: Record<ReviewAction, string> = {
-  uphold: 'Warning confirmed',
   ban: 'Banned',
   dismiss: 'Dismissed',
   false_report: 'Marked false',
@@ -40,7 +39,7 @@ const DONE: Record<ReviewAction, string> = {
 
 /** How a case someone else already decided reads to the reviewer who lost the race. */
 const OUTCOME: Partial<Record<CaseStatus, string>> = {
-  upheld: 'Warning confirmed',
+  banned: 'Banned',
   dismissed: 'Dismissed',
   false_report: 'Marked false',
 };
@@ -139,7 +138,6 @@ function CaseCard({ item }: { item: CaseItem }) {
               </>
             ) : (
               <div className={s.actionsInline}>
-                <button type="button" className={s.primary} disabled={state.busy} onClick={() => void act('uphold')}>Confirm warning</button>
                 <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'ban', error: null })}>Ban for life</button>
                 <button type="button" className={s.secondary} disabled={state.busy} onClick={() => void act('dismiss')}>Dismiss</button>
                 <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'false_report', error: null })}>False report</button>

@@ -384,7 +384,7 @@ function DoneScreen({ st, masked }: { st: Saved; masked?: string }) {
         <p className={s.lead}>
           {st.category === 'ok'
             ? "Your report shows on all of this landlord's listings."
-            : 'Our team checks every problem report before it shows on the listing.'}
+            : 'Thank you. Our team checks every problem report. If it confirms a scam, the landlord is banned on all of their listings.'}
         </p>
       )}
 

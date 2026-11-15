@@ -29,7 +29,7 @@ async function Review() {
       <main className={s.main}>
         <h1 id="step-heading" className={s.h1}>Reports to review</h1>
         <p className={s.lead}>
-          Each problem report waits here before it shows on a listing. Confirming a warning turns the landlord&apos;s listings amber; a ban is for life and follows the person to any new number.
+          Each problem report waits here. Ban for life blocks the landlord on every listing and follows the person to any new number; Dismiss and False report leave the landlord verified.
         </p>
         <ReviewList items={items} />
       </main>

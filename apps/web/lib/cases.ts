@@ -4,12 +4,10 @@ import type { Db } from './db';
 import { landlord, listing, reportCase, reporterBar, verification, viewingReport } from './db/schema';
 import { banPerson } from './queries';
 
-export type CaseStatus = 'awaiting_landlord' | 'ready' | 'dismissed' | 'false_report' | 'upheld';
+export type CaseStatus = 'awaiting_landlord' | 'ready' | 'dismissed' | 'false_report' | 'banned';
 export const OPEN: CaseStatus[] = ['awaiting_landlord', 'ready'];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** An upheld case counts for this long after the team decided it. */
-const UPHELD_MS = 2 * 365 * DAY_MS;
 /** A false reporter can't report again for this long. */
 const BAR_MS = 2 * 365 * DAY_MS;
 /** Cases on one person this close together: a crowd gathered at the property. */
@@ -28,12 +26,11 @@ export async function personLandlordIds(db: Db, landlordId: string): Promise<str
 
 export interface Standing {
   counts: ReportCounts;
-  warned: boolean;
   underReview: boolean;
 }
 
-/** What the badge may say about a person: ok reports at once, problems only once the team upheld them. */
-export async function landlordStanding(db: Db, landlordId: string, now = new Date()): Promise<Standing> {
+/** What the badge may say about a person: only all-good counts are published, and open problem reports add the soft note. */
+export async function landlordStanding(db: Db, landlordId: string): Promise<Standing> {
   const ids = await personLandlordIds(db, landlordId);
   const counts = emptyCounts();
 
@@ -44,21 +41,13 @@ export async function landlordStanding(db: Db, landlordId: string, now = new Dat
     .where(and(inArray(verification.landlordId, ids), eq(viewingReport.category, 'ok')));
   counts.ok = Number(ok?.n ?? 0);
 
-  const upheld = await db
-    .select({ category: viewingReport.category, n: sql<number>`count(distinct ${viewingReport.reporterPhoneHash})::int` })
-    .from(reportCase)
-    .innerJoin(viewingReport, eq(viewingReport.id, reportCase.reportId))
-    .where(and(inArray(reportCase.landlordId, ids), eq(reportCase.status, 'upheld'), gt(reportCase.decidedAt, new Date(now.getTime() - UPHELD_MS))))
-    .groupBy(viewingReport.category);
-  for (const r of upheld) if (REPORT_CATEGORIES.includes(r.category as ReportCategory)) counts[r.category as ReportCategory] = Number(r.n);
-
   const [open] = await db
     .select({ id: reportCase.id })
     .from(reportCase)
     .where(and(inArray(reportCase.landlordId, ids), inArray(reportCase.status, OPEN)))
     .limit(1);
 
-  return { counts, warned: upheld.length > 0, underReview: !!open };
+  return { counts, underReview: !!open };
 }
 
 /** True when a live bar matches the reporter's phone or account. */
@@ -168,8 +157,7 @@ export type DecideResult = 'ok' | 'not_found' | 'not_ready' | 'already_decided';
 
 /** Each action's outcome, and the statuses it may decide from (spec §4.5). */
 const DECISIONS: Record<ReviewAction, { to: CaseStatus; from: CaseStatus[] }> = {
-  uphold: { to: 'upheld', from: ['ready'] },
-  ban: { to: 'upheld', from: ['ready'] },
+  ban: { to: 'banned', from: ['ready'] },
   dismiss: { to: 'dismissed', from: OPEN },
   false_report: { to: 'false_report', from: OPEN },
 };

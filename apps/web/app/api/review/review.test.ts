@@ -49,17 +49,19 @@ describe('POST /api/review', () => {
     expect(await theCase()).toMatchObject({ status: 'ready', decidedAt: null, decidedBy: null });
   });
 
-  it('uphold turns the badge amber', async () => {
+  it('a stale uphold action is a bad request', async () => {
     as('team@x.ro');
-    expect((await review({ caseId, action: 'uphold' })).status).toBe(200);
-    expect((await check()).status).toBe('amber');
+    const res = await review({ caseId, action: 'uphold' });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'bad_request' });
+    expect(await theCase()).toMatchObject({ status: 'ready' });
     expect(await bannedAt(seeded.landlordId)).toBeNull();
   });
 
   it('ban bans the person and the badge goes red (email compared case-insensitively)', async () => {
     as('lead@x.ro');
     expect((await review({ caseId, action: 'ban' })).status).toBe(200);
-    expect(await theCase()).toMatchObject({ status: 'upheld' });
+    expect(await theCase()).toMatchObject({ status: 'banned' });
     expect((await check()).status).toBe('red_banned');
   });
 
@@ -100,14 +102,12 @@ describe('POST /api/review', () => {
     expect((await check()).status).toBe('green');
   });
 
-  it('uphold and ban are refused while awaiting the landlord; dismiss works', async () => {
+  it('ban is refused while awaiting the landlord; dismiss works', async () => {
     as('team@x.ro');
     await db.update(reportCase).set({ status: 'awaiting_landlord' }).where(eq(reportCase.id, caseId));
-    for (const action of ['uphold', 'ban']) {
-      const res = await review({ caseId, action });
-      expect(res.status).toBe(409);
-      expect(await res.json()).toEqual({ error: 'not_ready' });
-    }
+    const res = await review({ caseId, action: 'ban' });
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ error: 'not_ready' });
     expect(await bannedAt(seeded.landlordId)).toBeNull();
     expect(await theCase()).toMatchObject({ status: 'awaiting_landlord' });
     expect((await review({ caseId, action: 'dismiss' })).status).toBe(200);
@@ -116,15 +116,15 @@ describe('POST /api/review', () => {
 
   it('a double decision lands once', async () => {
     as('team@x.ro');
-    const [first, second] = await Promise.all([review({ caseId, action: 'uphold' }), review({ caseId, action: 'dismiss' })]);
+    const [first, second] = await Promise.all([review({ caseId, action: 'ban' }), review({ caseId, action: 'dismiss' })]);
     expect([first!.status, second!.status]).toEqual([200, 409]);
-    expect(await second!.json()).toEqual({ error: 'already_decided', status: 'upheld' });
-    expect(await theCase()).toMatchObject({ status: 'upheld' });
+    expect(await second!.json()).toEqual({ error: 'already_decided', status: 'banned' });
+    expect(await theCase()).toMatchObject({ status: 'banned' });
   });
 
   it('records which reviewer decided', async () => {
     as('Lead@X.ro');
-    await review({ caseId, action: 'uphold' });
+    await review({ caseId, action: 'ban' });
     const c = await theCase();
     expect(c.decidedBy).toBe('lead@x.ro');
     expect(c.decidedAt).not.toBeNull();
@@ -132,8 +132,8 @@ describe('POST /api/review', () => {
 
   it('404 unknown case, 400 bad body', async () => {
     as('team@x.ro');
-    expect((await review({ caseId: '00000000-0000-4000-8000-000000000000', action: 'uphold' })).status).toBe(404);
-    expect((await review({ caseId: 'not-a-uuid', action: 'uphold' })).status).toBe(400);
+    expect((await review({ caseId: '00000000-0000-4000-8000-000000000000', action: 'ban' })).status).toBe(404);
+    expect((await review({ caseId: 'not-a-uuid', action: 'ban' })).status).toBe(400);
     expect((await review({ caseId, action: 'delete' })).status).toBe(400);
     expect((await review({ landlordId: seeded.landlordId, action: 'ban' })).status).toBe(400);
     expect((await review(null)).status).toBe(400);

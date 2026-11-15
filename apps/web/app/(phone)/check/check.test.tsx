@@ -70,8 +70,8 @@ describe('CheckForm', () => {
   });
 
   const REPORT = "I'm at the viewing · Report it";
-  it.each(['green', 'amber'] as const)('%s: links to the viewing report for this verification', async (status) => {
-    stubCheck(200, { status, label: 'x', verificationId: 'v1' });
+  it('green: links to the viewing report for this verification', async () => {
+    stubCheck(200, { status: 'green', label: 'x', verificationId: 'v1' });
     render(<CheckForm signedIn />);
     await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
     expect((await screen.findByRole('link', { name: REPORT })).getAttribute('href')).toBe('/viewing/v1');

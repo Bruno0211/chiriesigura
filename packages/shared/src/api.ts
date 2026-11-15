@@ -4,12 +4,12 @@ import type { BadgeStatus, ListingRef, ReportCategory, ReportCounts } from './ty
 export interface CheckResponse {
   status: BadgeStatus;
   label: string;                 // verbatim badge copy
-  verificationId?: string;       // present for green/amber (for the viewing QR)
+  verificationId?: string;       // present for green (for the viewing QR)
   verifiedAt?: string;           // ISO
-  city?: string;                 // the city the landlord verified in, for green/amber when known
+  city?: string;                 // the city the landlord verified in, for green when known
   locationResult?: 'TRUE' | 'PARTIAL';
-  underReview?: true;            // present for green/amber while a viewer's report awaits a team decision
-  reports?: ReportCounts;        // present for green/amber only when a published count (all good, or an upheld problem) is above 0
+  underReview?: true;            // present for green while a viewer's report awaits a team decision
+  reports?: ReportCounts;        // present for green only when the all good count is above 0
 }
 
 // POST /api/verify/identity
@@ -47,7 +47,7 @@ export interface ReportResponse {
 }
 
 // POST /api/review (team only) → { ok: true } | 404 | 409 { error: 'not_ready' | 'already_decided' }
-export type ReviewAction = 'dismiss' | 'false_report' | 'uphold' | 'ban';
+export type ReviewAction = 'dismiss' | 'false_report' | 'ban';
 export interface ReviewRequest { caseId: string; action: ReviewAction }
 
 // Number Verification:

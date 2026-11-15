@@ -6,8 +6,6 @@ export interface BadgeInput {
   /** null = the code is unknown */
   verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string; banned: boolean } | null;
   pagePhoneHash: string | null;
-  /** An upheld case from the last 2 years stands against this landlord. */
-  warned: boolean;
   /** The listing's page puts the flat far from where the landlord verified (server-side check). */
   listingFar: boolean;
 }
@@ -22,7 +20,7 @@ export function decideBadge(i: BadgeInput): BadgeStatus {
   if (!i.verification.listings.some((l) => l.site === site && l.listingId === listingId)) return 'red_copied';
   if (i.pagePhoneHash && i.pagePhoneHash !== i.verification.phoneHash) return 'red_phone_mismatch';
   if (i.listingFar) return 'red_far_away';
-  return i.warned ? 'amber' : 'green';
+  return 'green';
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -32,7 +30,6 @@ const formatDate = (iso: string) => {
 };
 
 const LABELS: Record<Exclude<BadgeStatus, 'green'>, string> = {
-  amber: 'Verified, but warnings from viewers',
   red_fake_code: 'Fake code',
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",

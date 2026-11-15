@@ -37,7 +37,7 @@ describe('seed', () => {
     expect(await db.select().from(viewingReport).where(eq(viewingReport.verificationId, d5!.id))).toHaveLength(3);
   });
 
-  it('reseeding lifts a rehearsal ban, an upheld warning and a false-report bar', async () => {
+  it('reseeding lifts a rehearsal ban, a dismissal and a false-report bar', async () => {
     await seed(db);
     const d1 = (await findVerificationByCode(db, 'VC-7K3Q'))!;
     const d5 = (await findVerificationByCode(db, 'VC-BAN5'))!;
@@ -46,7 +46,7 @@ describe('seed', () => {
     const [c2] = await db.insert(reportCase).values({ reportId: (await db.insert(viewingReport).values({ verificationId: d1.id, reporterPhoneHash: 'rehearsal-2', locationResult: 'TRUE', category: 'no_show' }).returning())[0]!.id, landlordId: d1.landlordId, status: 'ready' }).returning();
     const scamCases = (await caseList(db)).filter((c) => c.landlordId === d5.landlordId);
     expect(await decideCase(db, scamCases[0]!.caseId, 'ban', 'team@x.ro')).toBe('ok');
-    expect(await decideCase(db, c1!.id, 'uphold', 'team@x.ro')).toBe('ok');
+    expect(await decideCase(db, c1!.id, 'dismiss', 'team@x.ro')).toBe('ok');
     expect(await decideCase(db, c2!.id, 'false_report', 'team@x.ro')).toBe('ok');
     expect((await db.select().from(reporterBar)).length).toBeGreaterThan(0);
 
