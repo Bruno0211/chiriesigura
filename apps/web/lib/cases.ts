@@ -1,7 +1,7 @@
-import { and, eq, gt, inArray, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, or, sql } from 'drizzle-orm';
 import { emptyCounts, REPORT_CATEGORIES, type ReportCategory, type ReportCounts } from '@cs/shared';
 import type { Db } from './db';
-import { landlord, reportCase, verification, viewingReport } from './db/schema';
+import { landlord, reportCase, reporterBar, verification, viewingReport } from './db/schema';
 
 export type CaseStatus = 'awaiting_landlord' | 'ready' | 'dismissed' | 'false_report' | 'upheld';
 export const OPEN: CaseStatus[] = ['awaiting_landlord', 'ready'];
@@ -50,4 +50,12 @@ export async function landlordStanding(db: Db, landlordId: string, now = new Dat
     .limit(1);
 
   return { counts, warned: upheld.length > 0, underReview: !!open };
+}
+
+/** True when a live bar matches the reporter's phone or account. */
+export async function isBarred(db: Db, h: { phoneHash: string; accountHash: string | null }, now = new Date()): Promise<boolean> {
+  const match = [and(eq(reporterBar.kind, 'phone'), eq(reporterBar.hash, h.phoneHash))];
+  if (h.accountHash) match.push(and(eq(reporterBar.kind, 'account'), eq(reporterBar.hash, h.accountHash)));
+  const [row] = await db.select({ id: reporterBar.id }).from(reporterBar).where(and(or(...match), gt(reporterBar.expiresAt, now))).limit(1);
+  return !!row;
 }

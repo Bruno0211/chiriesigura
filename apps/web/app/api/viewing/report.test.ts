@@ -1,12 +1,17 @@
+import { eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReportResponse } from '@cs/shared';
 import { makeTestDb } from '@/lib/db/test-db';
-import { verification, viewingReport } from '@/lib/db/schema';
+import { reportCase, reporterBar, verification, viewingReport } from '@/lib/db/schema';
+import { accountHash, phoneHash } from '@/lib/hash';
+import { signedInSub } from '@/lib/auth0';
 import { mockNetwork } from '@/lib/network/mock';
 import { issueNvCookie } from '@/lib/nv-session';
 import { addReports, seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
 import { POST } from './report/route';
+
+vi.mock('@/lib/auth0', () => ({ signedInSub: vi.fn(async () => 'google-oauth2|student') }));
 
 let db: Db;
 let verificationId: string;
@@ -15,7 +20,10 @@ beforeEach(async () => {
   db = await makeTestDb();
   ({ verificationId } = await seedVerified(db));
 });
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.mocked(signedInSub).mockResolvedValue('google-oauth2|student');
+});
 
 const report = (body: object, phone?: string) =>
   POST(new Request('http://localhost:3000/api/viewing/report', {
@@ -26,13 +34,77 @@ const report = (body: object, phone?: string) =>
 const ok = (category: string) => ({ consent: true, verificationId, category });
 
 describe('POST /api/viewing/report', () => {
-  it('stores a location-verified report and returns landlord-wide counts', async () => {
+  it('stores a location-verified report, opens a ready case and hides the problem count', async () => {
     await addReports(db, verificationId, 'no_show', 2);
     const res = await report(ok('no_show'), '+40711111111');
     expect(res.status).toBe(200);
     const body = (await res.json()) as ReportResponse;
     expect(body.ok).toBe(true);
-    expect(body.counts).toMatchObject({ no_show: 3, ok: 0 });
+    expect(body.counts).toMatchObject({ no_show: 0, ok: 0 });
+    const rows = await db.select().from(viewingReport).where(eq(viewingReport.reporterPhoneHash, phoneHash('+40711111111')));
+    expect(rows[0]!.reporterAccountHash).toBe(accountHash('google-oauth2|student'));
+    const cases = await db.select().from(reportCase).where(eq(reportCase.reportId, rows[0]!.id));
+    expect(cases).toHaveLength(1);
+    expect(cases[0]!.status).toBe('ready');
+  });
+
+  it('an ok report opens no case and counts at once', async () => {
+    const res = await report(ok('ok'), '+40711111111');
+    expect(res.status).toBe(200);
+    expect(((await res.json()) as ReportResponse).counts?.ok).toBe(1);
+    expect(await db.select().from(reportCase)).toHaveLength(0);
+  });
+
+  it('refuses a signed-out reporter', async () => {
+    vi.mocked(signedInSub).mockResolvedValue(null);
+    const res = await report(ok('no_show'), '+40711111111');
+    expect(res.status).toBe(401);
+    expect(((await res.json()) as ReportResponse).reason).toBe('signed_out');
+    expect(await db.select().from(viewingReport)).toHaveLength(0);
+  });
+
+  it('refuses a barred phone and a barred account', async () => {
+    const expiresAt = new Date(Date.now() + 86_400_000);
+    await db.insert(reporterBar).values({ kind: 'phone', hash: phoneHash('+40711111111'), expiresAt });
+    const a = await report(ok('no_show'), '+40711111111');
+    expect(a.status).toBe(403);
+    expect(((await a.json()) as ReportResponse).reason).toBe('barred');
+    await db.insert(reporterBar).values({ kind: 'account', hash: accountHash('google-oauth2|student'), expiresAt });
+    const b = await report(ok('no_show'), '+40711111113');
+    expect(b.status).toBe(403);
+    expect(((await b.json()) as ReportResponse).reason).toBe('barred');
+    expect(await db.select().from(viewingReport)).toHaveLength(0);
+  });
+
+  it('an expired bar no longer blocks', async () => {
+    await db.insert(reporterBar).values({ kind: 'phone', hash: phoneHash('+40711111111'), expiresAt: new Date(Date.now() - 86_400_000) });
+    expect((await report(ok('no_show'), '+40711111111')).status).toBe(200);
+  });
+
+  it('the landlord cannot report their own listing', async () => {
+    const res = await report(ok('no_show'), '+40700000001');
+    expect(res.status).toBe(403);
+    expect(((await res.json()) as ReportResponse).reason).toBe('own_listing');
+    expect(await db.select().from(viewingReport)).toHaveLength(0);
+  });
+
+  it('records the SIM-swap answer', async () => {
+    vi.spyOn(mockNetwork, 'simSwapped').mockResolvedValueOnce(true);
+    await report(ok('no_show'), '+40711111111');
+    expect((await db.select().from(viewingReport))[0]!.simSwapped).toBe(true);
+  });
+
+  it('a failed SIM-swap call still files the report', async () => {
+    vi.spyOn(mockNetwork, 'simSwapped').mockRejectedValueOnce(new Error('operator down'));
+    const res = await report(ok('no_show'), '+40711111111');
+    expect(res.status).toBe(200);
+    expect((await db.select().from(viewingReport))[0]!.simSwapped).toBeNull();
+  });
+
+  it('a double tap on a problem report makes exactly one case', async () => {
+    await Promise.all([report(ok('no_show'), '+40711111112'), report(ok('no_show'), '+40711111112')]);
+    expect(await db.select().from(viewingReport)).toHaveLength(1);
+    expect(await db.select().from(reportCase)).toHaveLength(1);
   });
 
   it('allows one report per phone per verification', async () => {
@@ -75,9 +147,9 @@ describe('POST /api/viewing/report', () => {
     const [v2] = await db.insert(verification).values({
       landlordId: (await db.select().from(verification))[0]!.landlordId, code: 'VC-AAAA', addressText: 'x', lat: 45.75, lng: 21.22, locationResult: 'TRUE', verifiedAt: new Date(),
     }).returning();
-    await report(ok('no_show'), '+40711111111');
-    const res = await report({ ...ok('no_show'), verificationId: v2!.id }, '+40711111111');
-    expect(((await res.json()) as ReportResponse).counts?.no_show).toBe(1);
+    await report(ok('ok'), '+40711111111');
+    const res = await report({ ...ok('ok'), verificationId: v2!.id }, '+40711111111');
+    expect(((await res.json()) as ReportResponse).counts?.ok).toBe(1);
   });
 
   it('answers 503 when the operator call fails', async () => {
@@ -87,8 +159,11 @@ describe('POST /api/viewing/report', () => {
     expect(await res.json()).toEqual({ ok: false });
   });
 
-  it('never stores the reporter phone in the clear', async () => {
-    await report(ok('ok'), '+40711111111');
-    expect(JSON.stringify(await db.select().from(viewingReport))).not.toContain('711111111');
+  it('never stores the reporter phone or account id in the clear', async () => {
+    await report(ok('no_show'), '+40711111111');
+    const dump = JSON.stringify([await db.select().from(viewingReport), await db.select().from(reportCase)]);
+    expect(dump).not.toContain('711111111');
+    expect(dump).not.toContain('google-oauth2');
+    expect(dump).not.toContain('student');
   });
 });

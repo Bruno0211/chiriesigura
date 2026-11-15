@@ -42,7 +42,7 @@ export interface ListingsResponse {
 export interface ReportRequest { consent: true; verificationId: string; category: ReportCategory }
 export interface ReportResponse {
   ok: boolean;
-  reason?: 'not_at_address' | 'already_reported' | 'not_number_verified';
+  reason?: 'not_at_address' | 'already_reported' | 'not_number_verified' | 'signed_out' | 'barred' | 'own_listing';
   counts?: ReportCounts;
 }
 
