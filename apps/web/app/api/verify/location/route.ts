@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   if (own instanceof Response) return own;
   const { verification: v, e164 } = own;
 
-  const radiusM = Number(process.env.LOCATION_RADIUS_M ?? 2000);
+  const radiusM = Number(process.env.LOCATION_RADIUS_M ?? 100);
   const result = await network().verifyLocation(e164, { lat: v.lat, lng: v.lng, radiusM }).catch(() => null);
   if (result === null) {
     return Response.json({ ok: false, step: { name: 'location', ok: false, message: CHECK_ERROR } } satisfies LocationResponse);

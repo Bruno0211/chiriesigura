@@ -6,5 +6,5 @@ const phone = process.env.SMOKE_PHONE;
 if (!phone) throw new Error('Set SMOKE_PHONE to a Nokia simulator number from the NaC dashboard');
 
 console.log('simSwapped(168h):', await nokiaNetwork.simSwapped(phone, 168));
-console.log('verifyLocation:', await nokiaNetwork.verifyLocation(phone, { lat: 45.7489, lng: 21.2087, radiusM: Number(process.env.LOCATION_RADIUS_M ?? 2000) }));
+console.log('verifyLocation:', await nokiaNetwork.verifyLocation(phone, { lat: 45.7489, lng: 21.2087, radiusM: Number(process.env.LOCATION_RADIUS_M ?? 100) }));
 console.log('kycMatch:', await nokiaNetwork.kycMatch(phone, { givenName: 'Test', familyName: 'User', birthdate: '2000-01-01', idDocument: 'X' }));
