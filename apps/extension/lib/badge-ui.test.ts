@@ -50,6 +50,16 @@ describe('renderBadge', () => {
     expect(text()).toContain(LABELS[status]);
   });
 
+  it.each(['green', 'amber'] as const)('%s shows the under-review note when a report is open', (status) => {
+    renderBadge(host, res(status, { underReview: true }), OPTS);
+    expect(text()).toContain("Viewers reported a problem · under review · never pay before you've seen the flat.");
+  });
+
+  it('no under-review note without an open report', () => {
+    renderBadge(host, res('green'), OPTS);
+    expect(text()).not.toContain('under review');
+  });
+
   it.each(['green', 'amber'] as const)('%s offers a QR code to the viewing report, carrying the listing code', (status) => {
     renderBadge(host, res(status), OPTS);
     expect(qr()?.getAttribute('aria-label')).toBe('QR code: report a viewing');

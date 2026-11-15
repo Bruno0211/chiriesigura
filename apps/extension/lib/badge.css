@@ -697,6 +697,12 @@ a.primary {
   line-height: 1.4;
 }
 
+.alert.caution {
+  border-color: #ecd49b;
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
 .alert svg {
   flex: none;
   width: 18px;

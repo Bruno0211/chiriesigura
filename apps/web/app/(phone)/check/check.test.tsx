@@ -83,4 +83,19 @@ describe('CheckForm', () => {
     await screen.findByText('x');
     expect(screen.queryByRole('link', { name: REPORT })).toBeNull();
   });
+
+  it('a verdict with underReview shows the note under it', async () => {
+    stubCheck(200, { status: 'green', label: 'Verified landlord', underReview: true });
+    render(<CheckForm signedIn />);
+    await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
+    expect(await screen.findByText("Viewers reported a problem · under review · never pay before you've seen the flat.")).toBeTruthy();
+  });
+
+  it('without underReview, the note is absent', async () => {
+    stubCheck(200, { status: 'green', label: 'Verified landlord' });
+    render(<CheckForm signedIn />);
+    await fill('http://localhost:3000/demo/listing/d1', 'VC-7K3Q');
+    await screen.findByText('Verified landlord');
+    expect(screen.queryByText(/under review/)).toBeNull();
+  });
 });

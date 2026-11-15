@@ -1,4 +1,4 @@
-import { REPORT_OK_TEXT, reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
+import { REPORT_OK_TEXT, UNDER_REVIEW_TEXT, reportLine, type BadgeStatus, type CheckResponse } from '@cs/shared';
 import css from './badge.css?inline';
 import { icon, type IconName } from './icons';
 import { qrSvg } from './qr';
@@ -355,6 +355,11 @@ function dontPay(doc: Document): HTMLElement {
   return el(doc, 'p', { class: 'alert' }, icon(doc, 'alert'), "Don't send a deposit or ID details to this advertiser.");
 }
 
+/** A caution, not the red "don't pay" alert: a landlord with an open case is still verified. */
+function underReview(doc: Document): HTMLElement {
+  return el(doc, 'p', { class: 'alert caution', role: 'note' }, icon(doc, 'alert'), UNDER_REVIEW_TEXT);
+}
+
 function panelFor(doc: Document, res: CheckResponse, opts: BadgeOptions): Child[] {
   const line = res.reports ? reportLine(res.reports) : null;
   switch (res.status) {
@@ -362,6 +367,7 @@ function panelFor(doc: Document, res: CheckResponse, opts: BadgeOptions): Child[
     case 'amber':
       return [
         landlordChecks(doc, res, opts),
+        res.underReview && underReview(doc),
         line && reports(doc, line, res.status === 'amber'),
         res.verificationId && viewingQr(doc, res.verificationId, opts),
       ];
