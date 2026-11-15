@@ -8,6 +8,7 @@ export interface CheckResponse {
   verifiedAt?: string;           // ISO
   city?: string;                 // the city the landlord verified in, for green/amber when known
   locationResult?: 'TRUE' | 'PARTIAL';
+  underReview?: true;            // present for green/amber while a viewer's report awaits a team decision
   reports?: ReportCounts;        // present for green/amber when any report exists
 }
 

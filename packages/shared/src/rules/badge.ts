@@ -6,7 +6,8 @@ export interface BadgeInput {
   /** null = the code is unknown */
   verification: { listings: ListingRef[]; phoneHash: string; verifiedAt: string; banned: boolean } | null;
   pagePhoneHash: string | null;
-  reports: ReportCounts;
+  /** An upheld case from the last 2 years stands against this landlord. */
+  warned: boolean;
   /** The listing's page puts the flat far from where the landlord verified (server-side check). */
   listingFar: boolean;
 }
@@ -28,7 +29,7 @@ export function decideBadge(i: BadgeInput): BadgeStatus {
   if (!i.verification.listings.some((l) => l.site === site && l.listingId === listingId)) return 'red_copied';
   if (i.pagePhoneHash && i.pagePhoneHash !== i.verification.phoneHash) return 'red_phone_mismatch';
   if (i.listingFar) return 'red_far_away';
-  return isWarned(i.reports) ? 'amber' : 'green';
+  return i.warned ? 'amber' : 'green';
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -55,9 +56,11 @@ export function badgeLabel(status: BadgeStatus, verifiedAt?: string, city?: stri
 }
 
 /** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */
+export const UNDER_REVIEW_TEXT = "Viewers reported a problem · under review · never pay before you've seen the flat.";
+
 export const REPORT_OK_TEXT = 'all good';
 
-const CATEGORY_TEXT: Record<ReportCategory, string> = {
+export const REPORT_CATEGORY_TEXT: Record<ReportCategory, string> = {
   ok: REPORT_OK_TEXT,
   no_show: "didn't show up",
   mismatch: "doesn't match the listing",
@@ -68,6 +71,6 @@ const CATEGORY_TEXT: Record<ReportCategory, string> = {
 export function reportLine(c: ReportCounts): string | null {
   const total = REPORT_CATEGORIES.reduce((n, k) => n + c[k], 0);
   if (total === 0) return null;
-  const parts = REPORT_CATEGORIES.filter((k) => c[k] > 0).map((k) => `${c[k]} ${CATEGORY_TEXT[k]}`);
+  const parts = REPORT_CATEGORIES.filter((k) => c[k] > 0).map((k) => `${c[k]} ${REPORT_CATEGORY_TEXT[k]}`);
   return `${total} verified viewing${total === 1 ? '' : 's'}: ${parts.join(' · ')}`;
 }

@@ -1,6 +1,6 @@
 import { and, eq, ne, notInArray } from 'drizzle-orm';
 import { getDb, type Db } from '@/lib/db';
-import { landlord, listing, verification, viewingReport } from '@/lib/db/schema';
+import { landlord, listing, reportCase, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_ADDRESSES, DEMO_APARTMENT } from '@/lib/geocode';
 import { identityHashes, phoneHash } from '@/lib/hash';
 
@@ -48,7 +48,7 @@ export async function seed(db: Db): Promise<void> {
     .insert(listing)
     .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd1', url: `${appUrl}/demo/listing/d1` })
     .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
-  await resetReports(db, v!.id, EARLIER_NO_SHOWS, 'no_show');
+  await resetReports(db, v!.id, l!.id, EARLIER_NO_SHOWS, 'no_show');
 
   await seedScammer(db, appUrl, now);
   await seedFarListing(db, appUrl, now);
@@ -72,15 +72,20 @@ async function seedScammer(db: Db, appUrl: string, now: Date): Promise<void> {
     .insert(listing)
     .values({ verificationId: v!.id, site: 'demo', siteListingId: 'd5', url: `${appUrl}/demo/listing/d5` })
     .onConflictDoUpdate({ target: [listing.site, listing.siteListingId], set: { verificationId: v!.id } });
-  await resetReports(db, v!.id, SCAM_REPORTERS, 'money_upfront');
+  await resetReports(db, v!.id, l!.id, SCAM_REPORTERS, 'money_upfront');
 }
 
 /** Leaves exactly the seeded reports on a demo verification, dropping any a rehearsal added. */
-async function resetReports(db: Db, verificationId: string, phones: string[], category: 'no_show' | 'money_upfront'): Promise<void> {
+async function resetReports(db: Db, verificationId: string, landlordId: string, phones: string[], category: 'no_show' | 'money_upfront'): Promise<void> {
   const hashes = phones.map(phoneHash);
   await db.delete(viewingReport).where(and(eq(viewingReport.verificationId, verificationId), notInArray(viewingReport.reporterPhoneHash, hashes)));
   for (const h of hashes) {
     await db.insert(viewingReport).values({ verificationId, reporterPhoneHash: h, locationResult: 'TRUE', category }).onConflictDoNothing();
+    const [r] = await db.select({ id: viewingReport.id }).from(viewingReport).where(and(eq(viewingReport.verificationId, verificationId), eq(viewingReport.reporterPhoneHash, h)));
+    await db
+      .insert(reportCase)
+      .values({ reportId: r!.id, landlordId, status: 'ready' })
+      .onConflictDoUpdate({ target: reportCase.reportId, set: { status: 'ready', decidedAt: null, decidedBy: null } });
   }
 }
 

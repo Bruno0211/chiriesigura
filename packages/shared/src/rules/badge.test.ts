@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { emptyCounts, type ListingRef, type ReportCounts } from '../types';
-import { AMBER_THRESHOLDS, badgeLabel, decideBadge, reportLine, type BadgeInput } from './badge';
+import { AMBER_THRESHOLDS, badgeLabel, decideBadge, reportLine, UNDER_REVIEW_TEXT, type BadgeInput } from './badge';
 
 const L1: ListingRef = { site: 'demo', listingId: 'd1' };
 const L2: ListingRef = { site: 'demo', listingId: 'd2' };
 const V = { listings: [L1], phoneHash: 'h1', verifiedAt: '2026-11-14T10:00:00Z', banned: false };
 const counts = (c: Partial<ReportCounts>): ReportCounts => ({ ...emptyCounts(), ...c });
 const input = (i: Partial<BadgeInput>): BadgeInput => ({
-  listing: L1, code: 'VC-7K3Q', verification: V, pagePhoneHash: null, reports: emptyCounts(), listingFar: false, ...i,
+  listing: L1, code: 'VC-7K3Q', verification: V, pagePhoneHash: null, warned: false, listingFar: false, ...i,
 });
 
 describe('decideBadge (spec §6.2, in order)', () => {
@@ -20,7 +20,7 @@ describe('decideBadge (spec §6.2, in order)', () => {
     expect(decideBadge(input({ listingFar: true, pagePhoneHash: 'h2' }))).toBe('red_phone_mismatch');
   });
   it('far away wins over amber', () => {
-    expect(decideBadge(input({ listingFar: true, reports: counts({ money_upfront: 2 }) }))).toBe('red_far_away');
+    expect(decideBadge(input({ listingFar: true, warned: true }))).toBe('red_far_away');
   });
   it('a banned landlord shows red_banned on their own listing', () => {
     expect(decideBadge(input({ verification: { ...V, banned: true } }))).toBe('red_banned');
@@ -44,11 +44,12 @@ describe('decideBadge (spec §6.2, in order)', () => {
     expect(decideBadge(input({}))).toBe('green');
     expect(decideBadge(input({ pagePhoneHash: 'h1' }))).toBe('green');
   });
-  it('5: report thresholds turn green into amber', () => {
-    expect(decideBadge(input({ reports: counts({ no_show: 3 }) }))).toBe('amber');
-    expect(decideBadge(input({ reports: counts({ no_show: 2 }) }))).toBe('green');
-    expect(decideBadge(input({ reports: counts({ money_upfront: 2 }) }))).toBe('amber');
-    expect(decideBadge(input({ reports: counts({ wrong_person: 3 }) }))).toBe('amber');
+  it('5: an upheld warning turns green into amber; open reports never do', () => {
+    expect(decideBadge(input({ warned: true }))).toBe('amber');
+    expect(decideBadge(input({ warned: false }))).toBe('green');
+  });
+  it('the soft note copy is verbatim', () => {
+    expect(UNDER_REVIEW_TEXT).toBe("Viewers reported a problem · under review · never pay before you've seen the flat.");
   });
   it('6: no code → not verified, parseable listing or not', () => {
     expect(decideBadge(input({ code: null }))).toBe('grey_unverified');

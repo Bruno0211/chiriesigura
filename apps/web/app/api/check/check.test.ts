@@ -3,7 +3,7 @@ import type { CheckResponse } from '@cs/shared';
 import { makeTestDb } from '@/lib/db/test-db';
 import { landlord, verification } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { addReports, seedVerified } from '@/lib/test-seed';
+import { addCases, seedVerified } from '@/lib/test-seed';
 import type { Db } from '@/lib/db';
 import { isSignedIn } from '@/lib/auth0';
 import { GET } from './route';
@@ -105,14 +105,21 @@ describe('GET /api/check', () => {
   it('is not verified without a code', async () => {
     expect((await check(d1)).body).toMatchObject({ status: 'grey_unverified', label: 'Not verified' });
   });
-  it('turns amber from reports on another verification of the same landlord', async () => {
+  it('turns amber from an upheld case on another verification of the same landlord', async () => {
     const [v2] = await db.insert(verification).values({
       landlordId: seeded.landlordId, code: 'VC-AAAA', addressText: 'Other', lat: 45.7, lng: 21.2, locationResult: 'TRUE', verifiedAt: new Date(),
     }).returning();
-    await addReports(db, v2!.id, 'no_show', 3);
+    await addCases(db, v2!.id, 'no_show', 1, 'upheld', new Date());
     const { body } = await check({ ...d1, code: 'VC-7K3Q' });
     expect(body.status).toBe('amber');
-    expect(body.reports?.no_show).toBe(3);
+    expect(body.reports?.no_show).toBe(1);
+  });
+  it('an open case keeps green with underReview and hides the problem count', async () => {
+    await addCases(db, seeded.verificationId, 'no_show', 3);
+    const { body } = await check({ ...d1, code: 'VC-7K3Q' });
+    expect(body.status).toBe('green');
+    expect(body.underReview).toBe(true);
+    expect(body.reports).toBeUndefined();
   });
   it('ignores codes that were never issued', async () => {
     await db.insert(verification).values({ landlordId: seeded.landlordId, code: 'VC-BBBB', addressText: 'x', lat: 0, lng: 0 });
