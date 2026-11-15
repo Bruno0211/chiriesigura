@@ -66,7 +66,7 @@ export default function PrivacyPage() {
               <li><strong>Your phone number itself.</strong> Only the one-way hash above.</li>
               <li>
                 <strong>Students&apos; email and name.</strong> Auth0, our sign-in provider, keeps your sign-in. ChirieSigură
-                only learns that you are signed in.
+                learns that you are signed in and, when you report, keeps a one-way hash of your sign-in ID.
               </li>
             </ul>
           </div>
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
             </p>
             <p>
               Problem reports never change a listing on their own. Our team reviews each one; only then can a listing show a
-              warning or a ban. When verified viewers report a landlord repeatedly, our team may ban that person for
+              warning or a ban. When our team confirms a report, it may ban that person for
               life: their listings show as banned, and verifying again with any phone number is refused. If you were refused
               and think it is a mistake, email us.
             </p>

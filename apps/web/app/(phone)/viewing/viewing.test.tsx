@@ -7,6 +7,7 @@ import { CONTACT } from '@/lib/contact';
 import { ViewingFlow } from './[verificationId]/ViewingFlow';
 
 const VID = '0f3c2b1a-1111-4222-8333-444455556666';
+const signIn = (to: string) => `/auth/login?returnTo=${encodeURIComponent(to)}`;
 
 function mockReport(status: number, json: unknown) {
   const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(
@@ -42,6 +43,18 @@ describe('ViewingFlow', () => {
     render(<ViewingFlow verificationId={VID} signedIn />);
     expect(screen.getByRole('heading', { level: 1, name: /report a viewing/i })).toBeTruthy();
     expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('consent names the SIM check as well', () => {
+    render(<ViewingFlow verificationId={VID} signedIn />);
+    expect(screen.getByText('SIM not changed recently')).toBeTruthy();
+    expect(screen.getByText(/never blocks your report/i)).toBeTruthy();
+  });
+
+  it('the report form does not list the SIM check as a step', () => {
+    readyToReport();
+    render(<ViewingFlow verificationId={VID} signedIn />);
+    expect(screen.queryByText('SIM not changed recently')).toBeNull();
   });
 
   it('offers the five report categories with their exact labels', () => {
@@ -101,8 +114,14 @@ describe('ViewingFlow', () => {
   it('signed out: offers sign-in and no consent screen', () => {
     render(<ViewingFlow verificationId={VID} signedIn={false} />);
     const link = screen.getByRole('link', { name: 'Sign in' });
-    expect(link.getAttribute('href')).toBe(`/auth/login?returnTo=/viewing/${VID}`);
+    expect(link.getAttribute('href')).toBe(signIn(`/viewing/${VID}`));
     expect(screen.queryByRole('button', { name: /i agree/i })).toBeNull();
+  });
+
+  it('sign-in keeps the listing code from the QR link', () => {
+    window.history.replaceState(null, '', `/viewing/${VID}?code=VC-7K3Q`);
+    render(<ViewingFlow verificationId={VID} signedIn={false} />);
+    expect(screen.getByRole('link', { name: 'Sign in' }).getAttribute('href')).toBe(signIn(`/viewing/${VID}?code=VC-7K3Q`));
   });
 
   it('a 401 signed_out asks the student to sign in', async () => {
@@ -112,7 +131,7 @@ describe('ViewingFlow', () => {
     await sendNoShow();
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toContain('Sign in to report');
-    expect(within(alert).getByRole('link').getAttribute('href')).toBe(`/auth/login?returnTo=/viewing/${VID}`);
+    expect(within(alert).getByRole('link').getAttribute('href')).toBe(signIn(`/viewing/${VID}`));
   });
 
   it('a 401 not_number_verified still sends the student back to the number step', async () => {

@@ -48,6 +48,7 @@ const LABEL = Object.fromEntries([GOOD, ...PROBLEMS].map((c) => [c.value, c.labe
 
 const STUDENT_COPY = {
   number: { label: 'Phone number', how: 'Your operator confirms this phone owns the number.' },
+  simswap: { label: 'SIM not changed recently', how: "Your operator says whether this number's SIM changed in the last 30 days. It never blocks your report." },
   location: { label: 'Phone at the viewing address', how: 'Checked when you send. Cell-level: near the address, never "inside".' },
 };
 const STUDENT_DATA: DataUse = {
@@ -64,7 +65,9 @@ const EXPIRED = 'Your number check expired after 15 minutes. Confirm it again, i
 
 type Problem = null | 'not_at_address' | 'signed_out' | 'barred' | 'own_listing' | 'not_found' | 'error';
 
-const signInHref = (verificationId: string) => `/auth/login?returnTo=/viewing/${verificationId}`;
+/** Signing in returns to this page, with the listing code from the QR link when there is one. */
+const signInHref = (verificationId: string, code?: string | null) =>
+  `/auth/login?returnTo=${encodeURIComponent(`/viewing/${verificationId}${code ? `?code=${code}` : ''}`)}`;
 
 interface Saved {
   stage: Stage;
@@ -129,7 +132,7 @@ export function ViewingFlow({
           <h1 id="step-heading" className={s.h1}>Sign in to report a viewing</h1>
           <p className={s.lead}>Reports are for signed-in students. Sign in, and you come straight back here.</p>
           <div className={s.actionsInline}>
-            <a className={s.primary} href={signInHref(verificationId)}>Sign in</a>
+            <a className={s.primary} href={signInHref(verificationId, listingCode)}>Sign in</a>
           </div>
         </main>
       </>
@@ -141,7 +144,7 @@ export function ViewingFlow({
     case 'consent':
       screen = (
         <ConsentScreen
-          checks={['number', 'location']}
+          checks={['number', 'simswap', 'location']}
           onAccept={() => update({ stage: 'number' })}
           heading="Report a viewing"
           lead="For a verified landlord's listing. You need to be at the apartment, on mobile data."
@@ -177,6 +180,7 @@ export function ViewingFlow({
           st={st}
           masked={masked}
           codeLine={codeLine}
+          signInUrl={signInHref(verificationId, listingCode)}
           onSent={(category, counts) =>
             update({ stage: 'done', outcome: 'sent', category, counts, times: { ...st.times, location: clockTime() } })
           }
@@ -207,6 +211,7 @@ function ReportForm({
   st,
   masked,
   codeLine,
+  signInUrl,
   onSent,
   onAlready,
   onExpired,
@@ -215,6 +220,7 @@ function ReportForm({
   st: Saved;
   masked?: string;
   codeLine: ReactNode;
+  signInUrl: string;
   onSent: (category: ReportCategory, counts: ReportCounts) => void;
   onAlready: (category: ReportCategory) => void;
   onExpired: () => void;
@@ -315,7 +321,7 @@ function ReportForm({
           <div className={s.alert} role="alert">
             <p className={s.alertTitle}>Sign in to report</p>
             <p className={s.alertBody}>
-              Your sign-in has ended. <a className={s.textLink} href={signInHref(verificationId)}>Sign in</a> and you come
+              Your sign-in has ended. <a className={s.textLink} href={signInUrl}>Sign in</a> and you come
               straight back here.
             </p>
           </div>
