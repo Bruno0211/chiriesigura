@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import { REPORT_CATEGORY_TEXT, type ReviewAction, type ReviewRequest } from '@cs/shared';
-import type { CaseItem, WarningSign } from '@/lib/cases';
+import type { CaseItem, CaseStatus, WarningSign } from '@/lib/cases';
 import s from '../phone.module.css';
 
 /** The two actions that can't be undone in practice ask once before they post. */
 type Confirmable = 'ban' | 'false_report';
-type CardState = { kind: 'open'; confirming: Confirmable | null; error: boolean; busy: boolean } | { kind: 'done'; action: ReviewAction };
+type CardError = 'failed' | 'not_ready';
+type CardState =
+  | { kind: 'open'; confirming: Confirmable | null; error: CardError | null; busy: boolean }
+  | { kind: 'done'; action: ReviewAction }
+  | { kind: 'lost'; status: CaseStatus | null };
 
 const SIGN_TEXT: Record<WarningSign, string> = {
   burst: 'Burst: other reports on this landlord within 2 hours',
@@ -34,6 +38,13 @@ const DONE: Record<ReviewAction, string> = {
   false_report: 'Marked false',
 };
 
+/** How a case someone else already decided reads to the reviewer who lost the race. */
+const OUTCOME: Partial<Record<CaseStatus, string>> = {
+  upheld: 'Warning confirmed',
+  dismissed: 'Dismissed',
+  false_report: 'Marked false',
+};
+
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const day = (iso: string) => {
   const d = new Date(iso);
@@ -52,19 +63,25 @@ export function ReviewList({ items }: { items: CaseItem[] }) {
 }
 
 function CaseCard({ item }: { item: CaseItem }) {
-  const [state, setState] = useState<CardState>({ kind: 'open', confirming: null, error: false, busy: false });
+  const [state, setState] = useState<CardState>({ kind: 'open', confirming: null, error: null, busy: false });
   const titleId = `case-${item.caseId}-title`;
   const confirming = state.kind === 'open' ? state.confirming : null;
 
   async function act(action: ReviewAction) {
-    setState({ kind: 'open', confirming: null, error: false, busy: true });
+    setState({ kind: 'open', confirming: null, error: null, busy: true });
     const body: ReviewRequest = { caseId: item.caseId, action };
     const res = await fetch('/api/review', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     }).catch(() => null);
-    setState(res?.ok ? { kind: 'done', action } : { kind: 'open', confirming: null, error: true, busy: false });
+    if (res?.ok) return setState({ kind: 'done', action });
+    if (res?.status === 409) {
+      const reply = (await res.json().catch(() => null)) as { error?: string; status?: CaseStatus } | null;
+      if (reply?.error === 'already_decided') return setState({ kind: 'lost', status: reply.status ?? null });
+      if (reply?.error === 'not_ready') return setState({ kind: 'open', confirming: null, error: 'not_ready', busy: false });
+    }
+    setState({ kind: 'open', confirming: null, error: 'failed', busy: false });
   }
 
   return (
@@ -93,11 +110,21 @@ function CaseCard({ item }: { item: CaseItem }) {
 
         {state.kind === 'done' ? (
           <p className={s.alertTitle} role="status">{DONE[state.action]}</p>
+        ) : state.kind === 'lost' ? (
+          <div className={s.alert} data-tone="warn" role="alert">
+            <p className={s.alertTitle}>
+              {state.status && OUTCOME[state.status]
+                ? `Someone already decided this report: ${OUTCOME[state.status]}`
+                : 'Someone already decided this report.'}
+            </p>
+          </div>
         ) : (
           <>
             {state.error && (
               <div className={s.alert} data-tone="fail" role="alert">
-                <p className={s.alertTitle}>That didn&apos;t go through. Try again.</p>
+                <p className={s.alertTitle}>
+                  {state.error === 'not_ready' ? "This report is waiting for the landlord's answer." : "That didn't go through. Try again."}
+                </p>
               </div>
             )}
             {confirming ? (
@@ -113,9 +140,9 @@ function CaseCard({ item }: { item: CaseItem }) {
             ) : (
               <div className={s.actionsInline}>
                 <button type="button" className={s.primary} disabled={state.busy} onClick={() => void act('uphold')}>Confirm warning</button>
-                <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'ban', error: false })}>Ban for life</button>
+                <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'ban', error: null })}>Ban for life</button>
                 <button type="button" className={s.secondary} disabled={state.busy} onClick={() => void act('dismiss')}>Dismiss</button>
-                <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'false_report', error: false })}>False report</button>
+                <button type="button" className={s.secondary} disabled={state.busy} onClick={() => setState({ ...state, confirming: 'false_report', error: null })}>False report</button>
               </div>
             )}
           </>

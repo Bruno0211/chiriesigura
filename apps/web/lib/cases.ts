@@ -197,6 +197,12 @@ export async function decideCase(db: Db, caseId: string, action: ReviewAction, r
   });
 }
 
+/** A case's current status, for telling a reviewer who lost a race what the other decision was. */
+export async function caseStatus(db: Db, caseId: string): Promise<CaseStatus | null> {
+  const [row] = await db.select({ status: reportCase.status }).from(reportCase).where(eq(reportCase.id, caseId));
+  return (row?.status as CaseStatus | undefined) ?? null;
+}
+
 /** Bars the report's phone and, when known, its account from reporting, for 2 years from now. */
 async function barReporter(db: Db, caseId: string, reportId: string, now: Date): Promise<void> {
   const [r] = await db

@@ -118,7 +118,7 @@ describe('POST /api/review', () => {
     as('team@x.ro');
     const [first, second] = await Promise.all([review({ caseId, action: 'uphold' }), review({ caseId, action: 'dismiss' })]);
     expect([first!.status, second!.status]).toEqual([200, 409]);
-    expect(await second!.json()).toEqual({ error: 'already_decided' });
+    expect(await second!.json()).toEqual({ error: 'already_decided', status: 'upheld' });
     expect(await theCase()).toMatchObject({ status: 'upheld' });
   });
 

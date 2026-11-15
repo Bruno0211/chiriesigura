@@ -17,8 +17,8 @@ const item = (id: string, extra: Partial<CaseItem> = {}): CaseItem => ({
   ...extra,
 });
 
-function stubPost(status = 200) {
-  const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => ({ status, ok: status < 400, json: async () => ({}) }) as Response);
+function stubPost(status = 200, json: unknown = {}) {
+  const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => ({ status, ok: status < 400, json: async () => json }) as Response);
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }
@@ -87,14 +87,45 @@ describe('ReviewList', () => {
     expect(await within(card('b')).findByText('Dismissed')).toBeTruthy();
   });
 
-  it('a failed request shows an error and keeps the buttons', async () => {
-    stubPost(409);
+  const BUTTONS = ['Confirm warning', 'Ban for life', 'Dismiss', 'False report'];
+
+  it.each([
+    ['upheld', 'Warning confirmed'],
+    ['dismissed', 'Dismissed'],
+    ['false_report', 'Marked false'],
+  ])('409 already_decided (%s) names the outcome and removes the buttons', async (status, words) => {
+    stubPost(409, { error: 'already_decided', status });
+    render(<ReviewList items={[item('a')]} />);
+    const user = userEvent.setup();
+    await user.click(within(card('a')).getByRole('button', { name: 'Ban for life' }));
+    await user.click(within(card('a')).getByRole('button', { name: 'Yes, ban for life' }));
+    expect(await within(card('a')).findByText(`Someone already decided this report: ${words}`)).toBeTruthy();
+    expect(within(card('a')).queryByText(/Try again/)).toBeNull();
+    for (const name of BUTTONS) expect(within(card('a')).queryByRole('button', { name })).toBeNull();
+  });
+
+  it('409 not_ready says the report waits for the landlord and keeps the buttons', async () => {
+    stubPost(409, { error: 'not_ready' });
+    render(<ReviewList items={[item('a')]} />);
+    await userEvent.setup().click(within(card('a')).getByRole('button', { name: 'Confirm warning' }));
+    expect(await within(card('a')).findByText("This report is waiting for the landlord's answer.")).toBeTruthy();
+    for (const name of BUTTONS) expect(within(card('a')).getByRole('button', { name })).toBeTruthy();
+  });
+
+  it('a 500 shows "Try again" and keeps the buttons', async () => {
+    stubPost(500);
     render(<ReviewList items={[item('a')]} />);
     await userEvent.setup().click(within(card('a')).getByRole('button', { name: 'Dismiss' }));
-    expect(await within(card('a')).findByRole('alert')).toBeTruthy();
-    for (const name of ['Confirm warning', 'Ban for life', 'Dismiss', 'False report']) {
-      expect(within(card('a')).getByRole('button', { name })).toBeTruthy();
-    }
+    expect(await within(card('a')).findByText("That didn't go through. Try again.")).toBeTruthy();
+    for (const name of BUTTONS) expect(within(card('a')).getByRole('button', { name })).toBeTruthy();
+  });
+
+  it('a network error shows "Try again" and keeps the buttons', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('offline'); }));
+    render(<ReviewList items={[item('a')]} />);
+    await userEvent.setup().click(within(card('a')).getByRole('button', { name: 'Dismiss' }));
+    expect(await within(card('a')).findByText("That didn't go through. Try again.")).toBeTruthy();
+    for (const name of BUTTONS) expect(within(card('a')).getByRole('button', { name })).toBeTruthy();
   });
 
   it('says when nothing is waiting', () => {

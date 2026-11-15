@@ -1,5 +1,5 @@
 import type { ReviewAction, ReviewRequest } from '@cs/shared';
-import { decideCase } from '@/lib/cases';
+import { caseStatus, decideCase } from '@/lib/cases';
 import { getDb } from '@/lib/db';
 import { reviewerEmail } from '@/lib/review';
 
@@ -18,5 +18,8 @@ export async function POST(req: Request) {
   const result = await decideCase(getDb(), caseId, action as ReviewAction, reviewer);
   if (result === 'ok') return Response.json({ ok: true });
   if (result === 'not_found') return Response.json({ error: 'not_found' }, { status: 404 });
+  if (result === 'already_decided') {
+    return Response.json({ error: result, status: await caseStatus(getDb(), caseId) }, { status: 409 });
+  }
   return Response.json({ error: result }, { status: 409 });
 }
