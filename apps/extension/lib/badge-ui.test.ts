@@ -8,7 +8,6 @@ const OPTS = { appUrl: APP, code: 'VC-7K3Q', phoneShown: true };
 /** Verbatim badge copy (spec §6.2), written out by hand rather than taken from badgeLabel(). */
 const LABELS: Record<BadgeStatus, string> = {
   green: 'Verified landlord · near the address · 14 Nov 2026',
-  amber: 'Verified, but warnings from viewers',
   red_fake_code: 'Fake code',
   red_copied: 'Copied from a verified listing',
   red_phone_mismatch: "Phone number doesn't match the verified landlord",
@@ -23,7 +22,7 @@ const VERIFIED = { verificationId: 'v1', verifiedAt: '2026-11-14T10:00:00Z', loc
 const res = (status: BadgeStatus, extra: Partial<CheckResponse> = {}): CheckResponse => ({
   status,
   label: LABELS[status],
-  ...(status === 'green' || status === 'amber' ? VERIFIED : {}),
+  ...(status === 'green' ? VERIFIED : {}),
   ...extra,
 });
 
@@ -50,8 +49,18 @@ describe('renderBadge', () => {
     expect(text()).toContain(LABELS[status]);
   });
 
-  it.each(['green', 'amber'] as const)('%s offers a QR code to the viewing report, carrying the listing code', (status) => {
-    renderBadge(host, res(status), OPTS);
+  it('green shows the under-review note when a report is open', () => {
+    renderBadge(host, res('green', { underReview: true }), OPTS);
+    expect(text()).toContain("Viewers reported a problem · under review · never pay before you've seen the flat.");
+  });
+
+  it('no under-review note without an open report', () => {
+    renderBadge(host, res('green'), OPTS);
+    expect(text()).not.toContain('under review');
+  });
+
+  it('green offers a QR code to the viewing report, carrying the listing code', () => {
+    renderBadge(host, res('green'), OPTS);
     expect(qr()?.getAttribute('aria-label')).toBe('QR code: report a viewing');
     const link = root().querySelector<HTMLAnchorElement>('a[href*="/viewing/"]');
     expect(link?.href).toBe(`${APP}/viewing/v1?code=VC-7K3Q`);
@@ -93,13 +102,13 @@ describe('renderBadge', () => {
     expect(root().textContent).toContain('Registered to this listing');
   });
 
-  it.each(['green', 'amber'] as const)('%s names the city the landlord verified in', (status) => {
-    renderBadge(host, res(status, { city: 'Timișoara' }), OPTS);
+  it('green names the city the landlord verified in', () => {
+    renderBadge(host, res('green', { city: 'Timișoara' }), OPTS);
     expect(root().textContent).toContain('near Timișoara');
   });
 
   it('says nothing about a city it does not know', () => {
-    renderBadge(host, res('amber'), OPTS);
+    renderBadge(host, res('green'), OPTS);
     expect([...root().querySelectorAll('.footLine')].map((e) => e.textContent).join(' ')).not.toContain('near ');
   });
 
@@ -130,10 +139,10 @@ describe('renderBadge', () => {
   it('keeps one badge and its open state when the page is re-checked', () => {
     renderBadge(host, res('green'), OPTS);
     root().querySelector<HTMLButtonElement>('button[aria-expanded]')!.click();
-    renderBadge(host, res('amber'), OPTS);
+    renderBadge(host, res('red_copied'), OPTS);
     expect(root().querySelectorAll('button[aria-expanded]')).toHaveLength(1);
     expect(root().querySelector('button[aria-expanded]')!.getAttribute('aria-expanded')).toBe('true');
-    expect(text()).toContain(LABELS.amber);
+    expect(text()).toContain(LABELS.red_copied);
     expect(text()).not.toContain(LABELS.green);
   });
 

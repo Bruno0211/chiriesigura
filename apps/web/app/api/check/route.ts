@@ -6,7 +6,8 @@ import { isSignedIn } from '@/lib/auth0';
 import { getDb } from '@/lib/db';
 import { phoneHash } from '@/lib/hash';
 import { listingFarFrom, type LatLng } from '@/lib/listing-area';
-import { findVerificationByCode, landlordReportCounts } from '@/lib/queries';
+import { landlordStanding } from '@/lib/cases';
+import { findVerificationByCode } from '@/lib/queries';
 
 const SITES: Site[] = ['olx', 'storia', 'imobiliare', 'demo'];
 const CORS = { 'Access-Control-Allow-Origin': '*' };
@@ -41,15 +42,16 @@ export async function GET(req: Request) {
 
   const db = getDb();
   const v = code ? await findVerificationByCode(db, code) : null;
-  const reports = v ? await landlordReportCounts(db, v.landlordId) : emptyCounts();
+  const standing = v ? await landlordStanding(db, v.landlordId) : { counts: emptyCounts(), underReview: false };
   const listingFar = v ? await listingFarFrom({ text: placeText(q.get('place')), coords: placeCoords(q.get('placeLat'), q.get('placeLng')) }, v) : false;
-  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, reports, listingFar });
+  const status = decideBadge({ listing, code, verification: v, pagePhoneHash: phone ? phoneHash(phone) : null, listingFar });
 
   const body: CheckResponse = { status, label: badgeLabel(status, v?.verifiedAt, v?.city) };
-  if (v && (status === 'green' || status === 'amber')) {
+  if (v && status === 'green') {
     Object.assign(body, { verificationId: v.id, verifiedAt: v.verifiedAt, locationResult: v.locationResult });
     if (v.city) body.city = v.city;
-    if (REPORT_CATEGORIES.some((k) => reports[k] > 0)) body.reports = reports;
+    if (standing.underReview) body.underReview = true;
+    if (REPORT_CATEGORIES.some((k) => standing.counts[k] > 0)) body.reports = standing.counts;
   }
   return Response.json(body, { headers: CORS });
 }

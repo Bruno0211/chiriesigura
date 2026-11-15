@@ -4,11 +4,12 @@ import type { BadgeStatus, ListingRef, ReportCategory, ReportCounts } from './ty
 export interface CheckResponse {
   status: BadgeStatus;
   label: string;                 // verbatim badge copy
-  verificationId?: string;       // present for green/amber (for the viewing QR)
+  verificationId?: string;       // present for green (for the viewing QR)
   verifiedAt?: string;           // ISO
-  city?: string;                 // the city the landlord verified in, for green/amber when known
+  city?: string;                 // the city the landlord verified in, for green when known
   locationResult?: 'TRUE' | 'PARTIAL';
-  reports?: ReportCounts;        // present for green/amber when any report exists
+  underReview?: true;            // present for green while a viewer's report awaits a team decision
+  reports?: ReportCounts;        // present for green only when the all good count is above 0
 }
 
 // POST /api/verify/identity
@@ -41,9 +42,13 @@ export interface ListingsResponse {
 export interface ReportRequest { consent: true; verificationId: string; category: ReportCategory }
 export interface ReportResponse {
   ok: boolean;
-  reason?: 'not_at_address' | 'already_reported' | 'not_number_verified';
+  reason?: 'not_at_address' | 'already_reported' | 'not_number_verified' | 'signed_out' | 'barred' | 'own_listing';
   counts?: ReportCounts;
 }
+
+// POST /api/review (team only) → { ok: true } | 404 | 409 { error: 'not_ready' | 'already_decided' }
+export type ReviewAction = 'dismiss' | 'false_report' | 'ban';
+export interface ReviewRequest { caseId: string; action: ReviewAction }
 
 // Number Verification:
 // GET /api/nv/start?phone=<raw>&next=<path>  → 302

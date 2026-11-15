@@ -7,7 +7,6 @@ import { isSignedInPage } from '@/lib/urls';
 /** The toolbar icon repeats the page's verdict, in the badge's state colours. */
 const ACTION: Partial<Record<BadgeStatus, { text: string; color: string }>> = {
   green: { text: '✓', color: '#0f7a4a' },
-  amber: { text: '!', color: '#8a5300' },
   red_fake_code: { text: '✕', color: '#b3261e' },
   red_copied: { text: '✕', color: '#b3261e' },
   red_phone_mismatch: { text: '✕', color: '#b3261e' },

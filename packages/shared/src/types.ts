@@ -9,6 +9,6 @@ export const emptyCounts = (): ReportCounts => ({ ok: 0, no_show: 0, mismatch: 0
 export type LocationResult = 'TRUE' | 'PARTIAL' | 'FALSE' | 'UNKNOWN';
 
 export type BadgeStatus =
-  | 'green' | 'amber'
+  | 'green'
   | 'red_fake_code' | 'red_copied' | 'red_phone_mismatch' | 'red_banned' | 'red_far_away'
   | 'grey_unverified' | 'grey_cannot_confirm';

@@ -208,12 +208,6 @@ button.head:hover .zone {
   --tone-ink: var(--ok-ink);
 }
 
-.status[data-tone='warn'] {
-  --tone: var(--warn);
-  --tone-bg: var(--warn-bg);
-  --tone-ink: var(--warn);
-}
-
 .status[data-tone='fail'] {
   --tone: var(--fail);
   --tone-bg: var(--fail-bg);
@@ -499,10 +493,6 @@ button.head:hover .zone {
   line-height: 1.4;
 }
 
-.reportWarn {
-  color: var(--warn);
-}
-
 /* A report phrase never splits ("1 didn't / show up"); the line wraps only at the gaps between phrases. */
 .phrase {
   white-space: nowrap;
@@ -695,6 +685,12 @@ a.primary {
   font-size: 14px;
   font-weight: 700;
   line-height: 1.4;
+}
+
+.alert.caution {
+  border-color: #ecd49b;
+  background: var(--warn-bg);
+  color: var(--warn);
 }
 
 .alert svg {

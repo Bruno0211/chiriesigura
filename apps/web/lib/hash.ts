@@ -7,6 +7,13 @@ export function phoneHash(e164: string): string {
   return createHmac('sha256', pepper).update(e164).digest('hex');
 }
 
+/** Peppered hash of an Auth0 sub, under its own prefix so it never matches a phone hash. The raw sub is never stored. */
+export function accountHash(sub: string): string {
+  const pepper = process.env.PHONE_PEPPER;
+  if (!pepper) throw new Error('PHONE_PEPPER is not set');
+  return createHmac('sha256', pepper).update('account:' + sub).digest('hex');
+}
+
 export interface IdentityHashes { idDocHash: string; nameBirthHash: string }
 
 const nameKey = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim();

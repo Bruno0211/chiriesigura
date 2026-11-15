@@ -277,7 +277,7 @@ A single saturated cobalt on white and cool grey, with three quarantined state h
 - **Passed Green** (ok): filled passed discs and their drawn check, "Passed" words on white, the cellular dot.
 - **Passed Ink** (ok-ink): success text on tints and on grey blocks (passed pills, ok alert titles, the badge's ok status line, the "All good" drawn check).
 - **Failed Red** (fail): failed disc rings and crosses, "Failed" words, field errors, invalid input strokes, fail alerts.
-- **Caution Amber** (warn on warn-bg, with warn-dot): the Wi-Fi connection chip, the session clock's last minute, warn alerts and the badge's amber status.
+- **Caution Amber** (warn on warn-bg, with warn-dot): the Wi-Fi connection chip, the session clock's last minute, warn alerts and the under-review note.
 - **Tints and edges** (ok-bg / fail-bg / warn-bg with ok-edge / fail-edge / warn-edge): alert grounds with their 1 px borders, state pills, badge status lines.
 
 ### Named Rules
@@ -379,7 +379,7 @@ A Line Cobalt plate (16px radius) headed "Your code", with the code in Deep Coba
 - **Alerts:** 14px-radius tinted boxes with a 1px matching edge, a 17px/700 title in the state colour and a 15px ink body.
 
 ### Extension Badge
-The same world at badge scale: a white card with a 1px Rule Grey border and the floating shadow, a header with the 30px VC mark and a chevron, then the status line, the one place state colour lives: a 30px state disc (green, amber or red with a drawn mark; the dotted ring turning in cobalt while checking; a grey ring-with-dash when there is nothing to vouch for) on the matching tint, a 16px/800 lead and a 13px Graphite line. The panel holds grey modules, the listing's checks as a mini line diagram (16px discs, 4px line, cobalt where passed), report lines, the QR to report a viewing, and cobalt buttons.
+The same world at badge scale: a white card with a 1px Rule Grey border and the floating shadow, a header with the 30px VC mark and a chevron, then the status line, the one place state colour lives: a 30px state disc (green or red with a drawn mark; the dotted ring turning in cobalt while checking; a grey ring-with-dash when there is nothing to vouch for) on the matching tint, a 16px/800 lead and a 13px Graphite line. The panel holds grey modules, the listing's checks as a mini line diagram (16px discs, 4px line, cobalt where passed), report lines, the QR to report a viewing, and cobalt buttons.
 
 ## Do's and Don'ts
 
