@@ -48,9 +48,10 @@ export function badgeLabel(status: BadgeStatus, verifiedAt?: string, city?: stri
   return verifiedAt ? `${near} · ${formatDate(verifiedAt)}` : near;
 }
 
-/** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */
+/** The soft note shown while a viewer's report awaits a team decision. */
 export const UNDER_REVIEW_TEXT = "Viewers reported a problem · under review · never pay before you've seen the flat.";
 
+/** The "all good" category in a report line, in words; each surface draws its own check icon beside it. */
 export const REPORT_OK_TEXT = 'all good';
 
 export const REPORT_CATEGORY_TEXT: Record<ReportCategory, string> = {
