@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import type { Db } from './db';
-import { landlord, verification } from './db/schema';
+import { landlord, reportCase, reporterBar, verification, viewingReport } from './db/schema';
 import { makeTestDb } from './db/test-db';
-import { landlordStanding, personLandlordIds } from './cases';
+import { caseList, landlordStanding, personLandlordIds, type CaseStatus } from './cases';
 import { addCases, addReports, seedVerified } from './test-seed';
 import { phoneHash } from './hash';
 
@@ -68,5 +68,101 @@ describe('landlordStanding', () => {
     await addCases(db, other.verificationId, 'no_show', 1, 'upheld', new Date());
     expect((await landlordStanding(db, seeded.landlordId)).warned).toBe(false);
     expect(await personLandlordIds(db, seeded.landlordId)).toEqual([seeded.landlordId]);
+  });
+});
+
+describe('caseList', () => {
+  const ago = (days: number) => new Date(Date.now() - days * DAY);
+  let landlords = 0;
+
+  /** A landlord of their own (no ID hash), with one verification. */
+  async function freshVerification() {
+    landlords++;
+    const [l] = await db.insert(landlord).values({ phoneHash: `fresh-${landlords}` }).returning();
+    const [v] = await db.insert(verification).values({
+      landlordId: l!.id, code: `VC-F${landlords}`, addressText: 'Other', lat: 45.7, lng: 21.2, locationResult: 'TRUE', verifiedAt: new Date(),
+    }).returning();
+    return v!.id;
+  }
+
+  /** One no-show report and its case, filed at `at`. */
+  async function fileCase(verificationId: string, o: { phone: string; account?: string; simSwapped?: boolean; status?: CaseStatus; at: Date }) {
+    const [v] = await db.select({ landlordId: verification.landlordId }).from(verification).where(eq(verification.id, verificationId));
+    const [r] = await db.insert(viewingReport).values({
+      verificationId, reporterPhoneHash: o.phone, reporterAccountHash: o.account ?? null, locationResult: 'TRUE', category: 'no_show',
+      simSwapped: o.simSwapped ?? null, createdAt: o.at,
+    }).returning();
+    const status = o.status ?? 'ready';
+    const [c] = await db.insert(reportCase).values({
+      reportId: r!.id, landlordId: v!.landlordId, status, decidedAt: status === 'ready' || status === 'awaiting_landlord' ? null : o.at, createdAt: o.at,
+    }).returning();
+    return c!.id;
+  }
+
+  const signsOf = async (caseId: string) => (await caseList(db)).find((c) => c.caseId === caseId)!.signs;
+
+  it('flags a burst', async () => {
+    const ids = await addCases(db, seeded.verificationId, 'money_upfront', 3);
+    const items = await caseList(db);
+    expect(items.map((c) => c.caseId).sort()).toEqual([...ids].sort());
+    for (const c of items) expect(c.signs).toContain('burst');
+  });
+
+  it('no burst when reports are days apart', async () => {
+    const ids = await addCases(db, seeded.verificationId, 'money_upfront', 3);
+    for (const [i, id] of ids.entries()) await db.update(reportCase).set({ createdAt: ago(i) }).where(eq(reportCase.id, id));
+    const items = await caseList(db);
+    expect(items).toHaveLength(3);
+    for (const c of items) expect(c.signs).not.toContain('burst');
+  });
+
+  it('flags SIM change, a busy reporter, an earlier dismissal and a barred reporter', async () => {
+    // Every fixture lands on its own day, so no burst mixes in.
+    const sim = await fileCase(seeded.verificationId, { phone: 'p-sim', simSwapped: true, at: ago(1) });
+
+    const busy = [];
+    for (const [i, at] of [ago(2), ago(3), ago(4)].entries()) {
+      busy.push(await fileCase(i === 0 ? seeded.verificationId : await freshVerification(), { phone: 'p-busy', at }));
+    }
+
+    // The same account, on a new phone, had a case dismissed before.
+    await fileCase(await freshVerification(), { phone: 'p-old', account: 'acc-1', status: 'dismissed', at: ago(6) });
+    const dismissedBefore = await fileCase(seeded.verificationId, { phone: 'p-new', account: 'acc-1', at: ago(5) });
+
+    await db.insert(reporterBar).values({ kind: 'phone', hash: 'p-bar', expiresAt: new Date(Date.now() + 365 * DAY) });
+    const barred = await fileCase(seeded.verificationId, { phone: 'p-bar', at: ago(7) });
+
+    const plain = await fileCase(seeded.verificationId, { phone: 'p-plain', simSwapped: false, at: ago(8) });
+
+    expect(await signsOf(sim)).toEqual(['sim_changed']);
+    for (const id of busy) expect(await signsOf(id)).toEqual(['reporter_many_landlords']);
+    expect(await signsOf(dismissedBefore)).toEqual(['reporter_dismissed_before']);
+    expect(await signsOf(barred)).toEqual(['reporter_barred']);
+    expect(await signsOf(plain)).toEqual([]);
+  });
+
+  it('lists ready before awaiting, newest first, and hides decided cases', async () => {
+    const readyOld = await fileCase(seeded.verificationId, { phone: 'r1', at: ago(3) });
+    const readyNewAt = ago(1);
+    const readyNew = await fileCase(seeded.verificationId, { phone: 'r2', at: readyNewAt });
+    const awaitingOld = await fileCase(seeded.verificationId, { phone: 'r3', status: 'awaiting_landlord', at: ago(5) });
+    const awaitingNew = await fileCase(seeded.verificationId, { phone: 'r4', status: 'awaiting_landlord', at: ago(0) });
+    for (const [i, status] of (['dismissed', 'false_report', 'upheld'] as const).entries()) {
+      await fileCase(seeded.verificationId, { phone: `d${i}`, status, at: ago(10 + i) });
+    }
+
+    const items = await caseList(db);
+    expect(items.map((c) => c.caseId)).toEqual([readyNew, readyOld, awaitingNew, awaitingOld]);
+    expect(items[0]).toEqual({
+      caseId: readyNew,
+      landlordId: seeded.landlordId,
+      status: 'ready',
+      category: 'no_show',
+      createdAt: readyNewAt.toISOString(),
+      locationResult: 'TRUE',
+      listings: [{ site: 'demo', listingId: 'd1', url: 'http://localhost:3000/demo/listing/d1' }],
+      signs: [],
+    });
+    expect(items[2]!.status).toBe('awaiting_landlord');
   });
 });

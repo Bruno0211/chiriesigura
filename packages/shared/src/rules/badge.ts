@@ -12,13 +12,6 @@ export interface BadgeInput {
   listingFar: boolean;
 }
 
-export const AMBER_THRESHOLDS = { money_upfront: 2, no_show: 3, wrong_person: 3 } as const;
-
-export const isWarned = (r: ReportCounts): boolean =>
-  r.money_upfront >= AMBER_THRESHOLDS.money_upfront ||
-  r.no_show >= AMBER_THRESHOLDS.no_show ||
-  r.wrong_person >= AMBER_THRESHOLDS.wrong_person;
-
 /** Spec §6.2 rules, evaluated in order. */
 export function decideBadge(i: BadgeInput): BadgeStatus {
   if (!i.code) return 'grey_unverified';

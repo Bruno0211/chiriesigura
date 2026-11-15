@@ -46,6 +46,10 @@ export interface ReportResponse {
   counts?: ReportCounts;
 }
 
+// POST /api/review (team only) → { ok: true } | 404 | 409 { error: 'not_ready' | 'already_decided' }
+export type ReviewAction = 'dismiss' | 'false_report' | 'uphold' | 'ban';
+export interface ReviewRequest { caseId: string; action: ReviewAction }
+
 // Number Verification:
 // GET /api/nv/start?phone=<raw>&next=<path>  → 302
 // GET /api/nv/callback → 302 to next with ?nv=ok|fail|wifi

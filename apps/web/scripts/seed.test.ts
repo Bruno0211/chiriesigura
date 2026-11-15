@@ -5,7 +5,8 @@ import type { Db } from '@/lib/db';
 import { landlord, listing, reportCase, verification, viewingReport } from '@/lib/db/schema';
 import { makeTestDb } from '@/lib/db/test-db';
 import { identityHashes, phoneHash } from '@/lib/hash';
-import { banPerson, findVerificationByCode, holdList, isBannedIdentity } from '@/lib/queries';
+import { caseList, decideCase } from '@/lib/cases';
+import { findVerificationByCode, isBannedIdentity } from '@/lib/queries';
 import { DEMO_LISTINGS } from '@/lib/demo-listings';
 import { seed } from './seed';
 
@@ -80,7 +81,7 @@ describe('seed', () => {
     expect(await db.select().from(listing).where(and(eq(listing.site, 'demo'), eq(listing.siteListingId, 'd4')))).toHaveLength(0);
   });
 
-  it('seeds the scammer on hold; a ban makes d5 red_banned and blocks the same ID; reseeding resets it', async () => {
+  it("seeds the scammer's three open cases; a ban makes d5 red_banned and blocks the same ID; reseeding resets it", async () => {
     const d5 = async () => {
       const q = new URLSearchParams({ site: 'demo', listingId: 'd5', code: 'VC-BAN5', phone: '+40 700 000 009' });
       return ((await (await GET(new Request(`http://localhost:3000/api/check?${q}`))).json()) as { status: string }).status;
@@ -91,16 +92,19 @@ describe('seed', () => {
     await seed(db);
     await seed(db);
     expect(await d5()).toBe('green');
-    const held = await holdList(db);
-    expect(held).toHaveLength(1);
-    expect(held[0]!.reports.money_upfront).toBe(3);
+    const scammer = (await findVerificationByCode(db, 'VC-BAN5'))!.landlordId;
+    const scammerCases = async () => (await caseList(db)).filter((c) => c.landlordId === scammer);
+    const cases = await scammerCases();
+    expect(cases).toHaveLength(3);
+    expect(cases.map((c) => c.category)).toEqual(['money_upfront', 'money_upfront', 'money_upfront']);
 
-    await banPerson(db, held[0]!.landlordId);
+    expect(await decideCase(db, cases[0]!.caseId, 'ban', 'team@x.ro')).toBe('ok');
     expect(await d5()).toBe('red_banned');
     expect(await isBannedIdentity(db, mihai)).toBe(true);
 
     await seed(db);
     expect(await d5()).toBe('green');
     expect(await isBannedIdentity(db, mihai)).toBe(false);
+    expect(await scammerCases()).toHaveLength(3);
   });
 });

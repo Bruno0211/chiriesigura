@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptyCounts, type ListingRef, type ReportCounts } from '../types';
-import { AMBER_THRESHOLDS, badgeLabel, decideBadge, reportLine, UNDER_REVIEW_TEXT, type BadgeInput } from './badge';
+import { badgeLabel, decideBadge, reportLine, UNDER_REVIEW_TEXT, type BadgeInput } from './badge';
 
 const L1: ListingRef = { site: 'demo', listingId: 'd1' };
 const L2: ListingRef = { site: 'demo', listingId: 'd2' };
@@ -54,9 +54,6 @@ describe('decideBadge (spec §6.2, in order)', () => {
   it('6: no code → not verified, parseable listing or not', () => {
     expect(decideBadge(input({ code: null }))).toBe('grey_unverified');
     expect(decideBadge(input({ code: null, listing: null }))).toBe('grey_unverified');
-  });
-  it('exposes the spec thresholds', () => {
-    expect(AMBER_THRESHOLDS).toEqual({ money_upfront: 2, no_show: 3, wrong_person: 3 });
   });
 });
 
