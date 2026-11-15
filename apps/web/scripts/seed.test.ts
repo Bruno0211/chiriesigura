@@ -8,6 +8,7 @@ import { identityHashes, phoneHash } from '@/lib/hash';
 import { caseList, decideCase } from '@/lib/cases';
 import { findVerificationByCode, isBannedIdentity } from '@/lib/queries';
 import { DEMO_LISTINGS } from '@/lib/demo-listings';
+import { savedDescription, saveDescription } from '@/lib/demo-edits';
 import { seed } from './seed';
 
 vi.mock('@/lib/auth0', () => ({ isSignedIn: vi.fn(async () => true) }));
@@ -58,6 +59,13 @@ describe('seed', () => {
     expect(cases.length).toBeGreaterThan(0);
     expect(cases.filter((c) => c.status !== 'ready')).toEqual([]);
     expect(await db.select().from(reporterBar)).toEqual([]);
+  });
+
+  it("reseeding drops the landlord's edit to d4, so it shows its built-in text again", async () => {
+    await seed(db);
+    await saveDescription(db, 'd4', ['x']);
+    await seed(db);
+    expect(await savedDescription(db, 'd4')).toBeNull();
   });
 
   it('d1 starts green with two all-good reports and no note', async () => {

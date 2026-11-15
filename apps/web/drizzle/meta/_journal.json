@@ -43,6 +43,13 @@
       "when": 1794735008168,
       "tag": "0005_premium_runaways",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794739637052,
+      "tag": "0006_cultured_black_panther",
+      "breakpoints": true
     }
   ]
 }

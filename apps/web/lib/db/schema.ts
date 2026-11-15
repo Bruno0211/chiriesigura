@@ -70,3 +70,10 @@ export const reporterBar = pgTable('reporter_bar', {
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: createdAt(),
 }, (t) => [unique('bar_once').on(t.kind, t.hash)]);
+
+// The landlord's own description for an editable /demo listing, lines joined by "\n". The seed deletes every row.
+export const demoListingEdit = pgTable('demo_listing_edit', {
+  listingId: text('listing_id').primaryKey(),
+  description: text('description').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});

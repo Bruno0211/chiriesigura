@@ -1,6 +1,6 @@
 import { and, eq, inArray, ne, notInArray, or } from 'drizzle-orm';
 import { getDb, type Db } from '@/lib/db';
-import { landlord, listing, reporterBar, reportCase, verification, viewingReport } from '@/lib/db/schema';
+import { demoListingEdit, landlord, listing, reporterBar, reportCase, verification, viewingReport } from '@/lib/db/schema';
 import { DEMO_ADDRESSES, DEMO_APARTMENT } from '@/lib/geocode';
 import { identityHashes, phoneHash } from '@/lib/hash';
 
@@ -38,6 +38,8 @@ export async function seed(db: Db): Promise<void> {
   // The student's report and the landlord's d4 registration.
   await db.delete(viewingReport).where(eq(viewingReport.reporterPhoneHash, phoneHash(LIVE_REPORTER)));
   await db.delete(listing).where(and(eq(listing.site, 'demo'), eq(listing.siteListingId, 'd4')));
+  // The landlord's edit to d4 (the pasted code line): every rehearsal starts from the built-in text.
+  await db.delete(demoListingEdit);
 
   const [l] = await db
     .insert(landlord)
