@@ -36,8 +36,13 @@ export default function PrivacyPage() {
               <li><strong>The apartment address</strong>: you publish it in your listing anyway. It is never shown in the extension.</li>
               <li><strong>Your listing links</strong>, so the extension can tell your listings from copies.</li>
               <li>
-                <strong>Viewing reports</strong>: the category picked, when, and a one-way hash of the reporter&apos;s number so
-                each phone reports once.
+                <strong>Viewing reports</strong>: the category picked, when, one-way hashes of the reporter&apos;s number and
+                sign-in, and whether the SIM changed in the last 30 days, so each phone reports once and our team can spot
+                fake reports.
+              </li>
+              <li>
+                <strong>False-report bars</strong>: one-way hashes of a reporter&apos;s number and sign-in, kept 2 years when
+                our team finds a report was false.
               </li>
             </ul>
           </div>
@@ -95,7 +100,8 @@ export default function PrivacyPage() {
               remove it.
             </p>
             <p>
-              When verified viewers report a landlord repeatedly, our team reviews the reports and may ban that person for
+              Problem reports never change a listing on their own. Our team reviews each one; only then can a listing show a
+              warning or a ban. When verified viewers report a landlord repeatedly, our team may ban that person for
               life: their listings show as banned, and verifying again with any phone number is refused. If you were refused
               and think it is a mistake, email us.
             </p>
