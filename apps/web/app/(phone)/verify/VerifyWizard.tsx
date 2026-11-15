@@ -672,6 +672,17 @@ function DoneScreen({
               </span>
               <span className={s.itemTitle}>{SITE_NAME[a.site]}</span>
               <span className={s.url}>ID {a.listingId}</span>
+              {a.site === 'demo' && (
+                // A new tab, so the code plate stays here while the landlord pastes the line on the listing.
+                <a
+                  href={`/demo/listing/${a.listingId}?edit=1`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${s.textLink} ${s.itemLink}`}
+                >
+                  Open the listing to add the line
+                </a>
+              )}
             </li>
           ))}
         </ul>

@@ -184,6 +184,20 @@ describe('VerifyWizard', () => {
     expect(fetchMock.mock.calls.map((c) => c[0])).toEqual(['/api/verify/location', '/api/verify/listings']);
   });
 
+  it('the done screen links each demo listing to its editor in a new tab, and no other site', () => {
+    sessionStorage.setItem(
+      'cs.verify',
+      JSON.stringify({ ...DONE, accepted: [{ site: 'demo', listingId: 'd1' }, { site: 'olx', listingId: 'IDabc12' }] }),
+    );
+    render(<VerifyWizard />);
+
+    const links = screen.getAllByRole('link', { name: 'Open the listing to add the line' });
+    expect(links).toHaveLength(1);
+    expect(links[0]!.getAttribute('href')).toBe('/demo/listing/d1?edit=1');
+    expect(links[0]!.getAttribute('target')).toBe('_blank');
+    expect(within(screen.getByText('OLX').closest('li')!).queryByRole('link')).toBeNull();
+  });
+
   it('a refused listings submission sends the landlord back to the location check', async () => {
     sessionStorage.setItem('cs.verify', JSON.stringify({ ...DONE, stage: 'listings' }));
     mockApi({ '/api/verify/listings': () => ({ status: 409, json: { error: 'location_not_verified' } }) });

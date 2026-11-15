@@ -1013,6 +1013,14 @@ textarea.input {
   color: var(--fail);
 }
 
+/* A demo listing's link to its editor, under the ID. */
+.itemLink {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 4px;
+  padding: 6px 0;
+}
+
 /* A state in words on a pill, in its own colour. */
 .state {
   display: inline-flex;

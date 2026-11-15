@@ -2,7 +2,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
+import { getDb } from '@/lib/db';
+import { EDITABLE_DEMO_LISTINGS, savedDescription } from '@/lib/demo-edits';
 import { DEMO_LISTINGS, SIMILAR } from '@/lib/demo-listings';
+import { Description, EditListing } from '../../EditListing';
 import { facts, pricePerSquareMeter, propertyType, sized, splitPrice, type FactKind } from '../../format';
 import { CameraIcon, CheckIcon, ChevronIcon, ClockIcon, FactIcon, PhoneIcon, PinIcon } from '../../icons';
 import { MessageButton, ShareButton } from '../../ListingActions';
@@ -35,6 +40,18 @@ const specValue = (kind: FactKind, text: string): string =>
 function mapUrl({ lat, lng }: { lat: number; lng: number }): string {
   const bbox = [lng - 0.012, lat - 0.006, lng + 0.012, lat + 0.006].map((n) => n.toFixed(4)).join(',');
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+}
+
+/** Read per request: the landlord's saved edit, else the built-in text. A database error still shows the built-in text. */
+async function SavedDescription({ listingId, builtIn }: { listingId: string; builtIn: string[] }) {
+  await connection();
+  let saved: string[] | null = null;
+  try {
+    saved = await savedDescription(getDb(), listingId);
+  } catch (e) {
+    console.error(`Could not read the edit to demo listing ${listingId}; showing its built-in description.`, e);
+  }
+  return <EditListing listingId={listingId} initial={saved ?? builtIn} />;
 }
 
 export default async function DemoListingPage({ params }: { params: Params }) {
@@ -136,11 +153,14 @@ export default async function DemoListingPage({ params }: { params: Params }) {
             <h2 id="desc-title" className={s.h2}>
               Descriere
             </h2>
-            <div className={s.description} data-testid="description">
-              {l.description.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-            </div>
+            {EDITABLE_DEMO_LISTINGS.includes(id) ? (
+              // The page stays prerendered with the built-in text; only the saved edit waits for the request.
+              <Suspense fallback={<EditListing listingId={id} initial={l.description} />}>
+                <SavedDescription listingId={id} builtIn={l.description} />
+              </Suspense>
+            ) : (
+              <Description lines={l.description} />
+            )}
           </section>
 
           <section className={s.panel} aria-labelledby="specs-title">
