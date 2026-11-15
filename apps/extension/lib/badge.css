@@ -208,12 +208,6 @@ button.head:hover .zone {
   --tone-ink: var(--ok-ink);
 }
 
-.status[data-tone='warn'] {
-  --tone: var(--warn);
-  --tone-bg: var(--warn-bg);
-  --tone-ink: var(--warn);
-}
-
 .status[data-tone='fail'] {
   --tone: var(--fail);
   --tone-bg: var(--fail-bg);

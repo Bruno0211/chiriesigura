@@ -1,5 +1,5 @@
 import { and, between, desc, eq, gt, inArray, ne, or, sql } from 'drizzle-orm';
-import { emptyCounts, REPORT_CATEGORIES, type ReportCategory, type ReportCounts, type ReviewAction } from '@cs/shared';
+import { emptyCounts, type ReportCategory, type ReportCounts, type ReviewAction } from '@cs/shared';
 import type { Db } from './db';
 import { landlord, listing, reportCase, reporterBar, verification, viewingReport } from './db/schema';
 import { banPerson } from './queries';

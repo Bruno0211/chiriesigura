@@ -100,8 +100,8 @@ export default function PrivacyPage() {
               remove it.
             </p>
             <p>
-              Problem reports never change a listing on their own. Our team reviews each one; only a ban by our team
-              changes a listing. When our team confirms a report, it may ban that person for
+              Problem reports never change your listings&apos; verdict on their own: while our team reviews one, your
+              listings show a note that a report is under review. Only a ban by our team changes the verdict. When our team confirms a report, it may ban that person for
               life: their listings show as banned, and verifying again with any phone number is refused. If you were refused
               and think it is a mistake, email us.
             </p>

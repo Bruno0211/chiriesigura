@@ -16,6 +16,7 @@ describe('isCheckResponse', () => {
     ['an HTML error page parsed as nothing', null],
     ['a JSON error body', { error: 'Internal Server Error' }],
     ['an unknown status', { status: 'blue', label: 'Verified' }],
+    ['the retired amber status (a cached or older-server answer)', { status: 'amber', label: 'x' }],
     ['a status without a label', { status: 'green' }],
   ])('rejects %s', (_, body) => {
     expect(isCheckResponse(body)).toBe(false);
