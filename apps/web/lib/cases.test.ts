@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { Db } from './db';
 import { landlord, reportCase, reporterBar, verification, viewingReport } from './db/schema';
 import { makeTestDb } from './db/test-db';
-import { caseList, landlordStanding, personLandlordIds, type CaseStatus } from './cases';
+import { caseList, decideCase, landlordStanding, personLandlordIds, type CaseStatus } from './cases';
 import { addCases, addReports, seedVerified } from './test-seed';
 import { phoneHash } from './hash';
 
@@ -164,5 +164,36 @@ describe('caseList', () => {
       signs: [],
     });
     expect(items[2]!.status).toBe('awaiting_landlord');
+  });
+});
+
+describe('decideCase', () => {
+  it('a second ban on the same person keeps the first ban time', async () => {
+    const [first, second] = (await addCases(db, seeded.verificationId, 'money_upfront', 2)) as [string, string];
+    const t1 = new Date('2026-11-15T10:00:00Z');
+    expect(await decideCase(db, first, 'ban', 'team@x.ro', t1)).toBe('ok');
+    const banned = (await db.select().from(landlord).where(eq(landlord.id, seeded.landlordId)))[0]!.bannedAt;
+    expect(banned).not.toBeNull();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(await decideCase(db, second, 'ban', 'team@x.ro', new Date(t1.getTime() + 60_000))).toBe('ok');
+    const after = (await db.select().from(landlord).where(eq(landlord.id, seeded.landlordId)))[0]!.bannedAt;
+    expect(after!.getTime()).toBe(banned!.getTime());
+  });
+
+  it("marking a report false flags the same reporter's other open cases as barred", async () => {
+    const other = await secondLandlord(null);
+    const reportFor = async (verificationId: string, landlordId: string) => {
+      const [r] = await db.insert(viewingReport).values({
+        verificationId, reporterPhoneHash: 'same-phone', locationResult: 'TRUE', category: 'no_show',
+      }).returning();
+      const [c] = await db.insert(reportCase).values({ reportId: r!.id, landlordId, status: 'ready', createdAt: new Date(Date.now() - (landlordId === seeded.landlordId ? 5 : 9) * DAY) }).returning();
+      return c!.id;
+    };
+    const a = await reportFor(seeded.verificationId, seeded.landlordId);
+    const b = await reportFor(other.verificationId, other.landlordId);
+    expect(await decideCase(db, a, 'false_report', 'team@x.ro')).toBe('ok');
+    const items = await caseList(db);
+    expect(items.map((c) => c.caseId)).toEqual([b]);
+    expect(items[0]!.signs).toContain('reporter_barred');
   });
 });
