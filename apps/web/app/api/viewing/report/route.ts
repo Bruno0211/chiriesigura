@@ -8,6 +8,8 @@ import { accountHash, phoneHash } from '@/lib/hash';
 import { network } from '@/lib/network';
 import { readNv } from '@/lib/nv-session';
 
+/** How long a report waits for the operator's SIM-swap answer before filing without it. */
+const SIM_SWAP_TIMEOUT_MS = 3000;
 const reply = (status: number, body: ReportResponse) => Response.json(body, { status });
 const isUniqueViolation = (e: unknown) => /unique|duplicate/i.test(String((e as { cause?: unknown })?.cause ?? e));
 
@@ -41,8 +43,12 @@ export async function POST(req: Request) {
   if (loc === null) return reply(503, { ok: false });
   if (loc !== 'TRUE' && loc !== 'PARTIAL') return reply(403, { ok: false, reason: 'not_at_address' });
 
-  // A failed operator call must not block the renter; the warning sign just stays unknown.
-  const simSwapped = await network().simSwapped(nv.e164, 720).catch(() => null);
+  // A failed or hung operator call must not block the renter; the warning sign just stays unknown.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const simSwapped = await Promise.race([
+    network().simSwapped(nv.e164, 720).catch(() => null),
+    new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), SIM_SWAP_TIMEOUT_MS); }),
+  ]).finally(() => clearTimeout(timer));
 
   try {
     await db.transaction(async (tx) => {

@@ -101,6 +101,21 @@ describe('POST /api/viewing/report', () => {
     expect((await db.select().from(viewingReport))[0]!.simSwapped).toBeNull();
   });
 
+  it('a hung SIM-swap call times out after 3 seconds and the report is still filed', async () => {
+    const spy = vi.spyOn(mockNetwork, 'simSwapped').mockImplementationOnce(() => new Promise<boolean>(() => {}));
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const pending = report(ok('no_show'), '+40711111111');
+      await vi.waitFor(() => expect(spy).toHaveBeenCalled());
+      await vi.advanceTimersByTimeAsync(3000);
+      const res = await pending;
+      expect(res.status).toBe(200);
+      expect((await db.select().from(viewingReport))[0]!.simSwapped).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('a double tap on a problem report makes exactly one case', async () => {
     await Promise.all([report(ok('no_show'), '+40711111112'), report(ok('no_show'), '+40711111112')]);
     expect(await db.select().from(viewingReport)).toHaveLength(1);
